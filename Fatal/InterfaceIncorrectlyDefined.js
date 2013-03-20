@@ -1,0 +1,5 @@
+;(function(undefined){
+	
+	InterfaceIncorrectlyDefinedFatal = function(){};
+	
+})();
