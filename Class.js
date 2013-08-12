@@ -209,10 +209,80 @@
 		
 		// Put properties in from definition
 		// Put methods in from definition
+		toInspectDefinition:
 		for (var i in definition) {
 			
 			var propName = i;
 			var scope;
+			
+			if (typeof definition[i] == 'object') {
+				
+				for (var j in definition[i]) {
+					
+					if (j != 'getter' && j != 'setter' && j != 'value') break;
+					
+					if (typeof definition[i].getter == 'undefined'
+					&&	typeof definition[i].setter == 'undefined') break;
+					
+					if (i.substring(0, 8) == 'private:'
+					||	i.substring(0, 10) == 'protected:'
+					||	i.substring(0, 7) == 'public:') {
+						throw new InvalidSyntaxFatal();
+					}
+					
+					if (Object.prototype.toString.apply(definition[i].getter) != '[object Array]') {
+						definition[i].getter = [definition[i].getter, true, true];
+					} else if (definition[i].getter.length == 2) {
+						definition[i].getter[2] = definition[i].getter[1];
+					}
+					
+					if (Object.prototype.toString.apply(definition[i].setter) != '[object Array]') {
+						definition[i].setter = [definition[i].setter, true, true];
+					} else if (definition[i].setter.length == 2) {
+						definition[i].setter[2] = definition[i].setter[1];
+					}
+					
+					
+					if (typeof definition[i].getter[0] != 'boolean'
+					&&	typeof definition[i].getter[0] != 'function'
+					&&	typeof definition[i].getter[0] != 'undefined') {
+						throw new InvalidSyntaxFatal();
+					}
+					
+					if (typeof definition[i].setter[0] != 'boolean'
+					&&	typeof definition[i].setter[0] != 'function'
+					&&	typeof definition[i].setter[0] != 'undefined') {
+						throw new InvalidSyntaxFatal();
+					}
+					
+					scope = new Class.Scope(Class.Scope.PRIVATE)
+					
+					namespace[className].properties[propName] = new Class.Property(
+						propName,
+						definition[i].value,
+						scope,
+						(typeof definition[i].getter[0] == 'undefined'
+						|| definition[i].getter[0] === true)
+							? function(value){ return value }
+							: definition[i].getter[0],
+						(typeof definition[i].setter[0] == 'undefined'
+						|| definition[i].setter[0] === true)
+							? function(value){ return value }
+							: definition[i].setter[0],
+						definition[i].getter[1],
+						definition[i].getter[2],
+						definition[i].setter[1],
+						definition[i].setter[2]
+					);
+					
+					scope.parent = namespace[className].properties[propName];
+					namespace[className].properties[propName].originalValue = definition[i].value;
+					
+					continue toInspectDefinition;
+					
+				}
+				
+			}
 			
 			if (propName.substring(0, 8) == 'private:') {
 				propName = propName.substring(8);
@@ -262,7 +332,21 @@
 			this,
 			arguments.callee.caller
 		);
-		property.scope.checkCallingFunction(arguments.callee.caller);
+		if (typeof property.getter == 'function'
+		||	typeof property.setter == 'boolean') {
+			if (arguments.callee.caller.parentType == this.type) {
+				if (property.parent.type == this.type && !property.ownerUsesGetter) {
+					return property.value;
+				}
+				if (property.parent.type != this.type && !property.childUsesGetter) {
+					return property.value;
+				}
+			}
+			if (property.getter === false) throw new ScopeFatal();
+			return property.getter(property.value);
+		} else {
+			property.scope.checkCallingFunction(arguments.callee.caller);
+		}
 		return property.value;
 	}
 	
@@ -275,8 +359,27 @@
 			this,
 			arguments.callee.caller
 		);
-		property.value = value;
-		this.propertyValues[propertyName] = value;
+		if (typeof property.setter == 'function'
+		||	typeof property.setter == 'boolean') {
+			if (arguments.callee.caller.parentType == this.type) {
+				if (property.parent.type == this.type && !property.ownerUsesSetter) {
+					property.value = value;
+					this.propertyValues[propertyName] = property.value;
+					return;
+				}
+				if (property.parent.type != this.type && !property.childUsesSetter) {
+					property.value = value;
+					this.propertyValues[propertyName] = property.value;
+					return;
+				}
+			}
+			if (property.setter === false) throw new ScopeFatal('Cannot access private property');
+			property.value = property.setter(value, property.value);
+			this.propertyValues[propertyName] = property.value;
+		} else {
+			property.value = value;
+			this.propertyValues[propertyName] = property.value;
+		}
 	}
 	
 	Class.prototype.call = function(methodName)
