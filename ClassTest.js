@@ -720,3 +720,391 @@ test('Child objects inherit parent toString method', function(){
 	var myChild = new MyChild();
 	ok(myChild.toString() == '[object MyObject]');
 });
+
+test('Property can be defined with getter method', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			getter: function(){
+				return 'My Value';
+			}
+		}
+	});
+	var myObject = new MyClass();
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Property can be defined with getter method and default value', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 'My Value',
+			getter: function(currentValue){
+				return currentValue;
+			}
+		}
+	});
+	var myObject = new MyClass();
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Property getter can be set to true', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 'My Value',
+			getter: true
+		}
+	});
+	var myObject = new MyClass();
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Property value cannot be accessed if getter set to false', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 'My Value',
+			getter: false
+		}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.get('myProperty');
+	}, ScopeFatal);
+});
+
+test('Property getter defaults to true', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 'My Value',
+			setter: function(){}
+		}
+	});
+	var myObject = new MyClass();
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Property can be defined with setter method', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			setter: function(value){
+				return value;
+			}
+		}
+	});
+	var myObject = new MyClass();
+	myObject.set('myProperty', 'My Value');
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Property setter can be set to true', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			setter: true
+		}
+	});
+	var myObject = new MyClass();
+	myObject.set('myProperty', 'My Value');
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Property value cannot be set if setter set to false', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			setter: false
+		}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.set('myProperty', 'My Value');
+	}, ScopeFatal);
+});
+
+test('Property setter defaults to true', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			getter: true
+		}
+	});
+	var myObject = new MyClass();
+	myObject.set('myProperty', 'My Value');
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Property setter can access current value', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			setter: function(newValue, currentValue){
+				if (!currentValue) return newValue;
+				return currentValue + ', ' + newValue;
+			}
+		}
+	});
+	var myObject = new MyClass();
+	myObject.set('myProperty', 'first');
+	myObject.set('myProperty', 'second');
+	ok(myObject.get('myProperty') == 'first, second');
+});
+
+test('Property can be defined with getter and setter methods', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			getter: function(currentValue){
+				return currentValue;
+			},
+			setter: function(newValue, currentValue){
+				return newValue + ' - edited';
+			}
+		}
+	});
+	var myObject = new MyClass();
+	myObject.set('myProperty', 'My Value');
+	ok(myObject.get('myProperty') == 'My Value - edited');
+});
+
+test('Object not treated as property if no getter or setter are supplied', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 'My Value'
+		}
+	});
+	var myObject = new MyClass();
+	ok('My Value' === myObject.get('myProperty').value);
+});
+
+test('Non boolean or function getter raises error', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			myProperty: {
+				getter: 'Invalid'
+			}
+		});
+	}, InvalidSyntaxFatal);
+});
+
+test('Non boolean or function setter raises error', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			myProperty: {
+				setter: 'Invalid'
+			}
+		});
+	}, InvalidSyntaxFatal);
+});
+
+test('Specifying scope on property raises error', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			'public:myProperty': {
+				getter: true
+			}
+		});
+	}, InvalidSyntaxFatal);
+	raises(function(){
+		Class.define('MyClass', {
+			'protected:myProperty': {
+				getter: true
+			}
+		});
+	}, InvalidSyntaxFatal);
+	raises(function(){
+		Class.define('MyClass', {
+			'private:myProperty': {
+				getter: true
+			}
+		});
+	}, InvalidSyntaxFatal);
+});
+
+test('Parent object can get property without using getter', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 'My Value',
+			getter: [function(){
+				return null;
+			}, false]
+		},
+		getterMethod: function(){
+			return this.get('myProperty');
+		}
+	});
+	var myObject = new MyClass();
+	ok(myObject.getterMethod() == 'My Value');
+});
+
+test('Parent object can get property when getter is false', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 'My Value',
+			getter: [false, false]
+		},
+		getterMethod: function(){
+			return this.get('myProperty');
+		}
+	});
+	var myObject = new MyClass();
+	ok(myObject.getterMethod() == 'My Value');
+});
+
+test('Inheriting object can get property without using getter', function(){
+	Class.define('MyParent', {
+		myProperty: {
+			value: 'My Value',
+			getter: [function(){
+				return null;
+			}, false]
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		getterMethod: function(){
+			return this.get('myProperty');
+		}
+	});
+	var myObject = new MyChild();
+	ok(myObject.getterMethod() == 'My Value');
+});
+
+test('Inheriting object can use getter whilst parent object does not', function(){
+	Class.define('MyParent', {
+		myProperty: {
+			value: 'Direct Value',
+			getter: [function(){
+				return 'Getter Value';
+			}, false, true]
+		},
+		parentGetterMethod: function(){
+			return this.get('myProperty');
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		childGetterMethod: function(){
+			return this.get('myProperty');
+		}
+	});
+	var myParent = new MyParent();
+	ok(myParent.parentGetterMethod() == 'Direct Value');
+	var myChild = new MyChild();
+	ok(myChild.childGetterMethod() == 'Getter Value');
+});
+
+test('Parent object can use getter whilst inheriting object does not', function(){
+	Class.define('MyParent', {
+		myProperty: {
+			value: 'Direct Value',
+			getter: [function(){
+				return 'Getter Value';
+			}, true, false]
+		},
+		parentGetterMethod: function(){
+			return this.get('myProperty');
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		childGetterMethod: function(){
+			return this.get('myProperty');
+		}
+	});
+	var myParent = new MyParent();
+	ok(myParent.parentGetterMethod() == 'Getter Value');
+	var myChild = new MyChild();
+	ok(myChild.childGetterMethod() == 'Direct Value');
+});
+
+test('Parent object can set property without using setter', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			setter: [function(){
+				return null;
+			}, false]
+		},
+		setterMethod: function(value){
+			this.set('myProperty', value);
+		}
+	});
+	var myObject = new MyClass();
+	myObject.setterMethod('My Value');
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Parent object can set property when setter is false', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			setter: [false, false]
+		},
+		setterMethod: function(value){
+			this.set('myProperty', value);
+		}
+	});
+	var myObject = new MyClass();
+	myObject.setterMethod('My Value');
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Inheriting object can set property without using setter', function(){
+	Class.define('MyParent', {
+		myProperty: {
+			setter: [function(){
+				return null;
+			}, false]
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		setterMethod: function(value){
+			this.set('myProperty', value);
+		}
+	});
+	var myObject = new MyChild();
+	myObject.setterMethod('My Value');
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Inheriting object can use setter whilst parent object does not', function(){
+	Class.define('MyParent', {
+		myProperty: {
+			setter: [function(){
+				return 'Setter Value';
+			}, false, true]
+		},
+		parentSetterMethod: function(value){
+			this.set('myProperty', value);
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		childSetterMethod: function(value){
+			this.set('myProperty', value);
+		}
+	});
+	var myParent = new MyParent();
+	myParent.parentSetterMethod('Parent Value');
+	ok(myParent.get('myProperty') == 'Parent Value');
+	var myChild = new MyChild();
+	myChild.childSetterMethod('Child Value');
+	ok(myChild.get('myProperty') == 'Setter Value');
+});
+
+test('Parent object can use setter whilst inheriting object does not', function(){
+	Class.define('MyParent', {
+		myProperty: {
+			setter: [function(){
+				return 'Setter Value';
+			}, true, false]
+		},
+		parentSetterMethod: function(value){
+			this.set('myProperty', value);
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		childSetterMethod: function(value){
+			this.set('myProperty', value);
+		}
+	});
+	var myParent = new MyParent();
+	myParent.parentSetterMethod('Parent Value');
+	ok(myParent.get('myProperty') == 'Setter Value');
+	var myChild = new MyChild();
+	myChild.childSetterMethod('Child Value');
+	ok(myChild.get('myProperty') == 'Child Value');
+});
