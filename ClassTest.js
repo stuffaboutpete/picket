@@ -720,3 +720,280 @@ test('Child objects inherit parent toString method', function(){
 	var myChild = new MyChild();
 	ok(myChild.toString() == '[object MyObject]');
 });
+
+test('Class can require a file', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-5ft78s.js'
+	});
+	ok(true);
+});
+
+test('Required file is included in the DOM on class declaration', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-7dgh20.js'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 14) == 'File-7dgh20.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+asyncTest('Required file is included before class is instantiated', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-s8ay12.js',
+		construct: function(){
+			ok(typeof s8ay12 != 'undefined');
+			start();
+		}
+	});
+	var myObject = new MyClass();
+});
+
+test('File will not be re-included if required multiple times', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-3fb5gb.js'
+	});
+	Class.define('MyOtherClass', {
+		Require: 'includes/File-3fb5gb.js'
+	});
+	var count = 0;
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 14) == 'File-3fb5gb.js') {
+			count++
+		}
+	}
+	ok(count == 1);
+});
+
+test('Multiple required files are included in the DOM on class declaration', function(){
+	Class.define('MyClass', {
+		Require: [
+			'includes/File-p9s8ch.js',
+			'includes/File-vdf5v8.js'
+		]
+	});
+	var p9s8chExists = false;
+	var vdf5v8Exists = false;
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 14) == 'File-p9s8ch.js') {
+			p9s8chExists = true;
+		}
+		if (script.substr(script.length - 14) == 'File-vdf5v8.js') {
+			vdf5v8Exists = true;
+		}
+	}
+	ok(p9s8chExists && vdf5v8Exists);
+});
+
+/*test('CSS file is included in the DOM on class declaration', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-cd7hsa.css'
+	});
+	var links = document.getElementsByTagName('link');
+	delete links.length;
+	for (var i in links) {
+		if (!links.hasOwnProperty(i)) continue;
+		if (links[i].rel != 'stylesheet') continue;
+		var link = links[i].href;
+		if (link.substr(link.length - 15) == 'File-cd7hsa.css') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('JPEG file is included in the DOM on class declaration', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-asedi8.jpg'
+	});
+	var images = document.getElementsByTagName('img');
+	delete images.length;
+	for (var i in images) {
+		if (!images.hasOwnProperty(i)) continue;
+		var image = images[i].src;
+		if (image.substr(image.length - 15) == 'File-asedi8.jpg') {
+			ok(true);
+			return;
+		}
+	}
+});*/
+
+test('Class can be required', function(){
+	Class.define('MyClass', {
+		Require: 'My.Test.sd8uds'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 17) == 'My/Test/sd8uds.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Folder pattern matching can be set up for required classes', function(){
+	Class.addClassAutoloadPattern('Test', 'subfolder');
+	Class.define('MyClass', {
+		Require: 'Test.p9c88c'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 19) == 'subfolder/p9c88c.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Multiple folder patterns can be set up for required classes', function(){
+	Class.addClassAutoloadPattern('Test', 'subfolder');
+	Class.addClassAutoloadPattern('Test.OtherTest', 'other/subfolder');
+	Class.define('MyClass', {
+		Require: [
+			'Test.d46fvb',
+			'Test.OtherTest.Example.ch732m'
+		]
+	});
+	var d46fvbExists = false;
+	var ch732mExists = false;
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 19) == 'subfolder/d46fvb.js') {
+			d46fvbExists = true;
+		}
+		if (script.substr(script.length - 33) == 'other/subfolder/Example/ch732m.js') {
+			ch732mExists = true;
+		}
+	}
+	ok(d46fvbExists && ch732mExists);
+});
+
+test('Longest matching pattern is used to include class', function(){
+	Class.addClassAutoloadPattern('My', 'folder1');
+	Class.addClassAutoloadPattern('My.Test.Class', 'folder2');
+	Class.addClassAutoloadPattern('My.Test', 'folder3');
+	Class.define('MyClass', {
+		Require: 'My.Test.Class.4rfc8u'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 17) == 'folder2/4rfc8u.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Folder pattern matching can be set up for required files', function(){
+	Class.addFolderAutoloadPattern('Test', 'subfolder');
+	Class.define('MyClass', {
+		Require: 'Test/4fcf9a.js'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 19) == 'subfolder/4fcf9a.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Multiple folder patterns can be set up for required files', function(){
+	Class.addFolderAutoloadPattern('Test', 'subfolder');
+	Class.addFolderAutoloadPattern('Test/OtherTest', 'other/subfolder');
+	Class.define('MyClass', {
+		Require: [
+			'Test/f54dh4.js',
+			'Test/OtherTest/Example/gpodlk.js'
+		]
+	});
+	var f54dh4Exists = false;
+	var gpodlkExists = false;
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 19) == 'subfolder/f54dh4.js') {
+			f54dh4Exists = true;
+		}
+		if (script.substr(script.length - 33) == 'other/subfolder/Example/gpodlk.js') {
+			gpodlkExists = true;
+		}
+	}
+	ok(f54dh4Exists && gpodlkExists);
+});
+
+test('Longest matching pattern is used to include file', function(){
+	Class.addFolderAutoloadPattern('My', 'folder1');
+	Class.addFolderAutoloadPattern('My/Test/Script', 'folder2');
+	Class.addFolderAutoloadPattern('My/Test', 'folder3');
+	Class.define('MyClass', {
+		Require: 'My/Test/Script/ftr56h.js'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 17) == 'folder2/ftr56h.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Loaded classes can be declared and will not be auto loaded in future', function(){
+	Class.registerLoadedClass('Pre.Loaded.Class.3fg9xh');
+	Class.define('MyClass', {
+		Require: 'Pre.Loaded.Class.3fg9xh'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 14) == 'Pre/Loaded/Class/3fg9xh.js') {
+			ok(false);
+			return;
+		}
+	}
+	ok(true);
+});
+
+/**
+ * @todo...
+ * 
+ * Handle failures?
+ * Ensure delayed methods are run in order
+ * Ensure leading and trailing slashes in folder patterns are handled
+ */
