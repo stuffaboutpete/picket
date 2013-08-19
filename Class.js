@@ -185,6 +185,16 @@
 		
 		// Work through keywords... (Also deleting from definition)
 		if (definition.Abstract) {
+			if (Object.prototype.toString.apply(
+				definition.Abstract
+			) == '[object Array]') {
+				for (var i in definition.Abstract) {
+					if (typeof definition.Abstract[i] != 'string') {
+						throw new InvalidSyntaxFatal();
+					}
+				}
+				namespace[className].AbstractMethods = definition.Abstract;
+			}
 			namespace[className].Abstract = true;
 			delete definition.Abstract;
 		}
@@ -247,6 +257,42 @@
 				);
 				scope.parent = namespace[className].properties[propName];
 				namespace[className].properties[propName].originalValue = definition[i];
+			}
+			
+		}
+		
+		// If the class is not abstract
+		// and it does extend another class
+		// we need to ensure it implements
+		// all abstract methods
+		if (!namespace[className].Abstract && namespace[className].Extends) {
+			
+			// Loop through all ancestors and
+			// gather a list of all abstract methods
+			var parent = namespace[className].Extends;
+			var methods = {};
+			while (parent) {
+				for (var i in parent.AbstractMethods) {
+					methods[parent.AbstractMethods[i]] = false;
+				}
+				parent = parent.Extends || false;
+			}
+			
+			// Loop through all ancesters again
+			// and mark all the methods that
+			// have been implemented
+			parent = namespace[className];
+			while (parent) {
+				for (var i in parent.methods) {
+					methods[i] = true;
+				}
+				parent = parent.Extends || false;
+			}
+			
+			// If any methods are still marked
+			// as missing, throw a fatal
+			for (var i in methods) {
+				if (methods[i] === false) throw new AbstractMethodNotImplementedFatal();
 			}
 			
 		}
