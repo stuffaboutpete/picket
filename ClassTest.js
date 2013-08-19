@@ -720,3 +720,460 @@ test('Child objects inherit parent toString method', function(){
 	var myChild = new MyChild();
 	ok(myChild.toString() == '[object MyObject]');
 });
+
+test('Class can define an array of event names', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent',
+			'myOtherEvent'
+		]
+	});
+	ok(true);
+});
+
+test('Events must be declared in an array', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			Events: 'myEvent'
+		});
+	}, InvalidSyntaxFatal);
+});
+
+test('Events must be declared as an array of strings', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			Events: [1, 2]
+		});
+	}, InvalidSyntaxFatal);
+});
+
+test('Object can trigger its own event', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('myEvent');
+		}
+	});
+	new MyClass().triggerEvent();
+	ok(true);
+});
+
+test('Event must be declared in order to be triggered', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('invalidEvent');
+		}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.triggerEvent();
+	}, UnknownEventFatal);
+});
+
+test('Object cannot trigger event defined in another class', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		]
+	});
+	Class.define('MyOtherClass', {
+		triggerEvent: function(){
+			this.trigger('myEvent');
+		}
+	});
+	var myObject = new MyOtherClass();
+	raises(function(){
+		myObject.triggerEvent();
+	}, UnknownEventFatal);
+});
+
+test('Client object can bind to event in target class and target method is called', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('myEvent');
+		}
+	});
+	Class.define('MyOtherClass', {
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+		},
+		targetMethod: function(){
+			ok(true);
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Object can trigger event in parent class', function(){
+	Class.define('MyParent', {
+		Events: [
+			'myEvent'
+		]
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		triggerEvent: function(){
+			this.bind('myEvent', 'targetMethod');
+			this.trigger('myEvent');
+		},
+		targetMethod: function(){
+			ok(true);
+		}
+	});
+	new MyChild().triggerEvent();
+});
+
+test('Object can trigger event in child class', function(){
+	Class.define('MyParent', {
+		triggerEvent: function(){
+			this.bind('myEvent', 'targetMethod');
+			this.trigger('myEvent');
+		},
+		targetMethod: function(){
+			ok(true);
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		Events: [
+			'myEvent'
+		]
+	});
+	new MyChild().triggerEvent();
+});
+
+test('Bound event must exist in target class', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		]
+	});
+	Class.define('MyOtherClass', {
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('invalidEvent', 'targetMethod');
+		},
+		targetMethod: function(){}
+	});
+	raises(function(){
+		new MyOtherClass();
+	}, UnknownEventFatal);
+});
+
+test('Target method must exist in client class', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		]
+	});
+	Class.define('MyOtherClass', {
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'invalidMethod');
+		},
+		targetMethod: function(){}
+	});
+	raises(function(){
+		new MyOtherClass();
+	}, UnknownMethodFatal);
+});
+
+test('Class can bind to own event', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.bind('myEvent', 'targetMethod');
+			this.trigger('myEvent');
+		},
+		targetMethod: function(){
+			ok(true);
+		}
+	});
+	new MyClass().triggerEvent();
+});
+
+test('Client cannot bind private method to event', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		]
+	});
+	Class.define('MyOtherClass', {
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+		},
+		'private:targetMethod': function(){}
+	});
+	raises(function(){
+		new MyOtherClass();
+	}, ScopeFatal);
+});
+
+test('Client cannot bind protected method to event', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		]
+	});
+	Class.define('MyOtherClass', {
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+		},
+		'protected:targetMethod': function(){}
+	});
+	raises(function(){
+		new MyOtherClass();
+	}, ScopeFatal);
+});
+
+test('Client can bind protected method to event if target is parent', function(){
+	Class.define('MyParent', {
+		'protected:targetMethod': function(){
+			ok(true);
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.bind('myEvent', 'targetMethod');
+			this.trigger('myEvent');
+		}
+	});
+	new MyChild().triggerEvent();
+});
+
+test('Client can bind protected method to event if target is child', function(){
+	Class.define('MyParent', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.bind('myEvent', 'targetMethod');
+			this.trigger('myEvent');
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'protected:targetMethod': function(){
+			ok(true);
+		}
+	});
+	new MyChild().triggerEvent();
+});
+
+test('Client cannot bind private method to event if target is parent', function(){
+	Class.define('MyParent', {
+		'private:targetMethod': function(){}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.bind('myEvent', 'targetMethod');
+		}
+	});
+	raises(function(){
+		new MyChild().triggerEvent();
+	}, ScopeFatal);
+});
+
+test('Client cannot bind private method to event if target is child', function(){
+	Class.define('MyParent', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.bind('myEvent', 'targetMethod');
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'private:targetMethod': function(){}
+	});
+	raises(function(){
+		new MyChild().triggerEvent();
+	}, ScopeFatal);
+});
+
+test('Single argument is passed to client method on event', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('myEvent', 'single argument');
+		}
+	});
+	Class.define('MyOtherClass', {
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+		},
+		targetMethod: function(arg){
+			ok(arg == 'single argument');
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Multiple arguments are passed to client method on event', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('myEvent', 'first argument', 'second argument');
+		}
+	});
+	Class.define('MyOtherClass', {
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+		},
+		targetMethod: function(arg1, arg2){
+			ok(arg1 == 'first argument');
+			ok(arg2 == 'second argument');
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Client method is called multiple times if triggererd multiple times', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('myEvent');
+		}
+	});
+	Class.define('MyOtherClass', {
+		count: 0,
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+			myObject.triggerEvent();
+			myObject.triggerEvent();
+			ok(this.get('count') == 3);
+		},
+		targetMethod: function(){
+			this.set('count', this.get('count') + 1);
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Client method is not called again if unbound', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('myEvent');
+		}
+	});
+	Class.define('MyOtherClass', {
+		count: 0,
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+			myObject.unbind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+			ok(this.get('count') == 1);
+		},
+		targetMethod: function(){
+			this.set('count', this.get('count') + 1);
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Client method can rebind to event', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('myEvent');
+		}
+	});
+	Class.define('MyOtherClass', {
+		count: 0,
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+			myObject.unbind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+			ok(this.get('count') == 2);
+		},
+		targetMethod: function(){
+			this.set('count', this.get('count') + 1);
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Client method is only called once if bound twice', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		triggerEvent: function(){
+			this.trigger('myEvent');
+		}
+	});
+	Class.define('MyOtherClass', {
+		count: 0,
+		construct: function(){
+			var myObject = new MyClass();
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.bind('myEvent', 'targetMethod');
+			myObject.triggerEvent();
+			ok(this.get('count') == 1);
+		},
+		targetMethod: function(){
+			this.set('count', this.get('count') + 1);
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Event cannot be triggered from class constructor', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		construct: function(){
+			this.trigger('myEvent');
+		}
+	});
+	raises(function(){
+		new MyClass();
+	}, RuntimeFatal);
+});

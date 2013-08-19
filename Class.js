@@ -77,6 +77,11 @@
 			
 			// Set values of properties
 			
+			this.eventCallbacks = {};
+			for (var i in this.type.Events) {
+				this.eventCallbacks[this.type.Events[i]] = [];
+			}
+			
 			// If this class extends another,
 			// we must instantiate it
 			if (this.type.Extends) {
@@ -201,6 +206,18 @@
 			namespace[className].Implements = definition.Implements;
 			delete definition.Implements;
 		}
+		if (definition.Events) {
+			if (Object.prototype.toString.apply(definition.Events) != '[object Array]') {
+				throw new InvalidSyntaxFatal();
+			}
+			for (var i in definition.Events) {
+				if (typeof definition.Events[i] != 'string') {
+					throw new InvalidSyntaxFatal();
+				}
+			}
+			namespace[className].Events = definition.Events;
+			delete definition.Events;
+		}
 		// namespace[className].interfaces = ...
 		// 
 		
@@ -315,6 +332,7 @@
 				copiedMethod[property] = method[property];
 			}
 		}
+		copiedMethod.method.parent = this;
 		copiedMethod.parentType.id = object.id;
 		// @todo next line should have one less 'caller' if
 		// the method is called directly using object.call('methodName');
@@ -327,6 +345,97 @@
 			return copiedMethod.method.apply(object, args);
 		} else {
 			return copiedMethod.method.call(object, methodName, args);
+		}
+	}
+	
+	Class.prototype.trigger = function()
+	{
+		if (arguments.callee.caller.parent.type.methods.construct
+		&&	arguments.callee.caller == arguments.callee.caller.parent.type.methods.construct.method) {
+			throw new RuntimeFatal('Cannot trigger an event from a constructor');
+		}
+		var eventName = arguments[0];
+		var target = getInstantiatedObject(this);
+		while (target) {
+			if (typeof target.eventCallbacks != 'undefined'
+			&&	typeof target.eventCallbacks[eventName] != 'undefined') {
+				var events = target.eventCallbacks;
+				break;
+			}
+			target = (target.parent) ? target.parent : false;
+		}
+		if (!events) throw new UnknownEventFatal();
+		var args = [];
+		for (var i = 1; i < arguments.length; i++) {
+			args.push(arguments[i]);
+		}
+		for (var i in events[eventName]) {
+			var callback = events[eventName][i];
+			callback.method.method.apply(callback.object, args);
+		}
+	}
+	
+	Class.prototype.bind = function(eventName, methodName)
+	{
+		var target = getInstantiatedObject(this);
+		while (target) {
+			if (typeof target.eventCallbacks != 'undefined'
+			&&	typeof target.eventCallbacks[eventName] != 'undefined') {
+				var events = target.eventCallbacks;
+				break;
+			}
+			target = (target.parent) ? target.parent : false;
+		}
+		if (!events) throw new UnknownEventFatal();
+		var object = getInstantiatedObject(this);
+		var targetObject = arguments.callee.caller.parent;
+		var method = lookup(
+			'method',
+			methodName,
+			targetObject,
+			this,
+			arguments.callee.caller
+		);
+		var copiedMethod = {};
+		for (property in method) {
+			if (method.hasOwnProperty(property) && property != 'prototype') {
+				copiedMethod[property] = method[property];
+			}
+		}
+		copiedMethod.method.parent = this;
+		copiedMethod.parentType.id = targetObject.id;
+		copiedMethod.scope.checkCallingObject(object);
+		for (var i in this.eventCallbacks[eventName]) {
+			if (this.eventCallbacks[eventName][i].method.name == methodName
+			&&	this.eventCallbacks[eventName][i].object == arguments.callee.caller.parent) {
+				return;
+			}
+		}
+		var events = events || this.eventCallbacks;
+		events[eventName].push({
+			object:	targetObject,
+			method:	method
+		});
+	}
+	
+	Class.prototype.unbind = function(eventName, method)
+	{
+		var target = getInstantiatedObject(this);
+		while (target) {
+			if (typeof target.eventCallbacks != 'undefined'
+			&&	typeof target.eventCallbacks[eventName] != 'undefined') {
+				var events = target.eventCallbacks;
+				break;
+			}
+			target = (target.parent) ? target.parent : false;
+		}
+		if (!events) throw new UnknownEventFatal();
+		for (var i in events[eventName]) {
+			if (events[eventName][i].method.name == method
+			&&	events[eventName][i].object == arguments.callee.caller.parent) {
+				events[eventName].splice(i, 1);
+				return;
+			}
 		}
 	}
 	
