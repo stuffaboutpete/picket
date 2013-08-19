@@ -4,6 +4,7 @@ QUnit.testStart(function(){
 	window.MyClass = undefined;
 	window.MyParent = undefined;
 	window.MyChild = undefined;
+	window.MyGrandChild = undefined;
 	window.OtherClass = undefined;
 	window.My = undefined;
 	window.MyInterface = undefined;
@@ -194,27 +195,6 @@ test('Child methods can call parent construct method', function(){
 	});
 	var myChild = new MyChild('My Value');
 	ok(myChild.get('myProperty') == 'My Value');
-});
-
-test('Abstract classes cannot be instantiated', function(){
-	Class.define('MyClass', {
-		Abstract: true
-	});
-	raises(function(){
-		var myObject = new MyClass();
-	}, AbstractClassFatal);
-});
-
-test('Extending classes can implement abstract classes', function(){
-	Class.define('MyParent', {
-		Abstract: true,
-		myProperty: 'myValue'
-	});
-	Class.define('MyChild', {
-		Extends: MyParent
-	});
-	var myChild = new MyChild();
-	ok(myChild.get('myProperty') == 'myValue');
 });
 
 test('Constructor method is called on instantiation', function(){
@@ -468,6 +448,163 @@ test('Private methods cannot be accessed from outside of object', function(){
 	raises(function(){
 		myObject.myValueMethod();
 	}, ScopeFatal);
+});
+
+test('Class can be defined as abstract and it cannot be instantiated', function(){
+	Class.define('MyClass', {
+		Abstract: true
+	});
+	raises(function(){
+		var myObject = new MyClass();
+	}, AbstractClassFatal);
+});
+
+test('Extending classes can implement abstract classes', function(){
+	Class.define('MyParent', {
+		Abstract: true,
+		myProperty: 'myValue'
+	});
+	Class.define('MyChild', {
+		Extends: MyParent
+	});
+	var myChild = new MyChild();
+	ok(myChild.get('myProperty') == 'myValue');
+});
+
+test('Abstract class can define an abstract method', function(){
+	Class.define('MyClass', {
+		Abstract: [
+			'myMethod'
+		]
+	});
+	ok(true);
+});
+
+test('Abstract method can be implemented in child and called', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'myMethod'
+		]
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		myMethod: function(){
+			ok(true);
+		}
+	});
+	new MyChild().myMethod();
+});
+
+test('Abstract class can define multiple abstract methods', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'myMethod',
+			'myOtherMethod'
+		]
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		myMethod: function(){
+			return 'first value';
+		},
+		myOtherMethod: function(){
+			return 'second value'
+		}
+	});
+	var myChild = new MyChild();
+	ok(myChild.myMethod() == 'first value' && myChild.myOtherMethod() == 'second value');
+});
+
+test('Abstract methods must be identified by strings', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			Abstract: [
+				1
+			]
+		});
+	}, InvalidSyntaxFatal);
+});
+
+test('Extending class must implement abstract method', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'myMethod'
+		]
+	});
+	raises(function(){
+		Class.define('MyChild', {
+			Extends: MyParent
+		});
+	}, AbstractMethodNotImplementedFatal);
+});
+
+test('Extending class must implement multiple abstract methods', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'myMethod',
+			'myOtherMethod'
+		]
+	});
+	raises(function(){
+		Class.define('MyChild', {
+			Extends: MyParent,
+			myMethod: function(){}
+		});
+	}, AbstractMethodNotImplementedFatal); // Fatal?
+});
+
+test('Extending class may not implement abstract methods if it is also abstract', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'myMethod'
+		]
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		Abstract: true
+	});
+	ok(true);
+});
+
+test('Extending class may implement some abstract methods and not others', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'myMethod',
+			'myOtherMethod'
+		]
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		Abstract: true,
+		myMethod: function(){}
+	});
+	Class.define('MyGrandChild', {
+		Extends: MyChild,
+		myOtherMethod: function(){}
+	});
+	ok(true);
+});
+
+test('Abstract child class can list extra abstract methods that must be implemented', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'myMethod',
+			'myOtherMethod'
+		]
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		Abstract: [
+			'myThirdMethod'
+		],
+		myMethod: function(){}
+	});
+	raises(function(){
+		Class.define('MyGrandChild', {
+			Extends: MyChild,
+			myOtherMethod: function(){}
+		});
+	}, AbstractMethodNotImplementedFatal);
 });
 
 test('Interface can be defined', function(){
