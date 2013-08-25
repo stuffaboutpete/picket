@@ -25,11 +25,25 @@
 			case Class.Scope.PROTECTED:
 				callingFunction.parentType = callingFunction.parentType || {};
 				if (this.parent instanceof Class.Method) {
-					if (this.parent.parentType.id != callingFunction.parentType.id) {
+					if (this.parent.isStatic) {
+						var something = callingFunction.parentType;
+						while (something) {
+							if (something == this.parent.parentType) return true;
+							something = something.Extends || false;
+						}
+						throw new ScopeFatal('Cannot access protected method');
+					} else if (this.parent.parentType.id != callingFunction.parentType.id) {
 						throw new ScopeFatal('Cannot access protected method');
 					}
 				} else {
-					if (this.parent.parent.id != callingFunction.parentType.id) {
+					if (this.parent.parentType) {
+						var type = callingFunction.parentType;
+						while (type) {
+							if (this.parent.parentType == type) return true;
+							type = type.Extends || false;
+						}
+						throw new ScopeFatal('Cannot access protected property');
+					} else if (this.parent.parent.id != callingFunction.parentType.id) {
 						throw new ScopeFatal('Cannot access protected property');
 					}
 				}
@@ -40,7 +54,10 @@
 						throw new ScopeFatal('Cannot access private property');
 					}
 				} else {
-					if (this.parent.parent.type != callingFunction.parentType) {
+					var parentType = (this.parent.parentType)
+						? this.parent.parentType
+						: this.parent.parent.type;
+					if (parentType != callingFunction.parentType) {
 						throw new ScopeFatal('Cannot access private property');
 					}
 				}
