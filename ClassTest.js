@@ -2,6 +2,7 @@ module('Class Tests');
 
 QUnit.testStart(function(){
 	window.MyClass = undefined;
+	window.MyOtherClass = undefined;
 	window.MyParent = undefined;
 	window.MyChild = undefined;
 	window.OtherClass = undefined;
@@ -468,6 +469,298 @@ test('Private methods cannot be accessed from outside of object', function(){
 	raises(function(){
 		myObject.myValueMethod();
 	}, ScopeFatal);
+});
+
+test('Class can define static property', function(){
+	Class.define('MyClass', {
+		'static:myProperty': null
+	});
+	ok(true);
+});
+
+test('Static property can be set and retrieved at class level', function(){
+	Class.define('MyClass', {
+		'static:myProperty': null
+	});
+	MyClass.set('myProperty', 'my value');
+	ok(MyClass.get('myProperty') == 'my value');
+});
+
+test('Static property cannot be accessed at instance level', function(){
+	Class.define('MyClass', {
+		'static:myProperty': 'my value'
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.get('myProperty');
+	}, UnknownPropertyFatal);
+});
+
+test('Class can define static method', function(){
+	Class.define('MyClass', {
+		'static:myMethod': function(){}
+	});
+	ok(true);
+});
+
+test('Static method can be called at class level', function(){
+	Class.define('MyClass', {
+		'static:myMethod': function(){
+			return 'my value';
+		}
+	});
+	ok(MyClass.myMethod() == 'my value');
+});
+
+test('Static method cannot be called at instance level', function(){
+	Class.define('MyClass', {
+		'static:myMethod': function(){}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod()
+	}, Error);
+});
+
+test('Static method can access static property', function(){
+	Class.define('MyClass', {
+		'static:myProperty': 'my value',
+		'static:myMethod': function(){
+			return MyClass.get('myProperty');
+		}
+	});
+	ok(MyClass.myMethod() == 'my value');
+});
+
+test('Static method cannot access non static property', function(){
+	Class.define('MyClass', {
+		myProperty: 'my value',
+		'static:myFirstMethod': function(){
+			this.get('myProperty');
+		},
+		'static:mySecondMethod': function(){
+			MyClass.get('myProperty');
+		}
+	});
+	raises(function(){
+		MyClass.myFirstMethod();
+	}, Error);
+	raises(function(){
+		MyClass.mySecondMethod();
+	}, UnknownPropertyFatal);
+});
+
+test('Non static method cannot access static property as instance property', function(){
+	Class.define('MyClass', {
+		'static:myProperty': 'my value',
+		myMethod: function(){
+			this.get('myProperty');
+		}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, UnknownPropertyFatal);
+});
+
+test('Static methods in parent are available to child', function(){
+	Class.define('MyParent', {
+		'static:myMethod': function(){
+			return 'my value';
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent
+	});
+	ok(MyChild.myMethod() == 'my value');
+});
+
+test('Static property can be explicitly declared public', function(){
+	Class.define('MyClass', {
+		'static:public:myProperty': 'my value'
+	});
+	ok(MyClass.get('myProperty') == 'my value');
+});
+
+test('Static property can be declared private', function(){
+	Class.define('MyClass', {
+		'static:private:myProperty': 'my value'
+	});
+	raises(function(){
+		MyClass.get('myProperty');
+	}, ScopeFatal);
+});
+
+test('Private static property can be accessed by static method of same class', function(){
+	Class.define('MyClass', {
+		'static:private:myProperty': 'my value',
+		'static:myMethod': function(){
+			return MyClass.get('myProperty');
+		}
+	});
+	ok(MyClass.myMethod() == 'my value');
+});
+
+test('Private static property cannot be accessed by static method of different class', function(){
+	Class.define('MyClass', {
+		'static:private:myProperty': 'my value'
+	});
+	Class.define('MyOtherClass', {
+		'static:myMethod': function(){
+			return MyClass.get('myProperty');
+		}
+	});
+	raises(function(){
+		MyOtherClass.myMethod();
+	}, ScopeFatal);
+});
+
+test('Static property can be declared protected', function(){
+	Class.define('MyClass', {
+		'static:protected:myProperty': 'my value'
+	});
+	raises(function(){
+		MyClass.get('myProperty');
+	}, ScopeFatal);
+});
+
+test('Protected static property can be accessed by static method of same class', function(){
+	Class.define('MyClass', {
+		'static:protected:myProperty': 'my value',
+		'static:myMethod': function(){
+			return MyClass.get('myProperty');
+		}
+	});
+	ok(MyClass.myMethod() == 'my value');
+});
+
+test('Protected static property cannot be accessed by static method of different class', function(){
+	Class.define('MyClass', {
+		'static:protected:myProperty': 'my value'
+	});
+	Class.define('MyOtherClass', {
+		'static:myMethod': function(){
+			return MyClass.get('myProperty');
+		}
+	});
+	raises(function(){
+		MyOtherClass.myMethod();
+	}, ScopeFatal);
+});
+
+test('Protected static property can be accessed by static method of child class', function(){
+	Class.define('MyParent', {
+		'static:protected:myProperty': 'my value'
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'static:myMethod': function(){
+			return MyParent.get('myProperty');
+		}
+	});
+	ok(MyChild.myMethod() == 'my value');
+});
+
+test('Static method can be explicitly declared public', function(){
+	Class.define('MyClass', {
+		'static:public:myMethod': function(){
+			return 'my value';
+		}
+	});
+	ok(MyClass.myMethod() == 'my value');
+});
+
+test('Static method can be declared private', function(){
+	Class.define('MyClass', {
+		'static:private:myMethod': function(){
+			return 'my value';
+		}
+	});
+	raises(function(){
+		MyClass.myMethod();
+	}, ScopeFatal);
+});
+
+test('Private static method can be accessed by static method of same class', function(){
+	Class.define('MyClass', {
+		'static:private:myMethod': function(){
+			return 'my value';
+		},
+		'static:myOtherMethod': function(){
+			return MyClass.myMethod();
+		}
+	});
+	ok(MyClass.myOtherMethod());
+});
+
+test('Private static method cannot be accessed by static method of different class', function(){
+	Class.define('MyClass', {
+		'static:private:myMethod': function(){
+			return 'my value';
+		}
+	});
+	Class.define('MyOtherClass', {
+		'static:myOtherMethod': function(){
+			return MyClass.myMethod();
+		}
+	});
+	raises(function(){
+		MyOtherClass.myOtherMethod();
+	}, ScopeFatal);
+});
+
+test('Static method can be declared protected', function(){
+	Class.define('MyClass', {
+		'static:protected:myMethod': function(){
+			return 'my value';
+		}
+	});
+	raises(function(){
+		MyClass.myMethod();
+	}, ScopeFatal);
+});
+
+test('Protected static method can be accessed by static method of same class', function(){
+	Class.define('MyClass', {
+		'static:protected:myMethod': function(){
+			return 'my value';
+		},
+		'static:myOtherMethod': function(){
+			return MyClass.myMethod();
+		}
+	});
+	ok(MyClass.myOtherMethod());
+});
+
+test('Protected static method cannot be accessed by static method of different class', function(){
+	Class.define('MyClass', {
+		'static:protected:myMethod': function(){
+			return 'my value';
+		}
+	});
+	Class.define('MyOtherClass', {
+		'static:myOtherMethod': function(){
+			return MyClass.myMethod();
+		}
+	});
+	raises(function(){
+		MyOtherClass.myOtherMethod();
+	}, ScopeFatal);
+});
+
+test('Protected static method can be accessed by static method of child class', function(){
+	Class.define('MyParent', {
+		'static:protected:myMethod': function(){
+			return 'my value';
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'static:myOtherMethod': function(){
+			return MyChild.myMethod();
+		}
+	});
+	ok(MyChild.myOtherMethod() == 'my value');
 });
 
 test('Interface can be defined', function(){
