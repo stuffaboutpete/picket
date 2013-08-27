@@ -177,6 +177,8 @@
 			
 		};
 		
+		namespace[className].className = name;
+		
 		for (var i in namespaceProperties) {
 			namespace[className][i] = namespaceProperties[i];
 		}
@@ -371,6 +373,7 @@
 		if (this.parent) {
 			return this.parent.toString();
 		}
+		return '[object ' + getInstantiatedObject(this).type.className + ']';
 		return Object.prototype.toString.call(this);
 	}
 	
