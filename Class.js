@@ -239,6 +239,30 @@
 					= namespace[className];
 				namespace[className].methods[propName].method.parentType
 					= namespace[className];
+			} else if (Object.prototype.toString.call(definition[i]) == '[object Array]'
+			&& typeof definition[i][definition[i].length-1] == 'function'
+			&& (definition[i].length == definition[i][definition[i].length-1].length+2
+			|| definition[i].length == definition[i][definition[i].length-1].length+1)) {
+				
+				var method = definition[i].pop();
+				
+				if (definition[i].length == method.length+1) {
+					var returnType = definition[i].splice(0, 1)[0];
+				}
+				
+				namespace[className].methods[propName] = new Class.Method(
+					propName,
+					method,
+					scope,
+					returnType,
+					definition[i]
+				);
+				scope.parent = namespace[className].methods[propName];
+				namespace[className].methods[propName].parentType
+					= namespace[className];
+				namespace[className].methods[propName].method.parentType
+					= namespace[className];
+				
 			} else {
 				namespace[className].properties[propName] = new Class.Property(
 					propName,
@@ -323,11 +347,23 @@
 		for (var a = 1; a < arguments.length; a++) {
 			args.push(arguments[a]);
 		}
-		if (overloaded === false) {
-			return copiedMethod.method.apply(object, args);
-		} else {
-			return copiedMethod.method.call(object, methodName, args);
+		if (typeof copiedMethod.argTypes != 'undefined') {
+			for (var i in copiedMethod.argTypes) {
+				if (validateType(args[i], copiedMethod.argTypes[i]) === false) {
+					throw new InvalidArgumentTypeFatal();
+				}
+			}
 		}
+		if (overloaded === false) {
+			var returnVal = copiedMethod.method.apply(object, args);
+		} else {
+			var returnVal = copiedMethod.method.call(object, methodName, args);
+		}
+		if (typeof copiedMethod.returnType == 'undefined') return returnVal;
+		if (validateType(returnVal, copiedMethod.returnType) === false) {
+			throw new InvalidReturnTypeFatal();
+		}
+		return returnVal;
 	}
 	
 	Class.prototype.instanceOf = function(type)
@@ -497,6 +533,27 @@
 			}
 		}
 		return methods;
+	}
+	
+	function validateType(argument, targetType)
+	{
+		if (Object.prototype.toString.call(argument) == '[object Array]') {
+			if (Object.prototype.toString.call(targetType) == '[object Array]') {
+				var returnType = targetType[0];
+				for (var i in argument) {
+					if (validateType(argument[i], returnType) === false) return false;
+				}
+			} else if (targetType != 'array') return false;
+		} else if (argument === null) {
+			if (targetType !== null) return false;
+		} else if (typeof targetType == 'function'
+		&& typeof argument.instanceOf != 'undefined') {
+			if (!argument.instanceOf(targetType)) {
+				return false;
+			}
+		} else if (targetType != typeof argument) {
+			return false;
+		}
 	}
 	
 })();
