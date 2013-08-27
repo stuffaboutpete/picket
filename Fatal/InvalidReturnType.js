@@ -1,0 +1,5 @@
+;(function(undefined){
+	
+	InvalidReturnTypeFatal = function(){};
+	
+})();
