@@ -704,10 +704,16 @@ test('Objects can implement toString method', function(){
 	ok(myObject.toString() === 'Instance of MyClass');
 });
 
-test('Objects that do not implement toString behave normally', function(){
+test('Objects that do not implement toString show class name', function(){
 	Class.define('MyClass');
 	var myObject = new MyClass();
-	ok(myObject.toString() === '[object Object]');
+	ok(myObject.toString() === '[object MyClass]');
+});
+
+test('Namespaced objects show full class name when converted to string', function(){
+	Class.define('My.TestClass');
+	var myObject = new My.TestClass();
+	ok(myObject.toString() === '[object My.TestClass]');
 });
 
 test('Child objects inherit parent toString method', function(){
