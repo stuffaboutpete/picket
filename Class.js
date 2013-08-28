@@ -7,13 +7,13 @@
 	Class.define = function(name, definition){
 		
 		if (typeof name != 'string' || name == '') {
-			throw new InvalidClassDeclarationFatal();
+			throw new InvalidClassDeclarationFatal('Class name is required');
 		}
 		
 		// Type checking and converting
 		
 		if (typeof definition != 'undefined' && typeof definition != 'object') {
-			throw new Error('Definition must be object or undefined');
+			throw new InvalidClassDeclarationFatal('Class definition must be object or undefined');
 		}
 		
 		definition = definition || {};
@@ -50,10 +50,15 @@
 						if (!currentInterface.methods.hasOwnProperty(method)) continue;
 						var args = currentInterface.methods[method];
 						if (typeof this.type.methods[method] == 'undefined') {
-							throw new InterfaceMethodNotImplementedFatal();
+							throw new InterfaceMethodNotImplementedFatal(
+								'Class \'' + name + '\' must define interface ' +
+								'method \'' + method + '\''
+							);
 						}
 						if (this.type.methods[method].scope.level != Class.Scope.PUBLIC) {
-							throw new InterfaceMethodNotImplementedFatal();
+							throw new InterfaceMethodNotImplementedFatal(
+								'Interface method \'' + method + '\' must be declared public'
+							);
 						}
 						var methodAsString = this.type.methods[method].method.toString();
 						var methodArgs = methodAsString.substring(
@@ -64,7 +69,10 @@
 						methodArgs = (methodArgs == '') ? [] : methodArgs.split(',');
 						var interfaceArgs = currentInterface.methods[method];
 						if (methodArgs<interfaceArgs || interfaceArgs<methodArgs) {
-							throw new InterfaceMethodNotImplementedFatal();
+							throw new InterfaceMethodNotImplementedFatal(
+								'Method arguments must match arguments declared by ' +
+								'interface in \'' + name + '.' + method + '\''
+							);
 						}
 					}
 				}
@@ -163,7 +171,7 @@
 				// If the class is marked as
 				// abstract throw an error
 				if (namespace[className].Abstract) {
-					throw new AbstractClassFatal(); 
+					throw new AbstractClassFatal('Abstract class cannot be instantiated');
 				}
 				
 				// If the method 'construct' exists and
@@ -435,7 +443,7 @@
 			return copy;
 		}
 		
-		throw new Error("Unable to copy object! Its type isn't supported.");
+		throw new CloneFatal('Unable to copy object argument of type ' + typeof object);
 		
 	}
 	
@@ -484,9 +492,9 @@
 			return target;
 		} else {
 			if (type == 'property') {
-				throw new UnknownPropertyFatal();
+				throw new UnknownPropertyFatal(name);
 			} else {
-				throw new UnknownMethodFatal();
+				throw new UnknownMethodFatal(name);
 			}
 		}
 	}
