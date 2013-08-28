@@ -23,6 +23,7 @@
 		var namespace = window;
 		
 		for (var i in namespaceTree) {
+			if (!namespaceTree.hasOwnProperty(i)) continue;
 			namespace[namespaceTree[i]] = namespace[namespaceTree[i]] || {};
 			namespace = namespace[namespaceTree[i]];
 		}
@@ -43,8 +44,10 @@
 			
 			if (namespace[className].Implements) {
 				for (var i in namespace[className].Implements) {
+					if (!namespace[className].Implements.hasOwnProperty(i)) continue;
 					var currentInterface = namespace[className].Implements[i];
 					for (var method in currentInterface.methods) {
+						if (!currentInterface.methods.hasOwnProperty(method)) continue;
 						var args = currentInterface.methods[method];
 						if (typeof this.type.methods[method] == 'undefined') {
 							throw new InterfaceMethodNotImplementedFatal();
@@ -69,6 +72,7 @@
 			this.propertyValues = {};
 			
 			for (var i in this.properties) {
+				if (!this.properties.hasOwnProperty(i)) continue;
 				this.properties[i].parent = this;
 				this.propertyValues[i] = cloneObject(
 					this.properties[i].originalValue
@@ -108,6 +112,8 @@
 			// method for this type...
 			for (var i in allAccessibleMethods) {
 				
+				if (!allAccessibleMethods.hasOwnProperty(i)) continue;
+				
 				var methodName = allAccessibleMethods[i];
 				
 				// If there is not already a
@@ -127,6 +133,7 @@
 						// Append all other function
 						// arguments to this array
 						for (var arg in arguments) {
+							if (!arguments.hasOwnProperty(arg)) continue;
 							args.push(arguments[arg]);
 						}
 						
@@ -180,6 +187,7 @@
 		namespace[className].className = name;
 		
 		for (var i in namespaceProperties) {
+			if (!namespaceProperties.hasOwnProperty(i)) continue;
 			namespace[className][i] = namespaceProperties[i];
 		}
 		
@@ -212,6 +220,8 @@
 		// Put properties in from definition
 		// Put methods in from definition
 		for (var i in definition) {
+			
+			if (!definition.hasOwnProperty(i)) continue;
 			
 			var propName = i;
 			var scope;
@@ -332,11 +342,12 @@
 		}
 	}
 	
-	Class.prototype.instanceOf = function(type)
+	Object.prototype.instanceOf = function(type)
 	{
 		if (this.type === type) return true;
 		if (this.type && this.type.Implements) {
 			for (var i in this.type.Implements) {
+				if (!this.type.Implements.hasOwnProperty(i)) continue;
 				if (type === this.type.Implements[i]) return true;
 			}
 		}
@@ -351,6 +362,7 @@
 		return cloneObject(this);
 		/*var newObject = new this.type();
 		for (var i in this.propertyValues) {
+			if (!this.propertyValues.hasOwnProperty(i)) continue;
 			if (typeof this.propertyValues[i].instanceOf == 'function'
 			&&	this.propertyValues[i].instanceOf(Class)) {
 				newObject.propertyValues[i] = this.propertyValues[i].clone();
@@ -491,11 +503,13 @@
 		var methods = [];
 		if (typeof object.type == 'undefined') return methods;
 		for (var i in object.type.methods) {
+			if (!object.type.methods.hasOwnProperty(i)) continue;
 			methods.push(i); 
 		}
 		if (object.parent) {
 			var parentMethods = getListOfMethods(object.parent);
 			for (var i in parentMethods) {
+				if (!parentMethods.hasOwnProperty(i)) continue;
 				methods.push(parentMethods[i]);
 			}
 		}

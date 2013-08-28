@@ -556,7 +556,7 @@ test('Class must have arguments which match interface arguments', function(){
 	ok(otherObject instanceof OtherClass);
 });
 
-test('Object is instanceof interface', function(){
+test('Object is instanceOf interface', function(){
 	Interface.define('MyInterface');
 	Class.define('MyClass', {
 		Implements: MyInterface
@@ -572,26 +572,26 @@ test('Object is not instanceOf interface if not implemented', function(){
 	ok(!myObject.instanceOf(MyInterface));
 });
 
-test('Object is instanceof class', function(){
+test('Object is instanceOf class', function(){
 	Class.define('MyClass');
 	var myObject = new MyClass();
 	ok(myObject.instanceOf(MyClass));
 });
 
-test('Object is instanceof root Class', function(){
+test('Object is instanceOf root Class', function(){
 	Class.define('MyClass');
 	var myObject = new MyClass();
 	ok(myObject.instanceOf(Class));
 });
 
-test('Object is not instanceof other class', function(){
+test('Object is not instanceOf other class', function(){
 	Class.define('MyClass');
 	Class.define('OtherClass');
 	var myObject = new MyClass();
 	ok(!myObject.instanceOf(OtherClass));
 });
 
-test('Object is instanceof parent class', function(){
+test('Object is instanceOf parent class', function(){
 	Class.define('MyParent');
 	Class.define('MyChild', {
 		Extends: MyParent
@@ -599,6 +599,19 @@ test('Object is instanceof parent class', function(){
 	var myObject = new MyChild();
 	ok(myObject.instanceOf(MyChild));
 	ok(myObject.instanceOf(MyParent));
+});
+
+test('All objects have instanceOf method', function(){
+	var myString = 'string';
+	var myNumber = 10;
+	var myObject = {};
+	var myArray = [];
+	var myBoolean = true;
+	ok(myString.instanceOf(Class) === false);
+	ok(myNumber.instanceOf(Class) === false);
+	ok(myObject.instanceOf(Class) === false);
+	ok(myArray.instanceOf(Class) === false);
+	ok(myBoolean.instanceOf(Class) === false);
 });
 
 test('Call to unknown method is dispatched to call if present', function(){
