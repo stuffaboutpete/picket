@@ -205,6 +205,13 @@
 		namespace[className].prototype = Class.prototype;
 		
 		// Work through keywords... (Also deleting from definition)
+		if (definition.Require) {
+			if (Object.prototype.toString.apply(definition.Require) != '[object Array]') {
+				definition.Require = [definition.Require];
+			}
+			processDependencies(definition.Require);
+			delete definition.Require;
+		}
 		if (definition.Abstract) {
 			namespace[className].Abstract = true;
 			delete definition.Abstract;
@@ -345,6 +352,10 @@
 		var args = [];
 		for (var a = 1; a < arguments.length; a++) {
 			args.push(arguments[a]);
+		}
+		if (isLoadingDependencies()) {
+			registerWaitingCallback(copiedMethod.method, object, args, methodName);
+			return;
 		}
 		if (overloaded === false) {
 			return copiedMethod.method.apply(object, args);
@@ -525,6 +536,155 @@
 			}
 		}
 		return methods;
+	}
+	
+	function processDependencies(dependencies)
+	{
+		
+		toProcessDependencies:
+		for (var i in dependencies) {
+			
+			var dependency = dependencies[i];
+			
+			for (var j in loadedClasses) {
+				if (loadedClasses[j] == dependency) {
+					continue toProcessDependencies;
+				}
+			}
+			
+			var extension = dependency.split('.').pop();
+			
+			// If the dependency does not contain
+			// any forward slashes and it does not
+			// end with a handled extension, we can
+			// consider it a class name
+			var isClass = (dependency.split('/').pop() == dependency
+			&&	['js' /* other file types link css or jpg? */].indexOf(extension) == -1);
+			
+			var map = (isClass) ? classMap : folderMap;
+			
+			var filename = undefined;
+			
+			for (var i in map) {
+				var pattern = map[i].pattern;
+				if (dependency.substr(0, pattern.length) == pattern) {
+					var filename = map[i].target + dependency.substr(pattern.length);
+					break;
+				}
+			}
+			
+			if (typeof filename == 'undefined') filename = dependency;
+			
+			if (isClass) {
+				filename = filename.split('.').join('/') + '.js';
+				extension = 'js';
+			}
+			
+			if (includedDependencies.indexOf(filename) > -1) continue;
+			
+			registerLoadingDependency(filename);
+			
+			switch (extension) {
+				
+				case 'js':
+					var script = document.createElement('script');
+					script.type = 'text/javascript';
+					script.src = filename;
+					script.onreadystatechange = script.onload = function(){
+						// Could check for ready state other than success
+						// http://stackoverflow.com/questions/6725272/dynamic-cross-browser-script-loading
+						registerLoadedDependency(filename);
+					};
+					document.head.appendChild(script);
+					includedDependencies.push(filename);
+				break;
+				
+				// Other file types like css or jpg?
+				
+			}
+			
+		}
+		
+	}
+	
+	var classMap = [];
+	var folderMap = [];
+	
+	Class.addClassAutoloadPattern = function(pattern, target)
+	{
+		classMap.push({
+			pattern: pattern,
+			target: target
+		});
+		classMap.sort(function(a, b){
+			return b.pattern.length - a.pattern.length;
+		});
+	};
+	
+	Class.addFolderAutoloadPattern = function(pattern, target)
+	{
+		folderMap.push({
+			pattern: pattern,
+			target: target
+		});
+		folderMap.sort(function(a, b){
+			return b.pattern.length - a.pattern.length;
+		});
+	};
+	
+	var loadedClasses = [];
+	var loadingDependencies = [];
+	var includedDependencies = [];
+	var waitingCallbacks = [];
+	
+	function isLoadingDependencies()
+	{
+		return (loadingDependencies.length);
+	}
+	
+	function registerLoadingDependency(filename)
+	{
+		loadingDependencies.push(filename);
+	}
+	
+	function registerLoadedDependency(filename)
+	{
+		var i = loadingDependencies.length;
+		while (i--) {
+			if (loadingDependencies[i] == filename) {
+				loadingDependencies.splice(i, 1);
+			}
+		}
+		if (loadingDependencies.length == 0) {
+			for (var i in waitingCallbacks) {
+				var c = waitingCallbacks[i];
+				if (c.methodName) {
+					c.callback.call(c.object, c.methodName, c.args);
+				} else {
+					c.callback.apply(c.object, c.args);
+				}
+			}
+		}
+	}
+	
+	function registerWaitingCallback(callback, object, args, methodName)
+	{
+		waitingCallbacks.push({
+			callback:	callback,
+			object:		object,
+			args:		args,
+			methodName:	methodName
+		});
+	}
+	
+	Class.registerLoadedClass = function(classnames)
+	{
+		if (Object.prototype.toString.apply(classnames) != '[object Array]') {
+			classnames = [classnames];
+		}
+		for (var i in classnames) {
+			loadedClasses.push(classnames[i]);
+		}
 	}
 	
 })();
