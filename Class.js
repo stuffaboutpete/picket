@@ -52,6 +52,9 @@
 						if (typeof this.type.methods[method] == 'undefined') {
 							throw new InterfaceMethodNotImplementedFatal();
 						}
+						if (this.type.methods[method].scope.level != Class.Scope.PUBLIC) {
+							throw new InterfaceMethodNotImplementedFatal();
+						}
 						var methodAsString = this.type.methods[method].method.toString();
 						var methodArgs = methodAsString.substring(
 							'function ('.length,
@@ -237,7 +240,7 @@
 				scope = new Class.Scope(Class.Scope.PUBLIC);
 			} else {
 				propName = i;
-				scope = new Class.Scope(Class.Scope.PUBLIC);
+				scope = new Class.Scope(Class.Scope.PRIVATE);
 			}
 			
 			if (typeof definition[i] == 'function') {
