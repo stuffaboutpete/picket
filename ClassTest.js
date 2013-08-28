@@ -801,6 +801,467 @@ test('Child objects inherit parent toString method', function(){
 	ok(myChild.toString() == '[object MyObject]');
 });
 
+test('Method can be defined with null return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': [null, function(){
+			return null;
+		}]
+	});
+	var myObject = new MyClass();
+	ok(null === myObject.myMethod());
+});
+
+test('Method must implement null return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': [null, function(){
+			return undefined;
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with undefined return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['undefined', function(){
+			return;
+		}]
+	});
+	var myObject = new MyClass();
+	ok(typeof myObject.myMethod() == 'undefined');
+});
+
+test('Method must implement undefined return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['undefined', function(){
+			return 'string';
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with string return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['string', function(){
+			return 'string';
+		}]
+	});
+	var myObject = new MyClass();
+	ok(typeof myObject.myMethod() == 'string');
+});
+
+test('Method must implement string return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['string', function(){
+			return 1;
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with number return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['number', function(){
+			return 10;
+		}]
+	});
+	var myObject = new MyClass();
+	ok(typeof myObject.myMethod() == 'number');
+});
+
+test('Method must implement number return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['number', function(){
+			return false;
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with boolean return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['boolean', function(){
+			return true;
+		}]
+	});
+	var myObject = new MyClass();
+	ok(typeof myObject.myMethod() == 'boolean');
+});
+
+test('Method must implement boolean return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['boolean', function(){
+			return {};
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with object return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['object', function(){
+			return {};
+		}]
+	});
+	var myObject = new MyClass();
+	ok(typeof myObject.myMethod() == 'object');
+});
+
+test('Method must implement object return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['object', function(){
+			return 'string';
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with class instance return type', function(){
+	Class.define('TargetClass');
+	Class.define('MyClass', {
+		'public:myMethod': [TargetClass, function(){
+			return new TargetClass();
+		}]
+	});
+	var myObject = new MyClass();
+	ok(myObject.myMethod().instanceOf(TargetClass));
+});
+
+test('Method must implement class instance return type', function(){
+	Class.define('TargetClass');
+	Class.define('MyClass', {
+		'public:myMethod': [TargetClass, function(){
+			return null;
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with array return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['array', function(){
+			return [1, 2, 3];
+		}]
+	});
+	var myObject = new MyClass();
+	ok(Object.prototype.toString.call(myObject.myMethod()) == '[object Array]');
+});
+
+test('Method must implement array return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['array', function(){
+			return 'string';
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with array of type return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': [['string'], function(){
+			return ['string 1', 'string 2', 'string 3'];
+		}]
+	});
+	var myObject = new MyClass();
+	var returnValue = myObject.myMethod();
+	for (var i in returnValue) {
+		if (!returnValue.hasOwnProperty(i)) continue;
+		if (typeof returnValue[i] != 'string') {
+			ok(false);
+			return;
+		}
+	}
+	ok(true);
+});
+
+test('Method must implement array of type return type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': [['boolean'], function(){
+			return [true, false, 'true'];
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with null argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': [null, function(arg){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod(null);
+	ok('true');
+});
+
+test('Method must implement null argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': [null, function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod('string');
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with string argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['string', function(arg){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod('string');
+	ok('true');
+});
+
+test('Method must implement string argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['string', function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod(1);
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with number argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['number', function(arg){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod(10);
+	ok('true');
+});
+
+test('Method must implement number argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['number', function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod(true);
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with boolean argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['boolean', function(arg){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod(false);
+	ok('true');
+});
+
+test('Method must implement boolean argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['boolean', function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod({});
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with object argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['object', function(arg){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod({});
+	ok('true');
+});
+
+test('Method must implement object argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['object', function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod('string');
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with class instance argument type', function(){
+	Class.define('TargetClass');
+	Class.define('MyClass', {
+		'public:myMethod': [TargetClass, function(arg){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod(new TargetClass());
+	ok('true');
+});
+
+test('Method must implement class instance argument type', function(){
+	Class.define('TargetClass');
+	Class.define('MyClass', {
+		'public:myMethod': [TargetClass, function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod(null);
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with array argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['array', function(arg){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod([]);
+	ok('true');
+});
+
+test('Method must implement array argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['array', function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod('string');
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with array of type argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': [['number'], function(arg){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod([1, 2, 100]);
+	ok('true');
+});
+
+test('Method must implement array of type argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': [['string'], function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod(['string 1', 'string 2', 3]);
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method will not accept undefined if argument is typed', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['boolean', function(arg){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with multiple argument types', function(){
+	Class.define('TargetClass');
+	Class.define('MyClass', {
+		'public:myMethod': ['number', 'string', TargetClass, function(arg1, arg2, arg3){}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod(10, 'ten', new TargetClass());
+	ok(true);
+});
+
+test('Method must implement multiple argument types', function(){
+	Class.define('TargetClass');
+	Class.define('MyClass', {
+		'public:myMethod': ['number', 'string', TargetClass, function(arg1, arg2, arg3){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod('ten', 'ten', new TargetClass());
+	}, InvalidArgumentTypeFatal);
+	raises(function(){
+		myObject.myMethod(10, true, new TargetClass());
+	}, InvalidArgumentTypeFatal);
+	raises(function(){
+		myObject.myMethod(10, 'ten', { target: new TargetClass() });
+	}, InvalidArgumentTypeFatal);
+});
+
+test('All arguments must be supplied if typed', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['number', 'string', 'boolean', function(arg1, arg2, arg3){}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod(10, 'ten');
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with return and argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['number', 'number', function(arg){
+			return arg;
+		}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod(1);
+	ok(true);
+});
+
+test('Method must implement return and argument type', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['string', 'number', function(arg){
+			return arg;
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod('string');
+	}, InvalidArgumentTypeFatal);
+	raises(function(){
+		myObject.myMethod(1);
+	}, InvalidReturnTypeFatal);
+});
+
+test('Method can be defined with return type and multiple argument types', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['array', 'number', 'string', function(arg1, arg2){
+			return [arg1, arg2];
+		}]
+	});
+	var myObject = new MyClass();
+	myObject.myMethod(1, 'one');
+	ok(true);
+});
+
+test('Method must implement return and and multiple argument types', function(){
+	Class.define('MyClass', {
+		'public:myMethod': ['boolean', 'string', 'number', function(arg1, arg2){
+			return arg1 + arg2;
+		}]
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod('string', 'string');
+	}, InvalidArgumentTypeFatal);
+	raises(function(){
+		myObject.myMethod('string', 1);
+	}, InvalidReturnTypeFatal);
+});
+
 test('Class can require a file', function(){
 	Class.define('MyClass', {
 		Require: 'includes/File-5ft78s.js'
@@ -827,7 +1288,7 @@ test('Required file is included in the DOM on class declaration', function(){
 asyncTest('Required file is included before class is instantiated', function(){
 	Class.define('MyClass', {
 		Require: 'includes/File-s8ay12.js',
-		construct: function(){
+		'public:construct': function(){
 			ok(typeof s8ay12 != 'undefined');
 			start();
 		}
@@ -1069,11 +1530,3 @@ test('Loaded classes can be declared and will not be auto loaded in future', fun
 	}
 	ok(true);
 });
-
-/**
- * @todo...
- * 
- * Handle failures?
- * Ensure delayed methods are run in order
- * Ensure leading and trailing slashes in folder patterns are handled
- */
