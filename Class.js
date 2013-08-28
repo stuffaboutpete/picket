@@ -7,13 +7,13 @@
 	Class.define = function(name, definition){
 		
 		if (typeof name != 'string' || name == '') {
-			throw new InvalidClassDeclarationFatal();
+			throw new InvalidClassDeclarationFatal('Class name is required');
 		}
 		
 		// Type checking and converting
 		
 		if (typeof definition != 'undefined' && typeof definition != 'object') {
-			throw new Error('Definition must be object or undefined');
+			throw new InvalidClassDeclarationFatal('Class definition must be object or undefined');
 		}
 		
 		definition = definition || {};
@@ -23,6 +23,7 @@
 		var namespace = window;
 		
 		for (var i in namespaceTree) {
+			if (!namespaceTree.hasOwnProperty(i)) continue;
 			namespace[namespaceTree[i]] = namespace[namespaceTree[i]] || {};
 			namespace = namespace[namespaceTree[i]];
 		}
@@ -43,11 +44,21 @@
 			
 			if (namespace[className].Implements) {
 				for (var i in namespace[className].Implements) {
+					if (!namespace[className].Implements.hasOwnProperty(i)) continue;
 					var currentInterface = namespace[className].Implements[i];
 					for (var method in currentInterface.methods) {
+						if (!currentInterface.methods.hasOwnProperty(method)) continue;
 						var args = currentInterface.methods[method];
 						if (typeof this.type.methods[method] == 'undefined') {
-							throw new InterfaceMethodNotImplementedFatal();
+							throw new InterfaceMethodNotImplementedFatal(
+								'Class \'' + name + '\' must define interface ' +
+								'method \'' + method + '\''
+							);
+						}
+						if (this.type.methods[method].scope.level != Class.Scope.PUBLIC) {
+							throw new InterfaceMethodNotImplementedFatal(
+								'Interface method \'' + method + '\' must be declared public'
+							);
 						}
 						var methodAsString = this.type.methods[method].method.toString();
 						var methodArgs = methodAsString.substring(
@@ -58,7 +69,10 @@
 						methodArgs = (methodArgs == '') ? [] : methodArgs.split(',');
 						var interfaceArgs = currentInterface.methods[method];
 						if (methodArgs<interfaceArgs || interfaceArgs<methodArgs) {
-							throw new InterfaceMethodNotImplementedFatal();
+							throw new InterfaceMethodNotImplementedFatal(
+								'Method arguments must match arguments declared by ' +
+								'interface in \'' + name + '.' + method + '\''
+							);
 						}
 					}
 				}
@@ -69,6 +83,7 @@
 			this.propertyValues = {};
 			
 			for (var i in this.properties) {
+				if (!this.properties.hasOwnProperty(i)) continue;
 				this.properties[i].parent = this;
 				this.propertyValues[i] = cloneObject(
 					this.properties[i].originalValue
@@ -108,6 +123,8 @@
 			// method for this type...
 			for (var i in allAccessibleMethods) {
 				
+				if (!allAccessibleMethods.hasOwnProperty(i)) continue;
+				
 				var methodName = allAccessibleMethods[i];
 				
 				// If there is not already a
@@ -127,6 +144,7 @@
 						// Append all other function
 						// arguments to this array
 						for (var arg in arguments) {
+							if (!arguments.hasOwnProperty(arg)) continue;
 							args.push(arguments[arg]);
 						}
 						
@@ -153,7 +171,7 @@
 				// If the class is marked as
 				// abstract throw an error
 				if (namespace[className].Abstract) {
-					throw new AbstractClassFatal(); 
+					throw new AbstractClassFatal('Abstract class cannot be instantiated');
 				}
 				
 				// If the method 'construct' exists and
@@ -177,13 +195,23 @@
 			
 		};
 		
+		namespace[className].className = name;
+		
 		for (var i in namespaceProperties) {
+			if (!namespaceProperties.hasOwnProperty(i)) continue;
 			namespace[className][i] = namespaceProperties[i];
 		}
 		
 		namespace[className].prototype = Class.prototype;
 		
 		// Work through keywords... (Also deleting from definition)
+		if (definition.Require) {
+			if (Object.prototype.toString.apply(definition.Require) != '[object Array]') {
+				definition.Require = [definition.Require];
+			}
+			processDependencies(definition.Require);
+			delete definition.Require;
+		}
 		if (definition.Abstract) {
 			namespace[className].Abstract = true;
 			delete definition.Abstract;
@@ -211,6 +239,8 @@
 		// Put methods in from definition
 		for (var i in definition) {
 			
+			if (!definition.hasOwnProperty(i)) continue;
+			
 			var propName = i;
 			var scope;
 			
@@ -225,7 +255,7 @@
 				scope = new Class.Scope(Class.Scope.PUBLIC);
 			} else {
 				propName = i;
-				scope = new Class.Scope(Class.Scope.PUBLIC);
+				scope = new Class.Scope(Class.Scope.PRIVATE);
 			}
 			
 			if (typeof definition[i] == 'function') {
@@ -334,7 +364,7 @@
 			}
 		}
 		var copiedMethod = {};
-		for (property in method) {
+		for (var property in method) {
 			if (method.hasOwnProperty(property) && property != 'prototype') {
 				copiedMethod[property] = method[property];
 			}
@@ -349,10 +379,15 @@
 		}
 		if (typeof copiedMethod.argTypes != 'undefined') {
 			for (var i in copiedMethod.argTypes) {
+				if (!copiedMethod.argTypes.hasOwnProperty(i)) continue;
 				if (validateType(args[i], copiedMethod.argTypes[i]) === false) {
 					throw new InvalidArgumentTypeFatal();
 				}
 			}
+		}
+		if (isLoadingDependencies()) {
+			registerWaitingCallback(copiedMethod.method, object, args, methodName);
+			return;
 		}
 		if (overloaded === false) {
 			var returnVal = copiedMethod.method.apply(object, args);
@@ -366,11 +401,12 @@
 		return returnVal;
 	}
 	
-	Class.prototype.instanceOf = function(type)
+	Object.prototype.instanceOf = function(type)
 	{
 		if (this.type === type) return true;
 		if (this.type && this.type.Implements) {
 			for (var i in this.type.Implements) {
+				if (!this.type.Implements.hasOwnProperty(i)) continue;
 				if (type === this.type.Implements[i]) return true;
 			}
 		}
@@ -385,6 +421,7 @@
 		return cloneObject(this);
 		/*var newObject = new this.type();
 		for (var i in this.propertyValues) {
+			if (!this.propertyValues.hasOwnProperty(i)) continue;
 			if (typeof this.propertyValues[i].instanceOf == 'function'
 			&&	this.propertyValues[i].instanceOf(Class)) {
 				newObject.propertyValues[i] = this.propertyValues[i].clone();
@@ -407,6 +444,7 @@
 		if (this.parent) {
 			return this.parent.toString();
 		}
+		return '[object ' + getInstantiatedObject(this).type.className + ']';
 		return Object.prototype.toString.call(this);
 	}
 	
@@ -453,7 +491,7 @@
 			return copy;
 		}
 		
-		throw new Error("Unable to copy object! Its type isn't supported.");
+		throw new CloneFatal('Unable to copy object argument of type ' + typeof object);
 		
 	}
 	
@@ -502,9 +540,9 @@
 			return target;
 		} else {
 			if (type == 'property') {
-				throw new UnknownPropertyFatal();
+				throw new UnknownPropertyFatal(name);
 			} else {
-				throw new UnknownMethodFatal();
+				throw new UnknownMethodFatal(name);
 			}
 		}
 	}
@@ -524,11 +562,13 @@
 		var methods = [];
 		if (typeof object.type == 'undefined') return methods;
 		for (var i in object.type.methods) {
+			if (!object.type.methods.hasOwnProperty(i)) continue;
 			methods.push(i); 
 		}
 		if (object.parent) {
 			var parentMethods = getListOfMethods(object.parent);
 			for (var i in parentMethods) {
+				if (!parentMethods.hasOwnProperty(i)) continue;
 				methods.push(parentMethods[i]);
 			}
 		}
@@ -541,6 +581,7 @@
 			if (Object.prototype.toString.call(targetType) == '[object Array]') {
 				var returnType = targetType[0];
 				for (var i in argument) {
+					if (!argument.hasOwnProperty(i)) continue;
 					if (validateType(argument[i], returnType) === false) return false;
 				}
 			} else if (targetType != 'array') return false;
@@ -553,6 +594,161 @@
 			}
 		} else if (targetType != typeof argument) {
 			return false;
+		}
+	}
+	
+	function processDependencies(dependencies)
+	{
+		
+		toProcessDependencies:
+		for (var i in dependencies) {
+			
+			if (!dependencies.hasOwnProperty(i)) continue;
+			
+			var dependency = dependencies[i];
+			
+			for (var j in loadedClasses) {
+				if (!loadedClasses.hasOwnProperty(j)) continue;
+				if (loadedClasses[j] == dependency) {
+					continue toProcessDependencies;
+				}
+			}
+			
+			var extension = dependency.split('.').pop();
+			
+			// If the dependency does not contain
+			// any forward slashes and it does not
+			// end with a handled extension, we can
+			// consider it a class name
+			var isClass = (dependency.split('/').pop() == dependency
+			&&	['js' /* other file types link css or jpg? */].indexOf(extension) == -1);
+			
+			var map = (isClass) ? classMap : folderMap;
+			
+			var filename = undefined;
+			
+			for (var i in map) {
+				if (!map.hasOwnProperty(i)) continue;
+				var pattern = map[i].pattern;
+				if (dependency.substr(0, pattern.length) == pattern) {
+					var filename = map[i].target + dependency.substr(pattern.length);
+					break;
+				}
+			}
+			
+			if (typeof filename == 'undefined') filename = dependency;
+			
+			if (isClass) {
+				filename = filename.split('.').join('/') + '.js';
+				extension = 'js';
+			}
+			
+			if (includedDependencies.indexOf(filename) > -1) continue;
+			
+			registerLoadingDependency(filename);
+			
+			switch (extension) {
+				
+				case 'js':
+					var script = document.createElement('script');
+					script.type = 'text/javascript';
+					script.src = filename;
+					script.onreadystatechange = script.onload = function(){
+						// Could check for ready state other than success
+						// http://stackoverflow.com/questions/6725272/dynamic-cross-browser-script-loading
+						registerLoadedDependency(filename);
+					};
+					document.head.appendChild(script);
+					includedDependencies.push(filename);
+				break;
+				
+				// Other file types like css or jpg?
+				
+			}
+			
+		}
+		
+	}
+	
+	var classMap = [];
+	var folderMap = [];
+	
+	Class.addClassAutoloadPattern = function(pattern, target)
+	{
+		classMap.push({
+			pattern: pattern,
+			target: target
+		});
+		classMap.sort(function(a, b){
+			return b.pattern.length - a.pattern.length;
+		});
+	};
+	
+	Class.addFolderAutoloadPattern = function(pattern, target)
+	{
+		folderMap.push({
+			pattern: pattern,
+			target: target
+		});
+		folderMap.sort(function(a, b){
+			return b.pattern.length - a.pattern.length;
+		});
+	};
+	
+	var loadedClasses = [];
+	var loadingDependencies = [];
+	var includedDependencies = [];
+	var waitingCallbacks = [];
+	
+	function isLoadingDependencies()
+	{
+		return (loadingDependencies.length);
+	}
+	
+	function registerLoadingDependency(filename)
+	{
+		loadingDependencies.push(filename);
+	}
+	
+	function registerLoadedDependency(filename)
+	{
+		var i = loadingDependencies.length;
+		while (i--) {
+			if (loadingDependencies[i] == filename) {
+				loadingDependencies.splice(i, 1);
+			}
+		}
+		if (loadingDependencies.length == 0) {
+			for (var i in waitingCallbacks) {
+				if (!waitingCallbacks.hasOwnProperty(i)) continue;
+				var c = waitingCallbacks[i];
+				if (c.methodName) {
+					c.callback.call(c.object, c.methodName, c.args);
+				} else {
+					c.callback.apply(c.object, c.args);
+				}
+			}
+		}
+	}
+	
+	function registerWaitingCallback(callback, object, args, methodName)
+	{
+		waitingCallbacks.push({
+			callback:	callback,
+			object:		object,
+			args:		args,
+			methodName:	methodName
+		});
+	}
+	
+	Class.registerLoadedClass = function(classnames)
+	{
+		if (Object.prototype.toString.apply(classnames) != '[object Array]') {
+			classnames = [classnames];
+		}
+		for (var i in classnames) {
+			if (!classnames.hasOwnProperty(i)) continue;
+			loadedClasses.push(classnames[i]);
 		}
 	}
 	
