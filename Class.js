@@ -333,7 +333,7 @@
 			}
 		}
 		var copiedMethod = {};
-		for (property in method) {
+		for (var property in method) {
 			if (method.hasOwnProperty(property) && property != 'prototype') {
 				copiedMethod[property] = method[property];
 			}

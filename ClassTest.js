@@ -335,17 +335,17 @@ test('Protected properties can be accessed from inside of object', function(){
 });
 
 test('Protected properties can be accessed from subclasses', function(){
-	Class.define('MyClass', {
+	Class.define('MyParent', {
 		'protected:myProperty': 'myValue'
 	});
-	Class.define('MySubClass', {
-		Extends: MyClass,
+	Class.define('MyChild', {
+		Extends: MyParent,
 		'public:myMethod': function(){
 			return this.get('myProperty');
 		}
 	});
-	var mySubObject = new MySubClass();
-	ok('myValue' == mySubObject.myMethod());
+	var myChild = new MyChild();
+	ok('myValue' == myChild.myMethod());
 });
 
 test('Protected properties cannot be accessed from outside of object', function(){
