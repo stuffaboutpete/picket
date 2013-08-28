@@ -9,7 +9,9 @@
 		ownerUsesGetter,
 		childUsesGetter,
 		ownerUserSetter,
-		childUsesSetter
+		childUsesSetter,
+		getterType,
+		setterType
 	){
 		this.name = name;
 		this.value = value;
@@ -20,6 +22,8 @@
 		this.childUsesGetter = childUsesGetter;
 		this.ownerUsesSetter = ownerUserSetter;
 		this.childUsesSetter = childUsesSetter;
+		this.getterType = getterType;
+		this.setterType = setterType;
 	};
 	
 })();
