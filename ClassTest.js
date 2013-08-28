@@ -1460,6 +1460,35 @@ test('Specifying scope on property raises error', function(){
 	}, InvalidSyntaxFatal);
 });
 
+test('Property getter can specify a return type', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 10,
+			getter: ['string', true]
+		}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.get('myProperty');
+	}, InvalidReturnTypeFatal);
+	myObject.set('myProperty', 'My Value');
+	ok(myObject.get('myProperty') == 'My Value');
+});
+
+test('Property setter can specify an argument type', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			setter: ['number', true]
+		}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.set('myProperty', 'ten');
+	}, InvalidArgumentTypeFatal);
+	myObject.set('myProperty', 10);
+	ok(myObject.get('myProperty') === 10);
+});
+
 test('Parent object can get property without using getter', function(){
 	Class.define('MyClass', {
 		myProperty: {
@@ -1654,6 +1683,40 @@ test('Parent object can use setter whilst inheriting object does not', function(
 	var myChild = new MyChild();
 	myChild.childSetterMethod('Child Value');
 	ok(myChild.get('myProperty') == 'Child Value');
+});
+
+test('Property getter can type hint and specify getter usage', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			value: 'string',
+			getter: ['boolean', function(value){
+				return (value) ? true : false;
+			}, false]
+		},
+		'public:myGetterMethod': function(){
+			return this.get('myProperty');
+		}
+	});
+	var myObject = new MyClass();
+	ok(myObject.get('myProperty') === true);
+	ok(myObject.myGetterMethod() === 'string');
+});
+
+test('Property setter can type hint and specify setter usage', function(){
+	Class.define('MyClass', {
+		myProperty: {
+			setter: ['string', true, false]
+		},
+		'public:mySetterMethod': function(value){
+			this.set('myProperty', value);
+		}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.set('myProperty', 10);
+	}, InvalidArgumentTypeFatal);
+	myObject.mySetterMethod(10);
+	ok(myObject.get('myProperty') === 10);
 });
 
 test('Class can require a file', function(){
