@@ -48,6 +48,7 @@
 	Mock.prototype.resolve = function()
 	{
 		for (var i in this.expectations) {
+			if (!this.expectations.hasOwnProperty(i)) continue;
 			if (!this.expectations[i].callCountMet()) {
 				throw new Error('At least one requirement was not met');
 			}
