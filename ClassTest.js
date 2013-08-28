@@ -48,7 +48,7 @@ test('Class can be defined with name and instantiated', function(){
 
 test('Declared class property exists in object', function(){
 	Class.define('MyClass', {
-		myProperty: 'Value'
+		'public:myProperty': 'Value'
 	});
 	var myObject = new MyClass();
 	ok(myObject.get('myProperty') == 'Value');
@@ -56,7 +56,7 @@ test('Declared class property exists in object', function(){
 
 test('Class property can be set', function(){
 	Class.define('MyClass', {
-		myProperty: null
+		'public:myProperty': null
 	});
 	var myObject = new MyClass();
 	myObject.set('myProperty', 'My String')
@@ -65,7 +65,7 @@ test('Class property can be set', function(){
 
 test('Class method can be called', function(){
 	Class.define('MyClass', {
-		myMethod: function(){return 'Return Value';}
+		'public:myMethod': function(){return 'Return Value';}
 	});
 	var myObject = new MyClass();
 	ok(myObject.call('myMethod') == 'Return Value');
@@ -73,7 +73,7 @@ test('Class method can be called', function(){
 
 test('Object method can be called magically by name', function(){
 	Class.define('MyClass', {
-		myMethod: function(){
+		'public:myMethod': function(){
 			return 'My Value';
 		}
 	});
@@ -83,7 +83,7 @@ test('Object method can be called magically by name', function(){
 
 test('Single argument is passed to class method', function(){
 	Class.define('MyClass', {
-		myMethod: function(arg){
+		'public:myMethod': function(arg){
 			return 'Your arg: ' + arg;
 		}
 	});
@@ -93,7 +93,7 @@ test('Single argument is passed to class method', function(){
 
 test('Multiple arguments are passed to class method', function(){
 	Class.define('MyClass', {
-		myMethod: function(arg1, arg2, arg3){
+		'public:myMethod': function(arg1, arg2, arg3){
 			return [arg1, arg2, arg3];
 		}
 	});
@@ -106,13 +106,61 @@ test('Multiple arguments are passed to class method', function(){
 
 test('\'this\' keyword is bound to object within class method', function(){
 	Class.define('MyClass', {
-		myProperty: 'myValue',
-		myMethod: function(){
+		'public:myProperty': 'myValue',
+		'public:myMethod': function(){
 			return this.get('myProperty');
 		}
 	});
 	var myObject = new MyClass();
 	ok(myObject.myMethod() == 'myValue');
+});
+
+test('Properties are declared private if not specified', function(){
+	Class.define('MyParent', {
+		myProperty: 'myValue',
+		'public:myParentMethod': function(){
+			return this.get('myProperty');
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'public:myChildMethod': function(){
+			return this.get('myProperty');
+		}
+	});
+	var myChild = new MyChild();
+	raises(function(){
+		myChild.get('myProperty');
+	}, ScopeFatal);
+	raises(function(){
+		myChild.myChildMethod();
+	}, ScopeFatal);
+	ok(myChild.myParentMethod() == 'myValue');
+});
+
+test('Methods are declared private if not specified', function(){
+	Class.define('MyParent', {
+		myValueMethod: function(){
+			return 'myValue';
+		},
+		'public:myAccessMethod': function(){
+			return this.myValueMethod();
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'public:myChildMethod': function(){
+			return this.myValueMethod();
+		}
+	});
+	var myChild = new MyChild();
+	raises(function(){
+		myChild.myValueMethod();
+	}, ScopeFatal);
+	raises(function(){
+		myChild.myChildMethod();
+	}, ScopeFatal);
+	ok(myChild.myAccessMethod() == 'myValue');
 });
 
 test('New namespace is created if class name requires it', function(){
@@ -130,7 +178,7 @@ test('Class is created within namespace if it already exists', function(){
 
 test('Classes can be subclassed using the Extends keyword', function(){
 	Class.define('MyParent', {
-		parentMethod: function(){return 'Returned from Parent';}
+		'public:parentMethod': function(){return 'Returned from Parent';}
 	});
 	Class.define('MyChild', {
 		Extends: MyParent
@@ -141,11 +189,11 @@ test('Classes can be subclassed using the Extends keyword', function(){
 
 test('Child methods override parent methods', function(){
 	Class.define('MyParent', {
-		myMethod: function(){return 'Returned from Parent';}
+		'public:myMethod': function(){return 'Returned from Parent';}
 	});
 	Class.define('MyChild', {
 		Extends: MyParent,
-		myMethod: function(){return 'Returned from Child';}
+		'public:myMethod': function(){return 'Returned from Child';}
 	});
 	var myChild = new MyChild();
 	ok(myChild.myMethod() == 'Returned from Child');
@@ -153,11 +201,11 @@ test('Child methods override parent methods', function(){
 
 test('Child methods can call overridden parent methods', function(){
 	Class.define('MyParent', {
-		myMethod: function(){return 'Returned from Parent';}
+		'public:myMethod': function(){return 'Returned from Parent';}
 	});
 	Class.define('MyChild', {
 		Extends: MyParent,
-		myMethod: function(){
+		'public:myMethod': function(){
 			return this.parent.myMethod();
 		}
 	});
@@ -167,11 +215,11 @@ test('Child methods can call overridden parent methods', function(){
 
 test('Child methods can call non overridden parent methods', function(){
 	Class.define('MyParent', {
-		myMethod: function(){return 'Returned from Parent';}
+		'public:myMethod': function(){return 'Returned from Parent';}
 	});
 	Class.define('MyChild', {
 		Extends: MyParent,
-		myOtherMethod: function(){
+		'public:myOtherMethod': function(){
 			return this.parent.myMethod();
 		}
 	});
@@ -181,14 +229,14 @@ test('Child methods can call non overridden parent methods', function(){
 
 test('Child methods can call parent construct method', function(){
 	Class.define('MyParent', {
-		myProperty: null,
-		construct: function(myProperty){
+		'public:myProperty': null,
+		'public:construct': function(myProperty){
 			this.set('myProperty', myProperty);
 		}
 	});
 	Class.define('MyChild', {
 		Extends: MyParent,
-		construct: function(myProperty){
+		'public:construct': function(myProperty){
 			this.parent.construct(myProperty);
 		}
 	});
@@ -208,7 +256,7 @@ test('Abstract classes cannot be instantiated', function(){
 test('Extending classes can implement abstract classes', function(){
 	Class.define('MyParent', {
 		Abstract: true,
-		myProperty: 'myValue'
+		'public:myProperty': 'myValue'
 	});
 	Class.define('MyChild', {
 		Extends: MyParent
@@ -219,8 +267,8 @@ test('Extending classes can implement abstract classes', function(){
 
 test('Constructor method is called on instantiation', function(){
 	Class.define('MyClass', {
-		myProperty: undefined,
-		construct: function(){
+		'public:myProperty': undefined,
+		'public:construct': function(){
 			this.set('myProperty', 'Some String');
 		}
 	});
@@ -230,8 +278,8 @@ test('Constructor method is called on instantiation', function(){
 
 test('Constructor arguments are passed to constuctor method', function(){
 	Class.define('MyClass', {
-		myProperty: undefined,
-		construct: function(arg1, arg2, arg3){
+		'public:myProperty': undefined,
+		'public:construct': function(arg1, arg2, arg3){
 			this.set('myProperty', [arg1, arg2, arg3]);
 		}
 	});
@@ -287,17 +335,17 @@ test('Protected properties can be accessed from inside of object', function(){
 });
 
 test('Protected properties can be accessed from subclasses', function(){
-	Class.define('MyClass', {
+	Class.define('MyParent', {
 		'protected:myProperty': 'myValue'
 	});
-	Class.define('MySubClass', {
-		Extends: MyClass,
+	Class.define('MyChild', {
+		Extends: MyParent,
 		'public:myMethod': function(){
 			return this.get('myProperty');
 		}
 	});
-	var mySubObject = new MySubClass();
-	ok('myValue' == mySubObject.myMethod());
+	var myChild = new MyChild();
+	ok('myValue' == myChild.myMethod());
 });
 
 test('Protected properties cannot be accessed from outside of object', function(){
@@ -527,11 +575,24 @@ test('Class can be instantiated with interface methods', function(){
 	]);
 	Class.define('MyClass', {
 		Implements: MyInterface,
-		myMethod: function(){},
-		myOtherMethod: function(){}
+		'public:myMethod': function(){},
+		'public:myOtherMethod': function(){}
 	});
 	var myObject = new MyClass();
 	ok(myObject instanceof MyClass);
+});
+
+test('Implemented interface methods must be declared public', function(){
+	Interface.define('MyInterface', [
+		'myMethod()'
+	]);
+	Class.define('MyClass', {
+		Implements: MyInterface,
+		myMethod: function(){}
+	});
+	raises(function(){
+		var myObject = new MyClass();
+	}, InterfaceMethodNotImplementedFatal);
 });
 
 test('Class must have arguments which match interface arguments', function(){
@@ -541,13 +602,13 @@ test('Class must have arguments which match interface arguments', function(){
 	]);
 	Class.define('MyClass', {
 		Implements: MyInterface,
-		myMethod: function(){},
-		myOtherMethod: function(){}
+		'public:myMethod': function(){},
+		'public:myOtherMethod': function(){}
 	});
 	Class.define('OtherClass', {
 		Implements: MyInterface,
-		myMethod: function(myArgument){},
-		myOtherMethod: function(arg1, arg2){}
+		'public:myMethod': function(myArgument){},
+		'public:myOtherMethod': function(arg1, arg2){}
 	});
 	raises(function(){
 		var myObject = new MyClass();
@@ -556,7 +617,7 @@ test('Class must have arguments which match interface arguments', function(){
 	ok(otherObject instanceof OtherClass);
 });
 
-test('Object is instanceof interface', function(){
+test('Object is instanceOf interface', function(){
 	Interface.define('MyInterface');
 	Class.define('MyClass', {
 		Implements: MyInterface
@@ -572,26 +633,26 @@ test('Object is not instanceOf interface if not implemented', function(){
 	ok(!myObject.instanceOf(MyInterface));
 });
 
-test('Object is instanceof class', function(){
+test('Object is instanceOf class', function(){
 	Class.define('MyClass');
 	var myObject = new MyClass();
 	ok(myObject.instanceOf(MyClass));
 });
 
-test('Object is instanceof root Class', function(){
+test('Object is instanceOf root Class', function(){
 	Class.define('MyClass');
 	var myObject = new MyClass();
 	ok(myObject.instanceOf(Class));
 });
 
-test('Object is not instanceof other class', function(){
+test('Object is not instanceOf other class', function(){
 	Class.define('MyClass');
 	Class.define('OtherClass');
 	var myObject = new MyClass();
 	ok(!myObject.instanceOf(OtherClass));
 });
 
-test('Object is instanceof parent class', function(){
+test('Object is instanceOf parent class', function(){
 	Class.define('MyParent');
 	Class.define('MyChild', {
 		Extends: MyParent
@@ -601,9 +662,22 @@ test('Object is instanceof parent class', function(){
 	ok(myObject.instanceOf(MyParent));
 });
 
+test('All objects have instanceOf method', function(){
+	var myString = 'string';
+	var myNumber = 10;
+	var myObject = {};
+	var myArray = [];
+	var myBoolean = true;
+	ok(myString.instanceOf(Class) === false);
+	ok(myNumber.instanceOf(Class) === false);
+	ok(myObject.instanceOf(Class) === false);
+	ok(myArray.instanceOf(Class) === false);
+	ok(myBoolean.instanceOf(Class) === false);
+});
+
 test('Call to unknown method is dispatched to call if present', function(){
 	Class.define('MyClass', {
-		'call': function(){
+		'public:call': function(){
 			return 'From Call';
 		}
 	})
@@ -613,7 +687,7 @@ test('Call to unknown method is dispatched to call if present', function(){
 
 test('Call to overload method passes method name as first argument', function(){
 	Class.define('MyClass', {
-		'call': function(method){
+		'public:call': function(method){
 			return method;
 		}
 	})
@@ -623,7 +697,7 @@ test('Call to overload method passes method name as first argument', function(){
 
 test('Call to overload method passes other arguments as array', function(){
 	Class.define('MyClass', {
-		'call': function(method, arguments){
+		'public:call': function(method, arguments){
 			return arguments;
 		}
 	})
@@ -636,7 +710,7 @@ test('Call to overload method passes other arguments as array', function(){
 
 test('Parent object methods can be called magically on child', function(){
 	Class.define('MyParent', {
-		'myMethod': function(){ return 'Returned from parent class'; }
+		'public:myMethod': function(){ return 'Returned from parent class'; }
 	});
 	Class.define('MyChild', {
 		Extends: MyParent
@@ -647,7 +721,7 @@ test('Parent object methods can be called magically on child', function(){
 
 test('Instances of same class can have different property values', function(){
 	Class.define('MyClass', {
-		myProperty: null
+		'public:myProperty': null
 	});
 	var myObject1 = new MyClass();
 	var myObject2 = new MyClass();
@@ -663,7 +737,7 @@ test('Instances of same class can have different property values', function(){
 
 test('Object properties are not persisted between instantiations', function(){
 	Class.define('MyClass', {
-		myProperty: {}
+		'public:myProperty': {}
 	});
 	var myObject = new MyClass();
 	var myProperty = myObject.get('myProperty');
@@ -675,7 +749,7 @@ test('Object properties are not persisted between instantiations', function(){
 
 test('Object can be cloned and values can be set independently', function(){
 	Class.define('MyClass', {
-		myProperty: null
+		'public:myProperty': null
 	});
 	var myObject = new MyClass();
 	myObject.set('myProperty', 'My Value');
@@ -687,7 +761,7 @@ test('Object can be cloned and values can be set independently', function(){
 
 test('Cloned object has higher ID', function(){
 	Class.define('MyClass', {
-		myProperty: null
+		'public:myProperty': null
 	});
 	var myObject = new MyClass();
 	var otherObject = myObject.clone();
@@ -696,7 +770,7 @@ test('Cloned object has higher ID', function(){
 
 test('Objects can implement toString method', function(){
 	Class.define('MyClass', {
-		toString: function(){
+		'public:toString': function(){
 			return 'Instance of MyClass';
 		}
 	});
@@ -704,15 +778,21 @@ test('Objects can implement toString method', function(){
 	ok(myObject.toString() === 'Instance of MyClass');
 });
 
-test('Objects that do not implement toString behave normally', function(){
+test('Objects that do not implement toString show class name', function(){
 	Class.define('MyClass');
 	var myObject = new MyClass();
-	ok(myObject.toString() === '[object Object]');
+	ok(myObject.toString() === '[object MyClass]');
+});
+
+test('Namespaced objects show full class name when converted to string', function(){
+	Class.define('My.TestClass');
+	var myObject = new My.TestClass();
+	ok(myObject.toString() === '[object My.TestClass]');
 });
 
 test('Child objects inherit parent toString method', function(){
 	Class.define('MyParent', {
-		toString: function(){return '[object MyObject]';}
+		'public:toString': function(){return '[object MyObject]';}
 	});
 	Class.define('MyChild', {
 		Extends: MyParent
@@ -723,7 +803,7 @@ test('Child objects inherit parent toString method', function(){
 
 test('Method can be defined with null return type', function(){
 	Class.define('MyClass', {
-		myMethod: [null, function(){
+		'public:myMethod': [null, function(){
 			return null;
 		}]
 	});
@@ -733,7 +813,7 @@ test('Method can be defined with null return type', function(){
 
 test('Method must implement null return type', function(){
 	Class.define('MyClass', {
-		myMethod: [null, function(){
+		'public:myMethod': [null, function(){
 			return undefined;
 		}]
 	});
@@ -745,7 +825,7 @@ test('Method must implement null return type', function(){
 
 test('Method can be defined with undefined return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['undefined', function(){
+		'public:myMethod': ['undefined', function(){
 			return;
 		}]
 	});
@@ -755,7 +835,7 @@ test('Method can be defined with undefined return type', function(){
 
 test('Method must implement undefined return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['undefined', function(){
+		'public:myMethod': ['undefined', function(){
 			return 'string';
 		}]
 	});
@@ -767,7 +847,7 @@ test('Method must implement undefined return type', function(){
 
 test('Method can be defined with string return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['string', function(){
+		'public:myMethod': ['string', function(){
 			return 'string';
 		}]
 	});
@@ -777,7 +857,7 @@ test('Method can be defined with string return type', function(){
 
 test('Method must implement string return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['string', function(){
+		'public:myMethod': ['string', function(){
 			return 1;
 		}]
 	});
@@ -789,7 +869,7 @@ test('Method must implement string return type', function(){
 
 test('Method can be defined with number return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['number', function(){
+		'public:myMethod': ['number', function(){
 			return 10;
 		}]
 	});
@@ -799,7 +879,7 @@ test('Method can be defined with number return type', function(){
 
 test('Method must implement number return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['number', function(){
+		'public:myMethod': ['number', function(){
 			return false;
 		}]
 	});
@@ -811,7 +891,7 @@ test('Method must implement number return type', function(){
 
 test('Method can be defined with boolean return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['boolean', function(){
+		'public:myMethod': ['boolean', function(){
 			return true;
 		}]
 	});
@@ -821,7 +901,7 @@ test('Method can be defined with boolean return type', function(){
 
 test('Method must implement boolean return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['boolean', function(){
+		'public:myMethod': ['boolean', function(){
 			return {};
 		}]
 	});
@@ -833,7 +913,7 @@ test('Method must implement boolean return type', function(){
 
 test('Method can be defined with object return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['object', function(){
+		'public:myMethod': ['object', function(){
 			return {};
 		}]
 	});
@@ -843,7 +923,7 @@ test('Method can be defined with object return type', function(){
 
 test('Method must implement object return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['object', function(){
+		'public:myMethod': ['object', function(){
 			return 'string';
 		}]
 	});
@@ -856,7 +936,7 @@ test('Method must implement object return type', function(){
 test('Method can be defined with class instance return type', function(){
 	Class.define('TargetClass');
 	Class.define('MyClass', {
-		myMethod: [TargetClass, function(){
+		'public:myMethod': [TargetClass, function(){
 			return new TargetClass();
 		}]
 	});
@@ -867,7 +947,7 @@ test('Method can be defined with class instance return type', function(){
 test('Method must implement class instance return type', function(){
 	Class.define('TargetClass');
 	Class.define('MyClass', {
-		myMethod: [TargetClass, function(){
+		'public:myMethod': [TargetClass, function(){
 			return null;
 		}]
 	});
@@ -879,7 +959,7 @@ test('Method must implement class instance return type', function(){
 
 test('Method can be defined with array return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['array', function(){
+		'public:myMethod': ['array', function(){
 			return [1, 2, 3];
 		}]
 	});
@@ -889,7 +969,7 @@ test('Method can be defined with array return type', function(){
 
 test('Method must implement array return type', function(){
 	Class.define('MyClass', {
-		myMethod: ['array', function(){
+		'public:myMethod': ['array', function(){
 			return 'string';
 		}]
 	});
@@ -901,13 +981,14 @@ test('Method must implement array return type', function(){
 
 test('Method can be defined with array of type return type', function(){
 	Class.define('MyClass', {
-		myMethod: [['string'], function(){
+		'public:myMethod': [['string'], function(){
 			return ['string 1', 'string 2', 'string 3'];
 		}]
 	});
 	var myObject = new MyClass();
 	var returnValue = myObject.myMethod();
 	for (var i in returnValue) {
+		if (!returnValue.hasOwnProperty(i)) continue;
 		if (typeof returnValue[i] != 'string') {
 			ok(false);
 			return;
@@ -918,7 +999,7 @@ test('Method can be defined with array of type return type', function(){
 
 test('Method must implement array of type return type', function(){
 	Class.define('MyClass', {
-		myMethod: [['boolean'], function(){
+		'public:myMethod': [['boolean'], function(){
 			return [true, false, 'true'];
 		}]
 	});
@@ -930,7 +1011,7 @@ test('Method must implement array of type return type', function(){
 
 test('Method can be defined with null argument type', function(){
 	Class.define('MyClass', {
-		myMethod: [null, function(arg){}]
+		'public:myMethod': [null, function(arg){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod(null);
@@ -939,7 +1020,7 @@ test('Method can be defined with null argument type', function(){
 
 test('Method must implement null argument type', function(){
 	Class.define('MyClass', {
-		myMethod: [null, function(arg){}]
+		'public:myMethod': [null, function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -949,7 +1030,7 @@ test('Method must implement null argument type', function(){
 
 test('Method can be defined with string argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['string', function(arg){}]
+		'public:myMethod': ['string', function(arg){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod('string');
@@ -958,7 +1039,7 @@ test('Method can be defined with string argument type', function(){
 
 test('Method must implement string argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['string', function(arg){}]
+		'public:myMethod': ['string', function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -968,7 +1049,7 @@ test('Method must implement string argument type', function(){
 
 test('Method can be defined with number argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['number', function(arg){}]
+		'public:myMethod': ['number', function(arg){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod(10);
@@ -977,7 +1058,7 @@ test('Method can be defined with number argument type', function(){
 
 test('Method must implement number argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['number', function(arg){}]
+		'public:myMethod': ['number', function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -987,7 +1068,7 @@ test('Method must implement number argument type', function(){
 
 test('Method can be defined with boolean argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['boolean', function(arg){}]
+		'public:myMethod': ['boolean', function(arg){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod(false);
@@ -996,7 +1077,7 @@ test('Method can be defined with boolean argument type', function(){
 
 test('Method must implement boolean argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['boolean', function(arg){}]
+		'public:myMethod': ['boolean', function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -1006,7 +1087,7 @@ test('Method must implement boolean argument type', function(){
 
 test('Method can be defined with object argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['object', function(arg){}]
+		'public:myMethod': ['object', function(arg){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod({});
@@ -1015,7 +1096,7 @@ test('Method can be defined with object argument type', function(){
 
 test('Method must implement object argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['object', function(arg){}]
+		'public:myMethod': ['object', function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -1026,7 +1107,7 @@ test('Method must implement object argument type', function(){
 test('Method can be defined with class instance argument type', function(){
 	Class.define('TargetClass');
 	Class.define('MyClass', {
-		myMethod: [TargetClass, function(arg){}]
+		'public:myMethod': [TargetClass, function(arg){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod(new TargetClass());
@@ -1036,7 +1117,7 @@ test('Method can be defined with class instance argument type', function(){
 test('Method must implement class instance argument type', function(){
 	Class.define('TargetClass');
 	Class.define('MyClass', {
-		myMethod: [TargetClass, function(arg){}]
+		'public:myMethod': [TargetClass, function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -1046,7 +1127,7 @@ test('Method must implement class instance argument type', function(){
 
 test('Method can be defined with array argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['array', function(arg){}]
+		'public:myMethod': ['array', function(arg){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod([]);
@@ -1055,7 +1136,7 @@ test('Method can be defined with array argument type', function(){
 
 test('Method must implement array argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['array', function(arg){}]
+		'public:myMethod': ['array', function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -1065,7 +1146,7 @@ test('Method must implement array argument type', function(){
 
 test('Method can be defined with array of type argument type', function(){
 	Class.define('MyClass', {
-		myMethod: [['number'], function(arg){}]
+		'public:myMethod': [['number'], function(arg){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod([1, 2, 100]);
@@ -1074,7 +1155,7 @@ test('Method can be defined with array of type argument type', function(){
 
 test('Method must implement array of type argument type', function(){
 	Class.define('MyClass', {
-		myMethod: [['string'], function(arg){}]
+		'public:myMethod': [['string'], function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -1084,7 +1165,7 @@ test('Method must implement array of type argument type', function(){
 
 test('Method will not accept undefined if argument is typed', function(){
 	Class.define('MyClass', {
-		myMethod: ['boolean', function(arg){}]
+		'public:myMethod': ['boolean', function(arg){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -1095,7 +1176,7 @@ test('Method will not accept undefined if argument is typed', function(){
 test('Method can be defined with multiple argument types', function(){
 	Class.define('TargetClass');
 	Class.define('MyClass', {
-		myMethod: ['number', 'string', TargetClass, function(arg1, arg2, arg3){}]
+		'public:myMethod': ['number', 'string', TargetClass, function(arg1, arg2, arg3){}]
 	});
 	var myObject = new MyClass();
 	myObject.myMethod(10, 'ten', new TargetClass());
@@ -1105,7 +1186,7 @@ test('Method can be defined with multiple argument types', function(){
 test('Method must implement multiple argument types', function(){
 	Class.define('TargetClass');
 	Class.define('MyClass', {
-		myMethod: ['number', 'string', TargetClass, function(arg1, arg2, arg3){}]
+		'public:myMethod': ['number', 'string', TargetClass, function(arg1, arg2, arg3){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -1121,7 +1202,7 @@ test('Method must implement multiple argument types', function(){
 
 test('All arguments must be supplied if typed', function(){
 	Class.define('MyClass', {
-		myMethod: ['number', 'string', 'boolean', function(arg1, arg2, arg3){}]
+		'public:myMethod': ['number', 'string', 'boolean', function(arg1, arg2, arg3){}]
 	});
 	var myObject = new MyClass();
 	raises(function(){
@@ -1131,7 +1212,7 @@ test('All arguments must be supplied if typed', function(){
 
 test('Method can be defined with return and argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['number', 'number', function(arg){
+		'public:myMethod': ['number', 'number', function(arg){
 			return arg;
 		}]
 	});
@@ -1142,7 +1223,7 @@ test('Method can be defined with return and argument type', function(){
 
 test('Method must implement return and argument type', function(){
 	Class.define('MyClass', {
-		myMethod: ['string', 'number', function(arg){
+		'public:myMethod': ['string', 'number', function(arg){
 			return arg;
 		}]
 	});
@@ -1157,7 +1238,7 @@ test('Method must implement return and argument type', function(){
 
 test('Method can be defined with return type and multiple argument types', function(){
 	Class.define('MyClass', {
-		myMethod: ['array', 'number', 'string', function(arg1, arg2){
+		'public:myMethod': ['array', 'number', 'string', function(arg1, arg2){
 			return [arg1, arg2];
 		}]
 	});
@@ -1168,7 +1249,7 @@ test('Method can be defined with return type and multiple argument types', funct
 
 test('Method must implement return and and multiple argument types', function(){
 	Class.define('MyClass', {
-		myMethod: ['boolean', 'string', 'number', function(arg1, arg2){
+		'public:myMethod': ['boolean', 'string', 'number', function(arg1, arg2){
 			return arg1 + arg2;
 		}]
 	});
@@ -1179,4 +1260,273 @@ test('Method must implement return and and multiple argument types', function(){
 	raises(function(){
 		myObject.myMethod('string', 1);
 	}, InvalidReturnTypeFatal);
+});
+
+test('Class can require a file', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-5ft78s.js'
+	});
+	ok(true);
+});
+
+test('Required file is included in the DOM on class declaration', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-7dgh20.js'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 14) == 'File-7dgh20.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+asyncTest('Required file is included before class is instantiated', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-s8ay12.js',
+		'public:construct': function(){
+			ok(typeof s8ay12 != 'undefined');
+			start();
+		}
+	});
+	var myObject = new MyClass();
+});
+
+test('File will not be re-included if required multiple times', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-3fb5gb.js'
+	});
+	Class.define('MyOtherClass', {
+		Require: 'includes/File-3fb5gb.js'
+	});
+	var count = 0;
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 14) == 'File-3fb5gb.js') {
+			count++
+		}
+	}
+	ok(count == 1);
+});
+
+test('Multiple required files are included in the DOM on class declaration', function(){
+	Class.define('MyClass', {
+		Require: [
+			'includes/File-p9s8ch.js',
+			'includes/File-vdf5v8.js'
+		]
+	});
+	var p9s8chExists = false;
+	var vdf5v8Exists = false;
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 14) == 'File-p9s8ch.js') {
+			p9s8chExists = true;
+		}
+		if (script.substr(script.length - 14) == 'File-vdf5v8.js') {
+			vdf5v8Exists = true;
+		}
+	}
+	ok(p9s8chExists && vdf5v8Exists);
+});
+
+/*test('CSS file is included in the DOM on class declaration', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-cd7hsa.css'
+	});
+	var links = document.getElementsByTagName('link');
+	delete links.length;
+	for (var i in links) {
+		if (!links.hasOwnProperty(i)) continue;
+		if (links[i].rel != 'stylesheet') continue;
+		var link = links[i].href;
+		if (link.substr(link.length - 15) == 'File-cd7hsa.css') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('JPEG file is included in the DOM on class declaration', function(){
+	Class.define('MyClass', {
+		Require: 'includes/File-asedi8.jpg'
+	});
+	var images = document.getElementsByTagName('img');
+	delete images.length;
+	for (var i in images) {
+		if (!images.hasOwnProperty(i)) continue;
+		var image = images[i].src;
+		if (image.substr(image.length - 15) == 'File-asedi8.jpg') {
+			ok(true);
+			return;
+		}
+	}
+});*/
+
+test('Class can be required', function(){
+	Class.define('MyClass', {
+		Require: 'My.Test.sd8uds'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 17) == 'My/Test/sd8uds.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Folder pattern matching can be set up for required classes', function(){
+	Class.addClassAutoloadPattern('Test', 'subfolder');
+	Class.define('MyClass', {
+		Require: 'Test.p9c88c'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 19) == 'subfolder/p9c88c.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Multiple folder patterns can be set up for required classes', function(){
+	Class.addClassAutoloadPattern('Test', 'subfolder');
+	Class.addClassAutoloadPattern('Test.OtherTest', 'other/subfolder');
+	Class.define('MyClass', {
+		Require: [
+			'Test.d46fvb',
+			'Test.OtherTest.Example.ch732m'
+		]
+	});
+	var d46fvbExists = false;
+	var ch732mExists = false;
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 19) == 'subfolder/d46fvb.js') {
+			d46fvbExists = true;
+		}
+		if (script.substr(script.length - 33) == 'other/subfolder/Example/ch732m.js') {
+			ch732mExists = true;
+		}
+	}
+	ok(d46fvbExists && ch732mExists);
+});
+
+test('Longest matching pattern is used to include class', function(){
+	Class.addClassAutoloadPattern('My', 'folder1');
+	Class.addClassAutoloadPattern('My.Test.Class', 'folder2');
+	Class.addClassAutoloadPattern('My.Test', 'folder3');
+	Class.define('MyClass', {
+		Require: 'My.Test.Class.4rfc8u'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 17) == 'folder2/4rfc8u.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Folder pattern matching can be set up for required files', function(){
+	Class.addFolderAutoloadPattern('Test', 'subfolder');
+	Class.define('MyClass', {
+		Require: 'Test/4fcf9a.js'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 19) == 'subfolder/4fcf9a.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Multiple folder patterns can be set up for required files', function(){
+	Class.addFolderAutoloadPattern('Test', 'subfolder');
+	Class.addFolderAutoloadPattern('Test/OtherTest', 'other/subfolder');
+	Class.define('MyClass', {
+		Require: [
+			'Test/f54dh4.js',
+			'Test/OtherTest/Example/gpodlk.js'
+		]
+	});
+	var f54dh4Exists = false;
+	var gpodlkExists = false;
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 19) == 'subfolder/f54dh4.js') {
+			f54dh4Exists = true;
+		}
+		if (script.substr(script.length - 33) == 'other/subfolder/Example/gpodlk.js') {
+			gpodlkExists = true;
+		}
+	}
+	ok(f54dh4Exists && gpodlkExists);
+});
+
+test('Longest matching pattern is used to include file', function(){
+	Class.addFolderAutoloadPattern('My', 'folder1');
+	Class.addFolderAutoloadPattern('My/Test/Script', 'folder2');
+	Class.addFolderAutoloadPattern('My/Test', 'folder3');
+	Class.define('MyClass', {
+		Require: 'My/Test/Script/ftr56h.js'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 17) == 'folder2/ftr56h.js') {
+			ok(true);
+			return;
+		}
+	}
+});
+
+test('Loaded classes can be declared and will not be auto loaded in future', function(){
+	Class.registerLoadedClass('Pre.Loaded.Class.3fg9xh');
+	Class.define('MyClass', {
+		Require: 'Pre.Loaded.Class.3fg9xh'
+	});
+	var scripts = document.getElementsByTagName('script');
+	delete scripts.length;
+	for (var i in scripts) {
+		if (!scripts.hasOwnProperty(i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 14) == 'Pre/Loaded/Class/3fg9xh.js') {
+			ok(false);
+			return;
+		}
+	}
+	ok(true);
 });
