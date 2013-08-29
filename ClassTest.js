@@ -5,7 +5,8 @@ QUnit.testStart(function(){
 	window.MyParent = undefined;
 	window.MyChild = undefined;
 	window.MyGrandChild = undefined;
-	window.OtherClass = undefined;
+	window.MyOtherClass = undefined;
+	window.ThirdClass = undefined;
 	window.My = undefined;
 	window.MyInterface = undefined;
 });
@@ -522,16 +523,26 @@ test('Extending classes can implement abstract classes', function(){
 test('Abstract class can define an abstract method', function(){
 	Class.define('MyClass', {
 		Abstract: [
-			'myMethod'
+			'public:myMethod()'
 		]
 	});
 	ok(true);
 });
 
+test('Abstract methods must have brackets after name', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			Abstract: [
+				'public:myMethod'
+			]
+		});
+	}, InvalidSyntaxFatal);
+});
+
 test('Abstract method can be implemented in child and called', function(){
 	Class.define('MyParent', {
 		Abstract: [
-			'myMethod'
+			'public:myMethod()'
 		]
 	});
 	Class.define('MyChild', {
@@ -546,8 +557,8 @@ test('Abstract method can be implemented in child and called', function(){
 test('Abstract class can define multiple abstract methods', function(){
 	Class.define('MyParent', {
 		Abstract: [
-			'myMethod',
-			'myOtherMethod'
+			'public:myMethod()',
+			'public:myOtherMethod()'
 		]
 	});
 	Class.define('MyChild', {
@@ -563,20 +574,10 @@ test('Abstract class can define multiple abstract methods', function(){
 	ok(myChild.myMethod() == 'first value' && myChild.myOtherMethod() == 'second value');
 });
 
-test('Abstract methods must be identified by strings', function(){
-	raises(function(){
-		Class.define('MyClass', {
-			Abstract: [
-				1
-			]
-		});
-	}, InvalidSyntaxFatal);
-});
-
 test('Extending class must implement abstract method', function(){
 	Class.define('MyParent', {
 		Abstract: [
-			'myMethod'
+			'public:myMethod()'
 		]
 	});
 	raises(function(){
@@ -589,8 +590,8 @@ test('Extending class must implement abstract method', function(){
 test('Extending class must implement multiple abstract methods', function(){
 	Class.define('MyParent', {
 		Abstract: [
-			'myMethod',
-			'myOtherMethod'
+			'public:myMethod()',
+			'public:myOtherMethod()'
 		]
 	});
 	raises(function(){
@@ -598,13 +599,36 @@ test('Extending class must implement multiple abstract methods', function(){
 			Extends: MyParent,
 			'public:myMethod': function(){}
 		});
-	}, AbstractMethodNotImplementedFatal); // Fatal?
+	}, AbstractMethodNotImplementedFatal);
+});
+
+test('Extending class must match argument list for abstract methods', function(){
+	Class.define('MyClass', {
+		Abstract: [
+			'public:myMethod(myArgument)',
+			'public:myOtherMethod(arg1, arg2)'
+		]
+	});
+	raises(function(){
+		Class.define('MyOtherClass', {
+			Extends: MyClass,
+			'public:myMethod': function(){},
+			'public:myOtherMethod': function(arg, otherArg){}
+		});
+	}, AbstractMethodNotImplementedFatal);
+	Class.define('ThirdClass', {
+		Extends: MyClass,
+		'public:myMethod': function(myArgument){},
+		'public:myOtherMethod': function(arg1, arg2){}
+	});
+	var thirdObject = new ThirdClass();
+	ok(thirdObject instanceof ThirdClass);
 });
 
 test('Extending class may not implement abstract methods if it is also abstract', function(){
 	Class.define('MyParent', {
 		Abstract: [
-			'myMethod'
+			'public:myMethod()'
 		]
 	});
 	Class.define('MyChild', {
@@ -617,8 +641,8 @@ test('Extending class may not implement abstract methods if it is also abstract'
 test('Extending class may implement some abstract methods and not others', function(){
 	Class.define('MyParent', {
 		Abstract: [
-			'myMethod',
-			'myOtherMethod'
+			'public:myMethod()',
+			'public:myOtherMethod()'
 		]
 	});
 	Class.define('MyChild', {
@@ -636,14 +660,14 @@ test('Extending class may implement some abstract methods and not others', funct
 test('Abstract child class can list extra abstract methods that must be implemented', function(){
 	Class.define('MyParent', {
 		Abstract: [
-			'myMethod',
-			'myOtherMethod'
+			'public:myMethod()',
+			'public:myOtherMethod()'
 		]
 	});
 	Class.define('MyChild', {
 		Extends: MyParent,
 		Abstract: [
-			'myThirdMethod'
+			'public:myThirdMethod()'
 		],
 		'public:myMethod': function(){}
 	});
@@ -653,6 +677,106 @@ test('Abstract child class can list extra abstract methods that must be implemen
 			'public:myOtherMethod': function(){}
 		});
 	}, AbstractMethodNotImplementedFatal);
+});
+
+test('Abstract method can specify implementing method must be public', function(){
+	Class.define('MyClass', {
+		Abstract: [
+			'public:myMethod()'
+		]
+	});
+	Class.define('MyOtherClass', {
+		Extends: MyClass,
+		'public:myMethod': function(){}
+	});
+	raises(function(){
+		Class.define('ThirdClass', {
+			Extends: MyClass,
+			'protected:myMethod': function(){}
+		});
+	}, AbstractMethodNotImplementedFatal);
+	var myOtherObject = new MyOtherClass();
+	ok(myOtherObject instanceof MyOtherClass);
+});
+
+test('Abstract method can specify implementing method must be protected', function(){
+	Class.define('MyClass', {
+		Abstract: [
+			'protected:myMethod()'
+		]
+	});
+	Class.define('MyOtherClass', {
+		Extends: MyClass,
+		'protected:myMethod': function(){}
+	});
+	raises(function(){
+		Class.define('ThirdClass', {
+			Extends: MyClass,
+			'public:myMethod': function(){}
+		});
+	}, AbstractMethodNotImplementedFatal);
+	var myOtherObject = new MyOtherClass();
+	ok(myOtherObject instanceof MyOtherClass);
+});
+
+test('Abstract method cannot specify access level as private', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			Abstract: [
+				'private:myMethod()'
+			]
+		});
+	}, InvalidSyntaxFatal);
+});
+
+test('Abstract method must specify access level', function(){
+	raises(function(){
+		Class.define('MyClass', {
+			Abstract: [
+				'myMethod()'
+			]
+		});
+	}, InvalidSyntaxFatal);
+});
+
+test('Abstract method can specify argument types which must be implemented', function(){
+	Class.define('MyClass', {
+		Abstract: {
+			'public:myMethod(arg1, arg2)': ['string', 'number']
+		}
+	});
+	Class.define('MyOtherClass', {
+		Extends: MyClass,
+		'public:myMethod': ['string', 'number', function(arg1, arg2){}]
+	});
+	raises(function(){
+		Class.define('ThirdClass', {
+			Extends: MyClass,
+			'public:myMethod': function(arg1, arg2){}
+		});
+	}, AbstractMethodNotImplementedFatal);
+	var myOtherObject = new MyOtherClass();
+	ok(myOtherObject instanceof MyOtherClass);
+});
+
+test('Abstract method can specify return and argument types which must be implemented', function(){
+	Class.define('MyClass', {
+		Abstract: {
+			'public:myMethod(arg1, arg2)': ['boolean', 'string', 'number']
+		}
+	});
+	Class.define('MyOtherClass', {
+		Extends: MyClass,
+		'public:myMethod': ['boolean', 'string', 'number', function(arg1, arg2){}]
+	});
+	raises(function(){
+		Class.define('ThirdClass', {
+			Extends: MyClass,
+			'public:myMethod': ['object', 'string', 'number', function(arg1, arg2){}]
+		});
+	}, AbstractMethodNotImplementedFatal);
+	var myOtherObject = new MyOtherClass();
+	ok(myOtherObject instanceof MyOtherClass);
 });
 
 test('Interface can be defined', function(){
@@ -742,7 +866,7 @@ test('Class must have arguments which match interface arguments', function(){
 		'public:myMethod': function(){},
 		'public:myOtherMethod': function(){}
 	});
-	Class.define('OtherClass', {
+	Class.define('MyOtherClass', {
 		Implements: MyInterface,
 		'public:myMethod': function(myArgument){},
 		'public:myOtherMethod': function(arg1, arg2){}
@@ -750,8 +874,8 @@ test('Class must have arguments which match interface arguments', function(){
 	raises(function(){
 		var myObject = new MyClass();
 	}, InterfaceMethodNotImplementedFatal);
-	var otherObject = new OtherClass();
-	ok(otherObject instanceof OtherClass);
+	var myOtherObject = new MyOtherClass();
+	ok(myOtherObject instanceof MyOtherClass);
 });
 
 test('Object is instanceOf interface', function(){
@@ -784,9 +908,9 @@ test('Object is instanceOf root Class', function(){
 
 test('Object is not instanceOf other class', function(){
 	Class.define('MyClass');
-	Class.define('OtherClass');
+	Class.define('MyOtherClass');
 	var myObject = new MyClass();
-	ok(!myObject.instanceOf(OtherClass));
+	ok(!myObject.instanceOf(MyOtherClass));
 });
 
 test('Object is instanceOf parent class', function(){
