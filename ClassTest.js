@@ -1729,7 +1729,7 @@ test('Class can define an array of event names', function(){
 	ok(true);
 });
 
-test('Events must be declared in an array', function(){
+test('Events must be declared in an array or object', function(){
 	raises(function(){
 		Class.define('MyClass', {
 			Events: 'myEvent'
@@ -1737,7 +1737,7 @@ test('Events must be declared in an array', function(){
 	}, InvalidSyntaxFatal);
 });
 
-test('Events must be declared as an array of strings', function(){
+test('Events must be declared as strings', function(){
 	raises(function(){
 		Class.define('MyClass', {
 			Events: [1, 2]
@@ -2174,6 +2174,111 @@ test('Event cannot be triggered from class constructor', function(){
 	raises(function(){
 		new MyClass();
 	}, RuntimeFatal);
+});
+
+test('Event can specify argument types', function(){
+	Class.define('MyClass', {
+		Events: {
+			'myEvent': ['number', 'string']
+		}
+	});
+	ok(true);
+});
+
+test('Method can be bound if it has a matching type signature', function(){
+	Class.define('MyClass', {
+		Events: {
+			'myEvent': ['number', 'string']
+		},
+		'public:bindEvent': function(){
+			this.bind('myEvent', 'targetMethod');
+		},
+		'public:targetMethod': ['number', 'string', function(arg1, arg2){}]
+	});
+	new MyClass().bindEvent();
+	ok(true);
+});
+
+test('Method cannot be bound if it does not have a matching type signature', function(){
+	Class.define('MyClass', {
+		Events: {
+			'myEvent': ['number', 'string']
+		},
+		'public:bindEvent': function(){
+			this.bind('myEvent', 'targetMethod');
+		},
+		'public:targetMethod': ['string', 'string', function(arg1, arg2){}]
+	});
+	raises(function(){
+		new MyClass().bindEvent();
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method cannot be bound if it does not have a matching argument count', function(){
+	Class.define('MyClass', {
+		Events: {
+			'myEvent': ['number', 'string']
+		},
+		'public:bindEvent': function(){
+			this.bind('myEvent', 'targetMethod');
+		},
+		'public:targetMethod': ['number', function(arg){}]
+	});
+	raises(function(){
+		new MyClass().bindEvent();
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Target method return type is ignored when binding to typed event', function(){
+	Class.define('MyClass', {
+		Events: {
+			'myEvent': ['boolean']
+		},
+		'public:bindEvent': function(){
+			this.bind('myEvent', 'targetMethod');
+		},
+		'public:targetMethod': ['string', 'boolean', function(arg){}]
+	});
+	new MyClass().bindEvent();
+	ok(true);
+});
+
+test('Typed target method can be bound to a non typed event', function(){
+	Class.define('MyClass', {
+		Events: [
+			'myEvent'
+		],
+		'public:bindEvent': function(){
+			this.bind('myEvent', 'targetMethod');
+		},
+		'public:targetMethod': ['string', function(arg){}]
+	});
+	new MyClass().bindEvent();
+	ok(true);
+});
+
+test('Non typed target method can be bound to a typed event', function(){
+	Class.define('MyClass', {
+		Events: {
+			'myEvent': ['string']
+		},
+		'public:bindEvent': function(){
+			this.bind('myEvent', 'targetMethod');
+		},
+		'public:targetMethod': function(){}
+	});
+	new MyClass().bindEvent();
+	ok(true);
+});
+
+test('Typed events can be declared alongside non typed events', function(){
+	Class.define('MyClass', {
+		Events: {
+			'firstEvent': ['string', 'object'],
+			'secondEvent': undefined
+		}
+	});
+	ok(true);
 });
 
 test('Class can require a file', function(){

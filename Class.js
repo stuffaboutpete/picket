@@ -95,7 +95,7 @@
 			this.eventCallbacks = {};
 			for (var i in this.type.Events) {
 				if (!this.type.Events.hasOwnProperty(i)) continue;
-				this.eventCallbacks[this.type.Events[i]] = [];
+				this.eventCallbacks[i] = [];
 			}
 			
 			// If this class extends another,
@@ -236,14 +236,19 @@
 			delete definition.Implements;
 		}
 		if (definition.Events) {
-			if (Object.prototype.toString.apply(definition.Events) != '[object Array]') {
-				throw new InvalidSyntaxFatal('Events must be declared in an array');
-			}
-			for (var i in definition.Events) {
-				if (!definition.Events.hasOwnProperty(i)) continue;
-				if (typeof definition.Events[i] != 'string') {
-					throw new InvalidSyntaxFatal('Events must be declared as an array of strings');
+			if (Object.prototype.toString.apply(definition.Events) == '[object Array]') {
+				var eventsTemp = {};
+				for (var i in definition.Events) {
+					if (!definition.Events.hasOwnProperty(i)) continue;
+					if (typeof definition.Events[i] != 'string') {
+						throw new InvalidSyntaxFatal('Events must be declared as an array of strings');
+					}
+					eventsTemp[definition.Events[i]] = undefined;
 				}
+				definition.Events = eventsTemp;
+			}
+			if (typeof definition.Events != 'object') {
+				throw new InvalidSyntaxFatal('Events must be declared in an array');
 			}
 			namespace[className].Events = definition.Events;
 			delete definition.Events;
@@ -680,6 +685,16 @@
 		copiedMethod.method.parent = this;
 		copiedMethod.parentType.id = targetObject.id;
 		copiedMethod.scope.checkCallingObject(object);
+		if (typeof copiedMethod.argTypes != 'undefined') {
+			for (var i in target.type.Events[eventName]) {
+				if (!target.type.Events[eventName].hasOwnProperty(i)) continue;
+				if (copiedMethod.argTypes[i] !== target.type.Events[eventName][i]) {
+					throw new InvalidArgumentTypeFatal(
+						'Method argument types must match target event argument types'
+					);
+				}
+			}
+		}
 		for (var i in this.eventCallbacks[eventName]) {
 			if (!this.eventCallbacks[eventName].hasOwnProperty(i)) continue;
 			if (this.eventCallbacks[eventName][i].method.name == methodName
