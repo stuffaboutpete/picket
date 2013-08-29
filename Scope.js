@@ -5,7 +5,7 @@
 		if (level != Class.Scope.PUBLIC
 		&& level != Class.Scope.PROTECTED
 		&& level != Class.Scope.PRIVATE) {
-			throw new Error('Invalid scope declaration');
+			throw new InvalidSyntaxFatal('Invalid scope declaration');
 		}
 		
 		this.level = level;
@@ -26,22 +26,30 @@
 				object = object || {};
 				if (this.parent instanceof Class.Method) {
 					if (this.parent.parentType.id != object.id) {
-						throw new ScopeFatal('Cannot access protected method');
+						throw new ScopeFatal(
+							'Cannot access protected method \'' + this.parent.name + '\''
+						);
 					}
 				} else {
 					if (this.parent.parent.id != object.id) {
-						throw new ScopeFatal('Cannot access protected property');
+						throw new ScopeFatal(
+							'Cannot access protected property \'' + this.parent.name + '\''
+						);
 					}
 				}
 				break;
 			case Class.Scope.PRIVATE:
 				if (this.parent instanceof Class.Method) {
 					if (this.parent.parentType != object) {
-						throw new ScopeFatal('Cannot access private property');
+						throw new ScopeFatal(
+							'Cannot access private method \'' + this.parent.name + '\''
+						);
 					}
 				} else {
 					if (this.parent.parent.type != object) {
-						throw new ScopeFatal('Cannot access private property');
+						throw new ScopeFatal(
+							'Cannot access private property \'' + this.parent.name + '\''
+						);
 					}
 				}
 		} 
