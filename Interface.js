@@ -7,6 +7,7 @@
 		var definitionError = false;
 		var methodList = {};
 		for (var i in methods) {
+			if (!methods.hasOwnProperty(i)) continue;
 			if (methods[i].split('(').length-1 != 1) {
 				definitionError = true;
 				break;
@@ -38,6 +39,7 @@
 		var namespace = window;
 		
 		for (var i in namespaceTree) {
+			if (!namespaceTree.hasOwnProperty(i)) continue;
 			namespace[namespaceTree[i]] = namespace[namespaceTree[i]] || {};
 			namespace = namespace[namespaceTree[i]];
 		}
