@@ -17,21 +17,21 @@
 	Class.Scope.PROTECTED =  0;
 	Class.Scope.PRIVATE	  = -1;
 	
-	Class.Scope.prototype.checkCallingFunction = function(callingFunction){
+	Class.Scope.prototype.checkCallingObject = function(object){
 		switch (this.level) {
 			case Class.Scope.PUBLIC:
 				return true;
 				break;
 			case Class.Scope.PROTECTED:
-				callingFunction.parentType = callingFunction.parentType || {};
+				object = object || {};
 				if (this.parent instanceof Class.Method) {
-					if (this.parent.parentType.id != callingFunction.parentType.id) {
+					if (this.parent.parentType.id != object.id) {
 						throw new ScopeFatal(
 							'Cannot access protected method \'' + this.parent.name + '\''
 						);
 					}
 				} else {
-					if (this.parent.parent.id != callingFunction.parentType.id) {
+					if (this.parent.parent.id != object.id) {
 						throw new ScopeFatal(
 							'Cannot access protected property \'' + this.parent.name + '\''
 						);
@@ -40,19 +40,23 @@
 				break;
 			case Class.Scope.PRIVATE:
 				if (this.parent instanceof Class.Method) {
-					if (this.parent.parentType != callingFunction.parentType) {
+					if (this.parent.parentType != object) {
 						throw new ScopeFatal(
-							'Cannot access private property \'' + this.parent.name + '\''
+							'Cannot access private method \'' + this.parent.name + '\''
 						);
 					}
 				} else {
-					if (this.parent.parent.type != callingFunction.parentType) {
+					if (this.parent.parent.type != object) {
 						throw new ScopeFatal(
 							'Cannot access private property \'' + this.parent.name + '\''
 						);
 					}
 				}
 		} 
+	}
+	
+	Class.Scope.prototype.checkCallingFunction = function(callingFunction){
+		return this.checkCallingObject(callingFunction.parentType);
 	}
 	
 })();

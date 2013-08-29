@@ -92,6 +92,12 @@
 			
 			// Set values of properties
 			
+			this.eventCallbacks = {};
+			for (var i in this.type.Events) {
+				if (!this.type.Events.hasOwnProperty(i)) continue;
+				this.eventCallbacks[i] = [];
+			}
+			
 			// If this class extends another,
 			// we must instantiate it
 			if (this.type.Extends) {
@@ -228,6 +234,24 @@
 			}
 			namespace[className].Implements = definition.Implements;
 			delete definition.Implements;
+		}
+		if (definition.Events) {
+			if (Object.prototype.toString.apply(definition.Events) == '[object Array]') {
+				var eventsTemp = {};
+				for (var i in definition.Events) {
+					if (!definition.Events.hasOwnProperty(i)) continue;
+					if (typeof definition.Events[i] != 'string') {
+						throw new InvalidSyntaxFatal('Events must be declared as an array of strings');
+					}
+					eventsTemp[definition.Events[i]] = undefined;
+				}
+				definition.Events = eventsTemp;
+			}
+			if (typeof definition.Events != 'object') {
+				throw new InvalidSyntaxFatal('Events must be declared in an array');
+			}
+			namespace[className].Events = definition.Events;
+			delete definition.Events;
 		}
 		// namespace[className].interfaces = ...
 		// 
@@ -570,6 +594,7 @@
 				copiedMethod[property] = method[property];
 			}
 		}
+		copiedMethod.method.parent = this;
 		copiedMethod.parentType.id = object.id;
 		// @todo next line should have one less 'caller' if
 		// the method is called directly using object.call('methodName');
@@ -600,6 +625,110 @@
 			throw new InvalidReturnTypeFatal();
 		}
 		return returnVal;
+	}
+	
+	Class.prototype.trigger = function()
+	{
+		if (arguments.callee.caller.parent.type.methods.construct
+		&&	arguments.callee.caller == arguments.callee.caller.parent.type.methods.construct.method) {
+			throw new RuntimeFatal('Cannot trigger an event from a constructor');
+		}
+		var eventName = arguments[0];
+		var target = getInstantiatedObject(this);
+		while (target) {
+			if (typeof target.eventCallbacks != 'undefined'
+			&&	typeof target.eventCallbacks[eventName] != 'undefined') {
+				var events = target.eventCallbacks;
+				break;
+			}
+			target = (target.parent) ? target.parent : false;
+		}
+		if (!events) throw new UnknownEventFatal(eventName);
+		var args = [];
+		for (var i = 1; i < arguments.length; i++) {
+			args.push(arguments[i]);
+		}
+		for (var i in events[eventName]) {
+			if (!events[eventName].hasOwnProperty(i)) continue;
+			var callback = events[eventName][i];
+			callback.method.method.apply(callback.object, args);
+		}
+	}
+	
+	Class.prototype.bind = function(eventName, methodName)
+	{
+		var target = getInstantiatedObject(this);
+		while (target) {
+			if (typeof target.eventCallbacks != 'undefined'
+			&&	typeof target.eventCallbacks[eventName] != 'undefined') {
+				var events = target.eventCallbacks;
+				break;
+			}
+			target = (target.parent) ? target.parent : false;
+		}
+		if (!events) throw new UnknownEventFatal(eventName);
+		var object = getInstantiatedObject(this);
+		var targetObject = arguments.callee.caller.parent;
+		var method = lookup(
+			'method',
+			methodName,
+			targetObject,
+			this,
+			arguments.callee.caller
+		);
+		var copiedMethod = {};
+		for (property in method) {
+			if (method.hasOwnProperty(property) && property != 'prototype') {
+				copiedMethod[property] = method[property];
+			}
+		}
+		copiedMethod.method.parent = this;
+		copiedMethod.parentType.id = targetObject.id;
+		copiedMethod.scope.checkCallingObject(object);
+		if (typeof copiedMethod.argTypes != 'undefined') {
+			for (var i in target.type.Events[eventName]) {
+				if (!target.type.Events[eventName].hasOwnProperty(i)) continue;
+				if (copiedMethod.argTypes[i] !== target.type.Events[eventName][i]) {
+					throw new InvalidArgumentTypeFatal(
+						'Method argument types must match target event argument types'
+					);
+				}
+			}
+		}
+		for (var i in this.eventCallbacks[eventName]) {
+			if (!this.eventCallbacks[eventName].hasOwnProperty(i)) continue;
+			if (this.eventCallbacks[eventName][i].method.name == methodName
+			&&	this.eventCallbacks[eventName][i].object == arguments.callee.caller.parent) {
+				return;
+			}
+		}
+		var events = events || this.eventCallbacks;
+		events[eventName].push({
+			object:	targetObject,
+			method:	method
+		});
+	}
+	
+	Class.prototype.unbind = function(eventName, method)
+	{
+		var target = getInstantiatedObject(this);
+		while (target) {
+			if (typeof target.eventCallbacks != 'undefined'
+			&&	typeof target.eventCallbacks[eventName] != 'undefined') {
+				var events = target.eventCallbacks;
+				break;
+			}
+			target = (target.parent) ? target.parent : false;
+		}
+		if (!events) throw new UnknownEventFatal(eventName);
+		for (var i in events[eventName]) {
+			if (!events[eventName].hasOwnProperty(i)) continue;
+			if (events[eventName][i].method.name == method
+			&&	events[eventName][i].object == arguments.callee.caller.parent) {
+				events[eventName].splice(i, 1);
+				return;
+			}
+		}
 	}
 	
 	Object.prototype.instanceOf = function(type)
