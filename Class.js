@@ -222,10 +222,32 @@
 			if (Object.prototype.toString.apply(
 				definition.Abstract
 			) == '[object Array]') {
+				var abstractMethods = {};
 				for (var i in definition.Abstract) {
 					if (!definition.Abstract.hasOwnProperty(i)) continue;
 					if (typeof definition.Abstract[i] != 'string') {
-						throw new InvalidSyntaxFatal();
+						throw new InvalidSyntaxFatal(
+							'Abstract method names must be specified as strings'
+						);
+					}
+					abstractMethods[definition.Abstract[i]] = undefined;
+				}
+				definition.Abstract = abstractMethods;
+			}
+			if (typeof definition.Abstract == 'object') {
+				for (var i in definition.Abstract) {
+					if (!definition.Abstract.hasOwnProperty(i)) continue;
+					if (i.split('(').length-1 != 1) {
+						throw new InvalidSyntaxFatal(
+							'Abstract method declarations must contain brackets even ' +
+							'if they expect no argument'
+						);
+					}
+					if (i.substring(0, 7) != 'public:'
+					&&	i.substring(0, 10) != 'protected:') {
+						throw new InvalidSyntaxFatal(
+							'Abstract methods must be specified public or protected'
+						);
 					}
 				}
 				namespace[className].AbstractMethods = definition.Abstract;
@@ -252,7 +274,9 @@
 				for (var i in definition.Events) {
 					if (!definition.Events.hasOwnProperty(i)) continue;
 					if (typeof definition.Events[i] != 'string') {
-						throw new InvalidSyntaxFatal('Events must be declared as an array of strings');
+						throw new InvalidSyntaxFatal(
+							'Events must be declared as an array of strings'
+						);
 					}
 					eventsTemp[definition.Events[i]] = undefined;
 				}
@@ -509,31 +533,112 @@
 			// gather a list of all abstract methods
 			var parent = namespace[className].Extends;
 			var methods = {};
+			var methodsFound = false;
 			while (parent) {
 				for (var i in parent.AbstractMethods) {
 					if (!parent.AbstractMethods.hasOwnProperty(i)) continue;
-					methods[parent.AbstractMethods[i]] = false;
+					methods[i] = parent.AbstractMethods[i];
+					methodsFound = true;
 				}
 				parent = parent.Extends || false;
+			}
+			
+			for (var i in methods) {
+				if (!methods.hasOwnProperty(i)) continue;
+				var args = i.substring(
+					i.indexOf('(')+1,
+					i.length-1
+				);
+				args = args.replace(' ', '');
+				args = (args == '') ? [] : args.split(',');
+				var methodName = i.substring(0, i.indexOf('('));
+				if (methodName.substring(0, 10) == 'protected:') {
+					methodName = methodName.substring(10);
+					var scope = Class.Scope.PROTECTED;
+				} else if (methodName.substring(0, 7) == 'public:') {
+					methodName = methodName.substring(7);
+					var scope = Class.Scope.PUBLIC;
+				} else {
+					methodName = methodName.substring(10);
+					var scope = Class.Scope.PROTECTED;
+				}
+				methods[methodName] = {
+					scope: scope,
+					args: args,
+					implemented: false,
+					types: methods[i]
+				};
+				delete methods[i];
 			}
 			
 			// Loop through all ancesters again
 			// and mark all the methods that
 			// have been implemented
-			parent = namespace[className];
-			while (parent) {
-				for (var i in parent.methods) {
-					if (!parent.methods.hasOwnProperty(i)) continue;
-					methods[i] = true;
+			if (methodsFound) {
+				parent = namespace[className];
+				while (parent) {
+					for (var i in parent.methods) {
+						var methodMatches = false;
+						if (!parent.methods.hasOwnProperty(i)) continue;
+						if (typeof methods[i] == 'undefined') continue;
+						var methodAsString = parent.methods[i].method.toString();
+						var methodArgs = methodAsString.substring(
+							'function ('.length,
+							methodAsString.indexOf(')')
+						);
+						methodArgs = methodArgs.replace(' ', '');
+						methodArgs = methodArgs.split(',');
+						if (methods[i].args.join('') == methodArgs.join('')
+						&&	methods[i].scope == parent.methods[i].scope.level) {
+							methodMatches = true;
+						}
+						var methodTypes = methods[i].types;
+						if (typeof methodTypes != 'undefined') {
+							if (typeof parent.methods[i].argTypes == 'undefined') {
+								methodMatches = false;
+							} else {
+								if (methodTypes.length != parent.methods[i].argTypes.length
+								&&	methodTypes.length != parent.methods[i].argTypes.length+1) {
+									methodMatches = false;
+								}
+								if (methodTypes.length == parent.methods[i].argTypes.length) {
+									for (var j in methodTypes) {
+										if (!methodTypes.hasOwnProperty(j)) continue;
+										if (parent.methods[i].argTypes[j] !== methodTypes[j]) {
+											methodMatches = false;
+											break;
+										}
+									}
+								}
+								if (methodTypes.length == parent.methods[i].argTypes.length+1) {
+									if (parent.methods[i].returnType != methodTypes[0]) {
+										methodMatches = false;
+									}
+									for (var j in methodTypes) {
+										var implementedTypes = parent.methods[i].argTypes[j];
+										if (!methodTypes.hasOwnProperty(j)) continue;
+										if (implementedTypes !== methodTypes[parseInt(j)+1]) {
+											methodMatches = false;
+											break;
+										}
+									}
+								}
+							}
+						}
+						if (methodMatches) methods[i].implemented = true;
+					}
+					parent = parent.Extends || false;
 				}
-				parent = parent.Extends || false;
-			}
-			
-			// If any methods are still marked
-			// as missing, throw a fatal
-			for (var i in methods) {
-				if (!methods.hasOwnProperty(i)) continue;
-				if (methods[i] === false) throw new AbstractMethodNotImplementedFatal();
+				
+				// If any methods are still marked
+				// as missing, throw a fatal
+				for (var i in methods) {
+					if (!methods.hasOwnProperty(i)) continue;
+					if (methods[i].implemented === false) {
+						throw new AbstractMethodNotImplementedFatal();
+					}
+				}
+				
 			}
 			
 		}
@@ -679,8 +784,9 @@
 	
 	Class.prototype.trigger = function()
 	{
-		if (arguments.callee.caller.parent.type.methods.construct
-		&&	arguments.callee.caller == arguments.callee.caller.parent.type.methods.construct.method) {
+		var caller = arguments.callee.caller;
+		if (caller.parent.type.methods.construct
+		&&	caller == caller.parent.type.methods.construct.method) {
 			throw new RuntimeFatal('Cannot trigger an event from a constructor');
 		}
 		var eventName = arguments[0];
