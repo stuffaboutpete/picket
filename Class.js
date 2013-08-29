@@ -237,12 +237,171 @@
 		
 		// Put properties in from definition
 		// Put methods in from definition
+		toInspectDefinition:
 		for (var i in definition) {
 			
 			if (!definition.hasOwnProperty(i)) continue;
 			
 			var propName = i;
 			var scope;
+			
+			if (typeof definition[i] == 'object') {
+				
+				for (var j in definition[i]) {
+					
+					if (!definition[i].hasOwnProperty(j)) continue;
+					
+					if (j != 'getter' && j != 'setter' && j != 'value') break;
+					
+					if (typeof definition[i].getter == 'undefined'
+					&&	typeof definition[i].setter == 'undefined') break;
+					
+					if (i.substring(0, 8) == 'private:'
+					||	i.substring(0, 10) == 'protected:'
+					||	i.substring(0, 7) == 'public:') {
+						throw new InvalidSyntaxFatal('Cannot declare access level on properties');
+					}
+					
+					if (Object.prototype.toString.apply(definition[i].getter) != '[object Array]') {
+						definition[i].getter = [undefined, definition[i].getter, true, true];
+					} else {
+						if (definition[i].getter.length == 1) {
+							definition[i].getter = [
+								undefined,
+								definition[i].getter[0],
+								true,
+								true
+							];
+						} else if (definition[i].getter.length == 2) {
+							var firstArg = definition[i].getter[0];
+							if (typeof firstArg == 'boolean' || typeof firstArg == 'function') {
+								definition[i].getter = [
+									undefined,
+									definition[i].getter[0],
+									definition[i].getter[1],
+									definition[i].getter[1]
+								];
+							} else {
+								definition[i].getter = [
+									definition[i].getter[0],
+									definition[i].getter[1],
+									true,
+									true
+								];
+							}
+						} else if (definition[i].getter.length == 3) {
+							var firstArg = definition[i].getter[0];
+							if (typeof firstArg == 'boolean' || typeof firstArg == 'function') {
+								definition[i].getter = [
+									undefined,
+									definition[i].getter[0],
+									definition[i].getter[1],
+									definition[i].getter[2]
+								];
+							} else {
+								definition[i].getter = [
+									definition[i].getter[0],
+									definition[i].getter[1],
+									definition[i].getter[2],
+									definition[i].getter[2]
+								];
+							}
+						}
+					}
+					
+					if (Object.prototype.toString.apply(definition[i].setter) != '[object Array]') {
+						definition[i].setter = [undefined, definition[i].setter, true, true];
+					} else {
+						if (definition[i].setter.length == 1) {
+							definition[i].setter = [
+								undefined,
+								definition[i].setter[0],
+								true,
+								true
+							];
+						} else if (definition[i].setter.length == 2) {
+							var firstArg = definition[i].setter[0];
+							if (typeof firstArg == 'boolean' || typeof firstArg == 'function') {
+								definition[i].setter = [
+									undefined,
+									definition[i].setter[0],
+									definition[i].setter[1],
+									definition[i].setter[1]
+								];
+							} else {
+								definition[i].setter = [
+									definition[i].setter[0],
+									definition[i].setter[1],
+									true,
+									true
+								];
+							}
+						} else if (definition[i].setter.length == 3) {
+							var firstArg = definition[i].setter[0];
+							if (typeof firstArg == 'boolean' || typeof firstArg == 'function') {
+								definition[i].setter = [
+									undefined,
+									definition[i].setter[0],
+									definition[i].setter[1],
+									definition[i].setter[2]
+								];
+							} else {
+								definition[i].setter = [
+									definition[i].setter[0],
+									definition[i].setter[1],
+									definition[i].setter[2],
+									definition[i].setter[2]
+								];
+							}
+						}
+					}
+					
+					if (typeof definition[i].getter[1] != 'boolean'
+					&&	typeof definition[i].getter[1] != 'function'
+					&&	typeof definition[i].getter[1] != 'undefined') {
+						throw new InvalidSyntaxFatal(
+							'Property getter should specify a function or boolean'
+						);
+					}
+					
+					if (typeof definition[i].setter[1] != 'boolean'
+					&&	typeof definition[i].setter[1] != 'function'
+					&&	typeof definition[i].setter[1] != 'undefined') {
+						throw new InvalidSyntaxFatal(
+							'Property setter should specify a function or boolean'
+						);
+					}
+					
+					scope = new Class.Scope(Class.Scope.PRIVATE)
+					
+					namespace[className].properties[propName] = new Class.Property(
+						propName,
+						definition[i].value,
+						scope,
+						(typeof definition[i].getter[1] == 'undefined'
+						|| definition[i].getter[1] === true)
+							? function(value){ return value }
+							: definition[i].getter[1],
+						(typeof definition[i].setter[1] == 'undefined'
+						|| definition[i].setter[1] === true)
+							? function(value){ return value }
+							: definition[i].setter[1],
+						definition[i].getter[2],
+						definition[i].getter[3],
+						definition[i].setter[2],
+						definition[i].setter[3],
+						definition[i].getter[0],
+						definition[i].setter[0]
+					);
+					
+					scope.parent = namespace[className].properties[propName];
+					namespace[className].properties[propName].originalValue = definition[i].value;
+					
+					continue toInspectDefinition;
+					
+				}
+				
+			}
 			
 			if (propName.substring(0, 8) == 'private:') {
 				propName = propName.substring(8);
@@ -316,7 +475,27 @@
 			this,
 			arguments.callee.caller
 		);
-		property.scope.checkCallingFunction(arguments.callee.caller);
+		if (typeof property.getter == 'function'
+		||	typeof property.getter == 'boolean') {
+			if (arguments.callee.caller.parentType == this.type) {
+				if (property.parent.type == this.type && !property.ownerUsesGetter) {
+					return property.value;
+				}
+				if (property.parent.type != this.type && !property.childUsesGetter) {
+					return property.value;
+				}
+			}
+			if (property.getter === false) throw new ScopeFatal(
+				'Cannot access restricted property'
+			);
+			var value = property.getter(property.value);
+			if (property.getterType && validateType(value, property.getterType) === false) {
+				throw new InvalidReturnTypeFatal();
+			}
+			return value;
+		} else {
+			property.scope.checkCallingFunction(arguments.callee.caller);
+		}
 		return property.value;
 	}
 	
@@ -329,8 +508,30 @@
 			this,
 			arguments.callee.caller
 		);
-		property.value = value;
-		this.propertyValues[propertyName] = value;
+		if (typeof property.setter == 'function'
+		||	typeof property.setter == 'boolean') {
+			if (arguments.callee.caller.parentType == this.type) {
+				if (property.parent.type == this.type && !property.ownerUsesSetter) {
+					property.value = value;
+					this.propertyValues[propertyName] = property.value;
+					return;
+				}
+				if (property.parent.type != this.type && !property.childUsesSetter) {
+					property.value = value;
+					this.propertyValues[propertyName] = property.value;
+					return;
+				}
+			}
+			if (property.setter === false) throw new ScopeFatal('Cannot access private property');
+			if (property.setterType && validateType(value, property.setterType) === false) {
+				throw new InvalidArgumentTypeFatal();
+			}
+			property.value = property.setter(value, property.value);
+			this.propertyValues[propertyName] = property.value;
+		} else {
+			property.value = value;
+			this.propertyValues[propertyName] = property.value;
+		}
 	}
 	
 	Class.prototype.call = function(methodName)
