@@ -496,27 +496,6 @@
 						= namespace[className];
 					namespace[className].methods[propName].method.parentType
 						= namespace[className];
-				} else {
-					namespace[className].properties[propName] = new Class.Property(
-						propName,
-						definition[i],
-						scope
-					);
-					scope.parent = namespace[className].properties[propName];
-					namespace[className].properties[propName].originalValue = definition[i];
-				}
-				
-				if (typeof definition[i] == 'function') {
-					namespace[className].methods[propName] = new Class.Method(
-						propName,
-						definition[i],
-						scope
-					);
-					scope.parent = namespace[className].methods[propName];
-					namespace[className].methods[propName].parentType
-						= namespace[className];
-					namespace[className].methods[propName].method.parentType
-						= namespace[className];
 				} else if (Object.prototype.toString.call(definition[i]) == '[object Array]'
 				&& typeof definition[i][definition[i].length-1] == 'function'
 				&& (definition[i].length == definition[i][definition[i].length-1].length+2
@@ -542,6 +521,14 @@
 					namespace[className].methods[propName].method.parentType
 						= namespace[className];
 					
+				} else {
+					namespace[className].properties[propName] = new Class.Property(
+						propName,
+						definition[i],
+						scope
+					);
+					scope.parent = namespace[className].properties[propName];
+					namespace[className].properties[propName].originalValue = definition[i];
 				}
 				
 			} else {
@@ -559,7 +546,44 @@
 					method.parentType = namespace[className];
 					method.method.parentType = namespace[className];
 					namespace[className][propName] = function(){
-						return callStatic(namespace[className], arguments.callee.methodName);
+						return callStatic(
+							namespace[className],
+							arguments.callee.methodName,
+							arguments
+						);
+					};
+					
+					namespace[className][propName].methodName = propName;
+					
+				} else if (Object.prototype.toString.call(definition[i]) == '[object Array]'
+				&& typeof definition[i][definition[i].length-1] == 'function'
+				&& (definition[i].length == definition[i][definition[i].length-1].length+2
+				|| definition[i].length == definition[i][definition[i].length-1].length+1)) {
+					
+					var method = definition[i].pop();
+					
+					if (definition[i].length == method.length+1) {
+						var returnType = definition[i].splice(0, 1)[0];
+					}
+					
+					namespace[className].staticMethods[propName] = new Class.Method(
+						propName,
+						method,
+						scope,
+						true,
+						returnType,
+						definition[i]
+					);
+					var method = namespace[className].staticMethods[propName];
+					scope.parent = method;
+					method.parentType = namespace[className];
+					method.method.parentType = namespace[className];
+					namespace[className][propName] = function(){
+						return callStatic(
+							namespace[className],
+							arguments.callee.methodName,
+							arguments
+						);
 					};
 					
 					namespace[className][propName].methodName = propName;
@@ -586,7 +610,11 @@
 		for (var i in parentMethods) {
 			if (!parentMethods.hasOwnProperty(i)) continue;
 			namespace[className][parentMethods[i]] = function(){
-				return callStatic(namespace[className], arguments.callee.methodName);
+				return callStatic(
+					namespace[className],
+					arguments.callee.methodName,
+					arguments
+				);
 			}
 			namespace[className][parentMethods[i]].methodName = parentMethods[i];
 		}
@@ -980,7 +1008,7 @@
 		}
 	}
 	
-	var callStatic = function(object, methodName)
+	var callStatic = function(object, methodName, passedArgs)
 	{
 		var method = object.staticMethods[methodName];
 		while (!method && object.Extends) {
@@ -991,7 +1019,23 @@
 			throw new UnknownMethodFatal(methodName);
 		}
 		method.scope.checkCallingFunction(arguments.callee.caller.caller);
-		return method.method.call();
+		var args = [];
+		for (var i = 0; i < passedArgs.length; i++) {
+			args.push(passedArgs[i]);
+		}
+		if (method.argTypes) {
+			for (var i in method.argTypes) {
+				if (!method.argTypes.hasOwnProperty(i)) continue;
+				if (validateType(args[i], method.argTypes[i]) === false) {
+					throw new InvalidArgumentTypeFatal();
+				}
+			}
+		}
+		var returnVal = method.method.apply(undefined, args);
+		if (method.returnType && validateType(returnVal, method.returnType) === false) {
+			throw new InvalidReturnTypeFatal();
+		}
+		return returnVal;
 	}
 	
 	Object.prototype.instanceOf = function(type)

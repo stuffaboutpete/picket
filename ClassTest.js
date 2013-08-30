@@ -740,6 +740,30 @@ test('Abstract method must specify access level', function(){
 	}, InvalidSyntaxFatal);
 });
 
+test('Abstract method can specify return type which must be implemented', function(){
+	Class.define('MyClass', {
+		Abstract: {
+			'public:myMethod()': ['boolean']
+		}
+	});
+	Class.define('MyOtherClass', {
+		Extends: MyClass,
+		'public:myMethod': ['boolean', function(){
+			return true;
+		}]
+	});
+	raises(function(){
+		Class.define('ThirdClass', {
+			Extends: MyClass,
+			'public:myMethod': function(){
+				return true;
+			}
+		});
+	}, AbstractMethodNotImplementedFatal);
+	var myOtherObject = new MyOtherClass();
+	ok(myOtherObject instanceof MyOtherClass);
+});
+
 test('Abstract method can specify argument types which must be implemented', function(){
 	Class.define('MyClass', {
 		Abstract: {
@@ -829,6 +853,24 @@ test('Static method cannot be called at instance level', function(){
 	raises(function(){
 		myObject.myMethod()
 	}, Error);
+});
+
+test('Static method can accept arguments and return a value', function(){
+	Class.define('MyClass', {
+		'static:public:myMethod': function(arg1, arg2){
+			return arg1 + ', ' + arg2;
+		}
+	});
+	ok(MyClass.myMethod('first', 'second') == 'first, second');
+});
+
+test('Static methods do not have access to "this"', function(){
+	Class.define('MyClass', {
+		'static:public:myMethod': function(){
+			ok(this instanceof Window);
+		}
+	});
+	MyClass.myMethod();
 });
 
 test('Static method can access static property', function(){
@@ -1070,6 +1112,48 @@ test('Protected static method can be accessed by static method of child class', 
 		}
 	});
 	ok(MyChild.myOtherMethod() == 'my value');
+});
+
+test('Static method can specify return type', function(){
+	Class.define('MyClass', {
+		'static:public:myMethod': ['boolean', function(){
+			return 'string';
+		}],
+		'static:public:myOtherMethod': ['boolean', function(){
+			return true;
+		}]
+	});
+	raises(function(){
+		MyClass.myMethod();
+	}, InvalidReturnTypeFatal);
+	ok(MyClass.myOtherMethod());
+});
+
+test('Static method can specify argument types', function(){
+	Class.define('MyClass', {
+		'static:public:myMethod': ['string', 'number', function(arg1, arg2){
+			return arg1 + arg2;
+		}]
+	});
+	raises(function(){
+		MyClass.myMethod('string', 'string');
+	}, InvalidArgumentTypeFatal);
+	ok(MyClass.myMethod('string', 10) === 'string10');
+});
+
+test('Static method can specify return and argument types', function(){
+	Class.define('MyClass', {
+		'static:public:myMethod': ['boolean', 'boolean', function(arg){
+			return (arg) ? 'string' : true;
+		}]
+	});
+	raises(function(){
+		MyClass.myMethod('string');
+	}, InvalidArgumentTypeFatal);
+	raises(function(){
+		MyClass.myMethod(true);
+	}, InvalidReturnTypeFatal);
+	ok(MyClass.myMethod(false));
 });
 
 test('Interface can be defined', function(){
