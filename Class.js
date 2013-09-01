@@ -293,6 +293,8 @@
 		
 		namespace[className].properties = {}; // []?
 		namespace[className].methods = {}; // []?
+		namespace[className].staticProperties = {};
+		namespace[className].staticMethods = {};
 		
 		// Put properties in from definition
 		// Put methods in from definition
@@ -303,6 +305,12 @@
 			
 			var propName = i;
 			var scope;
+			var isStatic = false;
+			
+			if (propName.substring(0, 7) == 'static:') {
+				propName = propName.substring(7);
+				isStatic = true;
+			}
 			
 			if (typeof definition[i] == 'object') {
 				
@@ -472,56 +480,169 @@
 				propName = propName.substring(7);
 				scope = new Class.Scope(Class.Scope.PUBLIC);
 			} else {
-				propName = i;
 				scope = new Class.Scope(Class.Scope.PRIVATE);
 			}
 			
-			if (typeof definition[i] == 'function') {
-				namespace[className].methods[propName] = new Class.Method(
-					propName,
-					definition[i],
-					scope
-				);
-				scope.parent = namespace[className].methods[propName];
-				namespace[className].methods[propName].parentType
-					= namespace[className];
-				namespace[className].methods[propName].method.parentType
-					= namespace[className];
-			} else if (Object.prototype.toString.call(definition[i]) == '[object Array]'
-			&& typeof definition[i][definition[i].length-1] == 'function'
-			&& (definition[i].length == definition[i][definition[i].length-1].length+2
-			|| definition[i].length == definition[i][definition[i].length-1].length+1)) {
+			if (!isStatic) {
 				
-				var method = definition[i].pop();
-				
-				if (definition[i].length == method.length+1) {
-					var returnType = definition[i].splice(0, 1)[0];
+				if (typeof definition[i] == 'function') {
+					namespace[className].methods[propName] = new Class.Method(
+						propName,
+						definition[i],
+						scope
+					);
+					scope.parent = namespace[className].methods[propName];
+					namespace[className].methods[propName].parentType
+						= namespace[className];
+					namespace[className].methods[propName].method.parentType
+						= namespace[className];
+				} else if (Object.prototype.toString.call(definition[i]) == '[object Array]'
+				&& typeof definition[i][definition[i].length-1] == 'function'
+				&& (definition[i].length == definition[i][definition[i].length-1].length+2
+				|| definition[i].length == definition[i][definition[i].length-1].length+1)) {
+					
+					var method = definition[i].pop();
+					
+					if (definition[i].length == method.length+1) {
+						var returnType = definition[i].splice(0, 1)[0];
+					}
+					
+					namespace[className].methods[propName] = new Class.Method(
+						propName,
+						method,
+						scope,
+						null,
+						returnType,
+						definition[i]
+					);
+					scope.parent = namespace[className].methods[propName];
+					namespace[className].methods[propName].parentType
+						= namespace[className];
+					namespace[className].methods[propName].method.parentType
+						= namespace[className];
+					
+				} else {
+					namespace[className].properties[propName] = new Class.Property(
+						propName,
+						definition[i],
+						scope
+					);
+					scope.parent = namespace[className].properties[propName];
+					namespace[className].properties[propName].originalValue = definition[i];
 				}
 				
-				namespace[className].methods[propName] = new Class.Method(
-					propName,
-					method,
-					scope,
-					returnType,
-					definition[i]
-				);
-				scope.parent = namespace[className].methods[propName];
-				namespace[className].methods[propName].parentType
-					= namespace[className];
-				namespace[className].methods[propName].method.parentType
-					= namespace[className];
-				
 			} else {
-				namespace[className].properties[propName] = new Class.Property(
-					propName,
-					definition[i],
-					scope
-				);
-				scope.parent = namespace[className].properties[propName];
-				namespace[className].properties[propName].originalValue = definition[i];
+				
+				if (typeof definition[i] == 'function') {
+					
+					namespace[className].staticMethods[propName] = new Class.Method(
+						propName,
+						definition[i],
+						scope,
+						true
+					);
+					var method = namespace[className].staticMethods[propName];
+					scope.parent = method;
+					method.parentType = namespace[className];
+					method.method.parentType = namespace[className];
+					namespace[className][propName] = function(){
+						return callStatic(
+							namespace[className],
+							arguments.callee.methodName,
+							arguments
+						);
+					};
+					
+					namespace[className][propName].methodName = propName;
+					
+				} else if (Object.prototype.toString.call(definition[i]) == '[object Array]'
+				&& typeof definition[i][definition[i].length-1] == 'function'
+				&& (definition[i].length == definition[i][definition[i].length-1].length+2
+				|| definition[i].length == definition[i][definition[i].length-1].length+1)) {
+					
+					var method = definition[i].pop();
+					
+					if (definition[i].length == method.length+1) {
+						var returnType = definition[i].splice(0, 1)[0];
+					}
+					
+					namespace[className].staticMethods[propName] = new Class.Method(
+						propName,
+						method,
+						scope,
+						true,
+						returnType,
+						definition[i]
+					);
+					var method = namespace[className].staticMethods[propName];
+					scope.parent = method;
+					method.parentType = namespace[className];
+					method.method.parentType = namespace[className];
+					namespace[className][propName] = function(){
+						return callStatic(
+							namespace[className],
+							arguments.callee.methodName,
+							arguments
+						);
+					};
+					
+					namespace[className][propName].methodName = propName;
+					
+				} else {
+					
+					namespace[className].staticProperties[propName] = new Class.Property(
+						propName,
+						definition[i],
+						scope
+					);
+					var property = namespace[className].staticProperties[propName];
+					property.parentType = namespace[className];
+					scope.parent = namespace[className].staticProperties[propName];
+					
+				}
+				
 			}
 			
 		}
+		
+		var parentMethods = getListOfParentStaticMethods(namespace[className]);
+		
+		for (var i in parentMethods) {
+			if (!parentMethods.hasOwnProperty(i)) continue;
+			namespace[className][parentMethods[i]] = function(){
+				return callStatic(
+					namespace[className],
+					arguments.callee.methodName,
+					arguments
+				);
+			}
+			namespace[className][parentMethods[i]].methodName = parentMethods[i];
+		}
+		
+		namespace[className].get = function(propertyName)
+		{
+			var object = this;
+			var property = object.staticProperties[propertyName];
+			while (!property && object.Extends) {
+				object = object.Extends;
+				property = object.staticProperties[propertyName];
+			}
+			if (!property) {
+				throw new UnknownPropertyFatal(propertyName);
+			}
+			namespace[className].staticProperties[propertyName].scope.checkCallingFunction(
+				arguments.callee.caller
+			);
+			return namespace[className].staticProperties[propertyName].value;
+		};
+		
+		namespace[className].set = function(propertyName, value)
+		{
+			if (typeof namespace[className].staticProperties[propertyName] == 'undefined') {
+				throw new UnknownPropertyFatal(propertyName);
+			}
+			namespace[className].staticProperties[propertyName].value = value;
+		};
 		
 		// If the class is not abstract
 		// and it does extend another class
@@ -635,7 +756,7 @@
 				for (var i in methods) {
 					if (!methods.hasOwnProperty(i)) continue;
 					if (methods[i].implemented === false) {
-						throw new AbstractMethodNotImplementedFatal();
+						throw new AbstractMethodNotImplementedFatal(i);
 					}
 				}
 				
@@ -887,6 +1008,36 @@
 		}
 	}
 	
+	var callStatic = function(object, methodName, passedArgs)
+	{
+		var method = object.staticMethods[methodName];
+		while (!method && object.Extends) {
+			object = object.Extends;
+			method = object.staticMethods[methodName];
+		}
+		if (!method) {
+			throw new UnknownMethodFatal(methodName);
+		}
+		method.scope.checkCallingFunction(arguments.callee.caller.caller);
+		var args = [];
+		for (var i = 0; i < passedArgs.length; i++) {
+			args.push(passedArgs[i]);
+		}
+		if (method.argTypes) {
+			for (var i in method.argTypes) {
+				if (!method.argTypes.hasOwnProperty(i)) continue;
+				if (validateType(args[i], method.argTypes[i]) === false) {
+					throw new InvalidArgumentTypeFatal();
+				}
+			}
+		}
+		var returnVal = method.method.apply(undefined, args);
+		if (method.returnType && validateType(returnVal, method.returnType) === false) {
+			throw new InvalidReturnTypeFatal();
+		}
+		return returnVal;
+	}
+	
 	Object.prototype.instanceOf = function(type)
 	{
 		if (this.type === type) return true;
@@ -1056,6 +1207,22 @@
 			for (var i in parentMethods) {
 				if (!parentMethods.hasOwnProperty(i)) continue;
 				methods.push(parentMethods[i]);
+			}
+		}
+		return methods;
+	}
+	
+	function getListOfParentStaticMethods(object)
+	{
+		var methods = [];
+		if (object.Extends) {
+			var parent = object.Extends;
+			while (parent) {
+				for (var i in parent.staticMethods) {
+					if (!parent.staticMethods.hasOwnProperty(i)) continue;
+					methods.push(i);
+				}
+				parent = parent.Extends || false;
 			}
 		}
 		return methods;
