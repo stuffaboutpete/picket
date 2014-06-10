@@ -18,7 +18,7 @@
 				if (typeof currentLevel[classnameParts[i]] != 'function') {
 					throw invalidClassnameError;
 				}
-				this.class = currentLevel[classnameParts[i]];
+				this.Class = currentLevel[classnameParts[i]];
 			}
 			currentLevel = currentLevel[classnameParts[i]];
 		}
@@ -30,7 +30,7 @@
 		if (typeof methodname != 'string') {
 			throw new Error('Method name must be a string');
 		}
-		if (typeof this.class.methods[methodname] == 'undefined') {
+		if (typeof this.Class.methods[methodname] == 'undefined') {
 			throw new Error('Method must be declared on mocked class');
 		}
 		this[methodname] = function(){
@@ -57,7 +57,7 @@
 	
 	Mock.prototype.instanceOf = function(type)
 	{
-		return (type === Class || type === this.class);
+		return (type === Class || type === this.Class);
 	};
 	
 	window.Mock = Mock;
