@@ -4,34 +4,27 @@
 	
 	Interface.define = function(name, methods){
 		
-		var definitionError = false;
 		var methodList = {};
+		
 		for (var i in methods) {
 			if (!methods.hasOwnProperty(i)) continue;
-			if (methods[i].split('(').length-1 != 1) {
-				definitionError = true;
-				break;
+			var definitionParts = methods[i].split(':');
+			if (definitionParts.length == 2) {
+				var argTypes = definitionParts.pop().trim().split(' ');
+			} else {
+				var argTypes = null;
 			}
-			if (methods[i].split(')').length-1 != 1) {
-				definitionError = true;
-				break;
+			definitionParts = definitionParts[0].trim().split(' ');
+			if (definitionParts.length == 2) {
+				var returnType = definitionParts.shift();
 			}
-			if (methods[i].slice(-1) != ')') {
-				definitionError = true;
-				break;
+			if (definitionParts.length > 1) {
+				// @todo Throw! (invalid definition)
 			}
-			var args = methods[i].substring(
-				methods[i].indexOf('(')+1,
-				methods[i].length-1
-			);
-			args.replace(' ', '');
-			args = (args == '') ? [] : args.split(',');
-			methodList[methods[i].substring(0, methods[i].indexOf('('))] = args;
-			//delete methods[i];
-		}
-		
-		if (definitionError) {
-			throw new InterfaceIncorrectlyDefinedFatal();
+			methodList[definitionParts[0]] = {
+				argTypes: argTypes,
+				returnType: returnType
+			};
 		}
 		
 		var namespaceTree = name.split('.');
