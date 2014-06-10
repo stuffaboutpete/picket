@@ -48,7 +48,7 @@
 					var currentInterface = namespace[className].Implements[i];
 					for (var method in currentInterface.methods) {
 						if (!currentInterface.methods.hasOwnProperty(method)) continue;
-						var args = currentInterface.methods[method];
+						var currentMethod = currentInterface.methods[method];
 						if (typeof this.type.methods[method] == 'undefined') {
 							throw new InterfaceMethodNotImplementedFatal(
 								'Class \'' + name + '\' must define interface ' +
@@ -60,18 +60,20 @@
 								'Interface method \'' + method + '\' must be declared public'
 							);
 						}
-						var methodAsString = this.type.methods[method].method.toString();
-						var methodArgs = methodAsString.substring(
-							'function ('.length,
-							methodAsString.indexOf(')')
-						);
-						methodArgs.replace(' ', '');
-						methodArgs = (methodArgs == '') ? [] : methodArgs.split(',');
-						var interfaceArgs = currentInterface.methods[method];
-						if (methodArgs<interfaceArgs || interfaceArgs<methodArgs) {
-							throw new InterfaceMethodNotImplementedFatal(
-								'Method arguments must match arguments declared by ' +
-								'interface in \'' + name + '.' + method + '\''
+						if (currentMethod.argTypes !== null
+						&&	!arrayEquals(
+								currentMethod.argTypes,
+								this.type.methods[method].argTypes
+							)
+						) {
+							throw new InvalidArgumentTypeFatal(
+								'Method \'' + method + '\' must match argument types of interface'
+							);
+						}
+						if (currentMethod.returnType !== undefined
+						&&	currentMethod.returnType != this.type.methods[method].returnType) {
+							throw new InvalidReturnTypeFatal(
+								'Method \'' + method + '\' must match return type of interface'
 							);
 						}
 					}
@@ -149,9 +151,9 @@
 						
 						// Append all other function
 						// arguments to this array
-						for (var arg in arguments) {
-							if (!arguments.hasOwnProperty(arg)) continue;
-							args.push(arguments[arg]);
+						for (var i = 0; i < arguments.length; i++) {
+							args.push(arguments[i]);
+							
 						}
 						
 						// Do the real method call
@@ -219,32 +221,13 @@
 			delete definition.Require;
 		}
 		if (definition.Abstract) {
-			if (Object.prototype.toString.apply(
-				definition.Abstract
-			) == '[object Array]') {
-				var abstractMethods = {};
+			
+			
+			if (Object.prototype.toString.apply(definition.Abstract) == '[object Array]') {
 				for (var i in definition.Abstract) {
 					if (!definition.Abstract.hasOwnProperty(i)) continue;
-					if (typeof definition.Abstract[i] != 'string') {
-						throw new InvalidSyntaxFatal(
-							'Abstract method names must be specified as strings'
-						);
-					}
-					abstractMethods[definition.Abstract[i]] = undefined;
-				}
-				definition.Abstract = abstractMethods;
-			}
-			if (typeof definition.Abstract == 'object') {
-				for (var i in definition.Abstract) {
-					if (!definition.Abstract.hasOwnProperty(i)) continue;
-					if (i.split('(').length-1 != 1) {
-						throw new InvalidSyntaxFatal(
-							'Abstract method declarations must contain brackets even ' +
-							'if they expect no argument'
-						);
-					}
-					if (i.substring(0, 7) != 'public:'
-					&&	i.substring(0, 10) != 'protected:') {
+					var definitionParts = definition.Abstract[i].split(' ');
+					if (definitionParts[0] != 'public' && definitionParts[0] != 'protected') {
 						throw new InvalidSyntaxFatal(
 							'Abstract methods must be specified public or protected'
 						);
@@ -252,6 +235,7 @@
 				}
 				namespace[className].AbstractMethods = definition.Abstract;
 			}
+			
 			namespace[className].Abstract = true;
 			delete definition.Abstract;
 		}
@@ -269,23 +253,33 @@
 			delete definition.Implements;
 		}
 		if (definition.Events) {
-			if (Object.prototype.toString.apply(definition.Events) == '[object Array]') {
-				var eventsTemp = {};
-				for (var i in definition.Events) {
-					if (!definition.Events.hasOwnProperty(i)) continue;
-					if (typeof definition.Events[i] != 'string') {
-						throw new InvalidSyntaxFatal(
-							'Events must be declared as an array of strings'
-						);
-					}
-					eventsTemp[definition.Events[i]] = undefined;
+			if (Object.prototype.toString.apply(definition.Events) != '[object Array]') {
+				throw new InvalidSyntaxFatal(
+					'Events must be declared in an array'
+				);
+			}
+			var eventsTemp = {};
+			for (var i in definition.Events) {
+				if (!definition.Events.hasOwnProperty(i)) continue;
+				if (typeof definition.Events[i] != 'string') {
+					throw new InvalidSyntaxFatal(
+						'Events must be declared as an array of strings'
+					);
 				}
-				definition.Events = eventsTemp;
+				var definitionParts = definition.Events[i].split(':');
+				if (definitionParts.length == 2) {
+					var argTypes = definitionParts[1].trim().split(' ');
+				}
+				definitionParts = definitionParts[0].trim().split(' ');
+				var returnType = (definitionParts.length == 2)
+					? definitionParts.shift()
+					: undefined;
+				eventsTemp[definitionParts[0]] = {
+					argTypes: argTypes,
+					returnType: returnType
+				}
 			}
-			if (typeof definition.Events != 'object') {
-				throw new InvalidSyntaxFatal('Events must be declared in an array');
-			}
-			namespace[className].Events = definition.Events;
+			namespace[className].Events = eventsTemp;
 			delete definition.Events;
 		}
 		// namespace[className].interfaces = ...
@@ -296,6 +290,75 @@
 		namespace[className].staticProperties = {};
 		namespace[className].staticMethods = {};
 		
+		var getterSetterMatcher = new RegExp(
+			'(?:(public|private|protected) )?([A-Za-z0-9-_]* )?(getter|setter)' +
+			'(?: :((?: [A-Za-z0-9-_][A-Za-z0-9-_.]*)*))?'
+		);
+		
+		for (var i in definition) {
+			
+			if (typeof definition[i] != 'object') continue;
+			
+			var newDefinition = {};
+			
+			for (var j in definition[i]) {
+				
+				if (!definition[i].hasOwnProperty(j)) continue;
+				
+				var match = j.match(getterSetterMatcher);
+				
+				if (!match) continue;
+				
+				var typeIndex = (match[3] == 'getter') ? 2 : 4;
+				var newSubDefinition = [match[typeIndex] ? match[typeIndex].trim() : undefined];
+				
+				if (typeof definition[i][j] == 'function') {
+					newSubDefinition.push(definition[i][j]);
+				} else if (definition[i][j] === true) {
+					newSubDefinition.push(function(value){ return value; });
+				} else if (definition[i][j] === false) {
+					newSubDefinition.push(false);
+				}
+				
+				if (typeof definition[i][j] != 'boolean'
+				&&	typeof definition[i][j] != 'function'
+				&&	typeof definition[i][j] != 'undefined') {
+					throw new InvalidSyntaxFatal(
+						'Property getter should specify a function or boolean'
+					);
+				}
+				
+				delete definition[i][j];
+				
+				if (typeof newDefinition[i] == 'undefined') newDefinition[i] = {};
+				
+				if (typeof newDefinition[i]['getter'] == 'undefined') {
+					newDefinition[i]['getter'] = {
+						'public': [undefined, function(value){ return value; }],
+						'private': undefined,
+						'protected': undefined
+					}
+				}
+				
+				if (typeof newDefinition[i]['setter'] == 'undefined') {
+					newDefinition[i]['setter'] = {
+						'public': [undefined, function(value){ return value; }],
+						'private': undefined,
+						'protected': undefined
+					}
+				}
+				
+				newDefinition[i][match[3]][match[1] || 'public'] = newSubDefinition;
+				
+			}
+			
+			for (var j in newDefinition[i]) {
+				if (!newDefinition[i].hasOwnProperty(j)) continue;
+				definition[i][j] = newDefinition[i][j];
+			}
+			
+		}
+		
 		// Put properties in from definition
 		// Put methods in from definition
 		toInspectDefinition:
@@ -303,13 +366,19 @@
 			
 			if (!definition.hasOwnProperty(i)) continue;
 			
-			var propName = i;
 			var scope;
 			var isStatic = false;
 			
-			if (propName.substring(0, 7) == 'static:') {
-				propName = propName.substring(7);
+			var definitionParts = i.split(':').shift().trim().split(' ');
+			if (i.split(':').length == 2) {
+				var argumentTypeParts = i.split(':').pop().trim().split(' ');
+			}
+			
+			var propName = definitionParts.pop();
+			
+			if (definitionParts[0] == 'static') {
 				isStatic = true;
+				definitionParts.shift();
 			}
 			
 			if (typeof definition[i] == 'object') {
@@ -423,22 +492,6 @@
 						}
 					}
 					
-					if (typeof definition[i].getter[1] != 'boolean'
-					&&	typeof definition[i].getter[1] != 'function'
-					&&	typeof definition[i].getter[1] != 'undefined') {
-						throw new InvalidSyntaxFatal(
-							'Property getter should specify a function or boolean'
-						);
-					}
-					
-					if (typeof definition[i].setter[1] != 'boolean'
-					&&	typeof definition[i].setter[1] != 'function'
-					&&	typeof definition[i].setter[1] != 'undefined') {
-						throw new InvalidSyntaxFatal(
-							'Property setter should specify a function or boolean'
-						);
-					}
-					
 					scope = new Class.Scope(Class.Scope.PRIVATE)
 					
 					namespace[className].properties[propName] = new Class.Property(
@@ -470,15 +523,15 @@
 				
 			}
 			
-			if (propName.substring(0, 8) == 'private:') {
-				propName = propName.substring(8);
+			if (definitionParts[0] == 'private') {
 				scope = new Class.Scope(Class.Scope.PRIVATE);
-			} else if (propName.substring(0, 10) == 'protected:') {
-				propName = propName.substring(10);
+				definitionParts.shift();
+			} else if (definitionParts[0] == 'protected') {
 				scope = new Class.Scope(Class.Scope.PROTECTED);
-			} else if (propName.substring(0, 7) == 'public:') {
-				propName = propName.substring(7);
+				definitionParts.shift();
+			} else if (definitionParts[0] == 'public') {
 				scope = new Class.Scope(Class.Scope.PUBLIC);
+				definitionParts.shift();
 			} else {
 				scope = new Class.Scope(Class.Scope.PRIVATE);
 			}
@@ -489,31 +542,10 @@
 					namespace[className].methods[propName] = new Class.Method(
 						propName,
 						definition[i],
-						scope
-					);
-					scope.parent = namespace[className].methods[propName];
-					namespace[className].methods[propName].parentType
-						= namespace[className];
-					namespace[className].methods[propName].method.parentType
-						= namespace[className];
-				} else if (Object.prototype.toString.call(definition[i]) == '[object Array]'
-				&& typeof definition[i][definition[i].length-1] == 'function'
-				&& (definition[i].length == definition[i][definition[i].length-1].length+2
-				|| definition[i].length == definition[i][definition[i].length-1].length+1)) {
-					
-					var method = definition[i].pop();
-					
-					if (definition[i].length == method.length+1) {
-						var returnType = definition[i].splice(0, 1)[0];
-					}
-					
-					namespace[className].methods[propName] = new Class.Method(
-						propName,
-						method,
 						scope,
 						null,
-						returnType,
-						definition[i]
+						(definitionParts.length == 0) ? undefined : definitionParts[0],
+						argumentTypeParts
 					);
 					scope.parent = namespace[className].methods[propName];
 					namespace[className].methods[propName].parentType
@@ -539,7 +571,9 @@
 						propName,
 						definition[i],
 						scope,
-						true
+						true,
+						(definitionParts.length == 0) ? undefined : definitionParts[0],
+						argumentTypeParts
 					);
 					var method = namespace[className].staticMethods[propName];
 					scope.parent = method;
@@ -653,12 +687,13 @@
 			// Loop through all ancestors and
 			// gather a list of all abstract methods
 			var parent = namespace[className].Extends;
-			var methods = {};
+			var methods = [];
+			var methodObjects = {};
 			var methodsFound = false;
 			while (parent) {
 				for (var i in parent.AbstractMethods) {
 					if (!parent.AbstractMethods.hasOwnProperty(i)) continue;
-					methods[i] = parent.AbstractMethods[i];
+					methods.push(parent.AbstractMethods[i]);
 					methodsFound = true;
 				}
 				parent = parent.Extends || false;
@@ -666,30 +701,30 @@
 			
 			for (var i in methods) {
 				if (!methods.hasOwnProperty(i)) continue;
-				var args = i.substring(
-					i.indexOf('(')+1,
-					i.length-1
-				);
-				args = args.replace(' ', '');
-				args = (args == '') ? [] : args.split(',');
-				var methodName = i.substring(0, i.indexOf('('));
-				if (methodName.substring(0, 10) == 'protected:') {
-					methodName = methodName.substring(10);
-					var scope = Class.Scope.PROTECTED;
-				} else if (methodName.substring(0, 7) == 'public:') {
-					methodName = methodName.substring(7);
-					var scope = Class.Scope.PUBLIC;
+				var definitionParts = methods[i].split(':');
+				if (typeof definitionParts[1] != 'undefined') {
+					var types = definitionParts[1].trim().split(' ');
 				} else {
-					methodName = methodName.substring(10);
+					var types = [];
+				}
+				definitionParts = definitionParts[0].trim().split(' ');
+				if (definitionParts[0] == 'protected') {
+					var scope = Class.Scope.PROTECTED;
+					definitionParts.shift();
+				} else if (definitionParts[0] == 'public') {
+					var scope = Class.Scope.PUBLIC;
+					definitionParts.shift();
+				} else {
 					var scope = Class.Scope.PROTECTED;
 				}
-				methods[methodName] = {
+				if (definitionParts.length == 2) types.unshift(definitionParts.shift());
+				var methodName = definitionParts.shift();
+				methodObjects[methodName] = {
 					scope: scope,
-					args: args,
+					//args: args,
 					implemented: false,
-					types: methods[i]
+					types: types
 				};
-				delete methods[i];
 			}
 			
 			// Loop through all ancesters again
@@ -701,61 +736,55 @@
 					for (var i in parent.methods) {
 						var methodMatches = false;
 						if (!parent.methods.hasOwnProperty(i)) continue;
-						if (typeof methods[i] == 'undefined') continue;
-						var methodAsString = parent.methods[i].method.toString();
-						var methodArgs = methodAsString.substring(
-							'function ('.length,
-							methodAsString.indexOf(')')
-						);
-						methodArgs = methodArgs.replace(' ', '');
-						methodArgs = methodArgs.split(',');
-						if (methods[i].args.join('') == methodArgs.join('')
-						&&	methods[i].scope == parent.methods[i].scope.level) {
+						if (typeof methodObjects[i] == 'undefined') continue;
+						if (methodObjects[i].scope == parent.methods[i].scope.level) {
 							methodMatches = true;
 						}
-						var methodTypes = methods[i].types;
-						if (typeof methodTypes != 'undefined') {
+						// methodMatches = true;
+						var methodTypes = methodObjects[i].types;
+						if (methodTypes.length != 0) {
 							if (typeof parent.methods[i].argTypes == 'undefined') {
-								methodMatches = false;
+								var parentArgTypesLength = 0;
 							} else {
-								if (methodTypes.length != parent.methods[i].argTypes.length
-								&&	methodTypes.length != parent.methods[i].argTypes.length+1) {
+								var parentArgTypesLength = parent.methods[i].argTypes.length;
+							}
+							if (methodTypes.length != parentArgTypesLength
+							&&	methodTypes.length != parentArgTypesLength+1) {
+								methodMatches = false;
+							}
+							if (methodTypes.length == parentArgTypesLength) {
+								for (var j in methodTypes) {
+									if (!methodTypes.hasOwnProperty(j)) continue;
+									if (parent.methods[i].argTypes[j] !== methodTypes[j]) {
+										methodMatches = false;
+										break;
+									}
+								}
+							}
+							if (methodTypes.length == parentArgTypesLength+1) {
+								if (parent.methods[i].returnType != methodTypes[0]) {
 									methodMatches = false;
 								}
-								if (methodTypes.length == parent.methods[i].argTypes.length) {
-									for (var j in methodTypes) {
-										if (!methodTypes.hasOwnProperty(j)) continue;
-										if (parent.methods[i].argTypes[j] !== methodTypes[j]) {
-											methodMatches = false;
-											break;
-										}
-									}
-								}
-								if (methodTypes.length == parent.methods[i].argTypes.length+1) {
-									if (parent.methods[i].returnType != methodTypes[0]) {
+								for (var j in methodTypes) {
+									if (j == 0) continue;
+									if (!methodTypes.hasOwnProperty(j)) continue;
+									if (parent.methods[i].argTypes[parseInt(j)-1] !== methodTypes[j]) {
 										methodMatches = false;
-									}
-									for (var j in methodTypes) {
-										var implementedTypes = parent.methods[i].argTypes[j];
-										if (!methodTypes.hasOwnProperty(j)) continue;
-										if (implementedTypes !== methodTypes[parseInt(j)+1]) {
-											methodMatches = false;
-											break;
-										}
+										break;
 									}
 								}
 							}
 						}
-						if (methodMatches) methods[i].implemented = true;
+						if (methodMatches) methodObjects[i].implemented = true;
 					}
 					parent = parent.Extends || false;
 				}
 				
 				// If any methods are still marked
 				// as missing, throw a fatal
-				for (var i in methods) {
-					if (!methods.hasOwnProperty(i)) continue;
-					if (methods[i].implemented === false) {
+				for (var i in methodObjects) {
+					if (!methodObjects.hasOwnProperty(i)) continue;
+					if (methodObjects[i].implemented === false) {
 						throw new AbstractMethodNotImplementedFatal(i);
 					}
 				}
@@ -775,21 +804,27 @@
 			this,
 			arguments.callee.caller
 		);
-		if (typeof property.getter == 'function'
-		||	typeof property.getter == 'boolean') {
-			if (arguments.callee.caller.parentType == this.type) {
-				if (property.parent.type == this.type && !property.ownerUsesGetter) {
-					return property.value;
+		if (typeof property.getter == 'object') {
+			if (property.parent.type == this.type) {
+				if (typeof property.getter['private'] != 'undefined') {
+					var getter = property.getter['private'];
+				} else if (typeof property.getter['protected'] != 'undefined') {
+					var getter = property.getter['protected'];
+				} else {
+					var getter = property.getter['public'];
 				}
-				if (property.parent.type != this.type && !property.childUsesGetter) {
-					return property.value;
+			} else if (property.parent.type != this.type) {
+				if (typeof property.getter['protected'] != 'undefined') {
+					var getter = property.getter['protected'];
+				} else {
+					var getter = property.getter['public'];
 				}
+			} else {
+				var getter = property.getter['public'];
 			}
-			if (property.getter === false) throw new ScopeFatal(
-				'Cannot access restricted property'
-			);
-			var value = property.getter(property.value);
-			if (property.getterType && validateType(value, property.getterType) === false) {
+			if (getter[1] === false) throw new ScopeFatal('Cannot access restricted property');
+			var value = getter[1](property.value);
+			if (getter[0] && validateType(value, getter[0]) === false) {
 				throw new InvalidReturnTypeFatal();
 			}
 			return value;
@@ -808,25 +843,30 @@
 			this,
 			arguments.callee.caller
 		);
-		if (typeof property.setter == 'function'
-		||	typeof property.setter == 'boolean') {
-			if (arguments.callee.caller.parentType == this.type) {
-				if (property.parent.type == this.type && !property.ownerUsesSetter) {
-					property.value = value;
-					this.propertyValues[propertyName] = property.value;
-					return;
+		if (typeof property.setter == 'object') {
+			if (property.parent.type == this.type) {
+				if (typeof property.setter['private'] != 'undefined') {
+					var setter = property.setter['private'];
+				} else if (typeof property.setter['protected'] != 'undefined') {
+					var setter = property.setter['protected'];
+				} else {
+					var setter = property.setter['public'];
 				}
-				if (property.parent.type != this.type && !property.childUsesSetter) {
-					property.value = value;
-					this.propertyValues[propertyName] = property.value;
-					return;
+			} else if (property.parent.type != this.type) {
+				if (typeof property.setter['protected'] != 'undefined') {
+					var setter = property.setter['protected'];
+				} else {
+					var setter = property.setter['public'];
 				}
+			} else {
+				var setter = property.setter['public'];
 			}
-			if (property.setter === false) throw new ScopeFatal('Cannot access private property');
-			if (property.setterType && validateType(value, property.setterType) === false) {
+			if (setter[1] === false) throw new ScopeFatal('Cannot access restricted property');
+			var value = setter[1](value, property.value);
+			if (setter[0] && validateType(value, setter[0]) === false) {
 				throw new InvalidArgumentTypeFatal();
 			}
-			property.value = property.setter(value, property.value);
+			property.value = value;
 			this.propertyValues[propertyName] = property.value;
 		} else {
 			property.value = value;
@@ -963,9 +1003,9 @@
 		copiedMethod.parentType.id = targetObject.id;
 		copiedMethod.scope.checkCallingObject(object);
 		if (typeof copiedMethod.argTypes != 'undefined') {
-			for (var i in target.type.Events[eventName]) {
-				if (!target.type.Events[eventName].hasOwnProperty(i)) continue;
-				if (copiedMethod.argTypes[i] !== target.type.Events[eventName][i]) {
+			for (var i in target.type.Events[eventName].argTypes) {
+				if (!target.type.Events[eventName].argTypes.hasOwnProperty(i)) continue;
+				if (copiedMethod.argTypes[i] !== target.type.Events[eventName].argTypes[i]) {
 					throw new InvalidArgumentTypeFatal(
 						'Method argument types must match target event argument types'
 					);
@@ -1231,23 +1271,45 @@
 	function validateType(argument, targetType)
 	{
 		if (Object.prototype.toString.call(argument) == '[object Array]') {
-			if (Object.prototype.toString.call(targetType) == '[object Array]') {
-				var returnType = targetType[0];
+			if (targetType.substr(0, 1) == '[' && targetType.substr(targetType.length-1) == ']') {
+				var returnType = targetType.substr(1, targetType.length - 2);
 				for (var i in argument) {
 					if (!argument.hasOwnProperty(i)) continue;
 					if (validateType(argument[i], returnType) === false) return false;
 				}
-			} else if (targetType != 'array') return false;
-		} else if (argument === null) {
-			if (targetType !== null) return false;
-		} else if (typeof targetType == 'function'
-		&& typeof argument.instanceOf != 'undefined') {
-			if (!argument.instanceOf(targetType)) {
-				return false;
 			}
+		} else if (targetType === 'null') {
+			if (argument !== null) return false;
+		} else if (targetType === 'object') {
+			if (typeof argument != 'object') return false;
+		} else if (typeof argument == 'object') {
+			if (argument === null) return false;
+			var targetParts = targetType.split('.');
+			var currentLevel = window;
+			for (var i = 0; i < targetParts.length; i++) {
+				if (typeof currentLevel[targetParts[i]] == 'undefined') break;
+				currentLevel = currentLevel[targetParts[i]];
+			}
+			var lastTargetPart = targetParts.pop();
+			if (typeof argument.instanceOf != 'undefined'
+			&&	argument.instanceOf(currentLevel)) {
+				return true;
+			}
+			return false;
 		} else if (targetType != typeof argument) {
 			return false;
 		}
+	}
+	
+	function arrayEquals(array1, array2)
+	{
+		if (array1 === array2) return true;
+		if (array1 == null || array2 == null) return false;
+		if (array1.length != array2.length) return false;
+		for (var i = 0; i < array1.length; i++) {
+			if (array1[i] !== array2[i]) return false;
+		}
+		return true;
 	}
 	
 	function processDependencies(dependencies)
@@ -1311,7 +1373,7 @@
 						// http://stackoverflow.com/questions/6725272/dynamic-cross-browser-script-loading
 						registerLoadedDependency(filename);
 					};
-					document.head.appendChild(script);
+						document.getElementsByTagName('head')[0].appendChild(script);
 					includedDependencies.push(filename);
 				break;
 				
