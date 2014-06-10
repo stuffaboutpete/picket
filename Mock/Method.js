@@ -5,7 +5,7 @@
 		
 	};
 	
-	Method.prototype.with = function()
+	Method.prototype.withArg = function()
 	{
 		this.expectedArguments = arguments;
 		return this;
@@ -23,7 +23,7 @@
 	Method.prototype.argumentsValid = function()
 	{
 		if (typeof this.expectedArguments == 'undefined') return true;
-		for (var i in this.expectedArguments) {
+		for (var i = 0; i < this.expectedArguments.length; i++) {
 			if (this.expectedArguments[i] != arguments[i]) return false;
 		}
 		return true;

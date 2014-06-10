@@ -11,7 +11,7 @@ QUnit.testStart(function(){
 	});
 	Class.define('My.Namespaced.Class');
 	Interface.define('IMyInterface', [
-		'myMethod()'
+		'myMethod'
 	]);
 	
 });
@@ -218,13 +218,13 @@ test('AtMost method returns Method object', function(){
 test('Method has with method', function(){
 	var myMock = new Mock('MyClass');
 	var method = myMock.method('myMethod').at(0);
-	ok(typeof method.with == 'function');
+	ok(typeof method.withArg == 'function');
 });
 
 test('With method returns same method', function(){
 	var myMock = new Mock('MyClass');
 	var method = myMock.method('myMethod').at(0);
-	ok(method === method.with('argument'));
+	ok(method === method.withArg('argument'));
 });
 
 test('Method has will method', function(){
@@ -388,14 +388,14 @@ test('AtMost expectations are not ok if call count is greater than', function(){
 
 test('Method can be called with required single argument', function(){
 	var myMock = new Mock('MyClass');
-	myMock.method('myMethod').at('any').with('string');
+	myMock.method('myMethod').at('any').withArg('string');
 	myMock.myMethod('string');
 	expect(0);
 });
 
 test('Method requires that single argument is supplied', function(){
 	var myMock = new Mock('MyClass');
-	myMock.method('myMethod').at('any').with('string');
+	myMock.method('myMethod').at('any').withArg('string');
 	raises(function(){
 		myMock.myMethod();
 	}, Error);
@@ -403,7 +403,7 @@ test('Method requires that single argument is supplied', function(){
 
 test('Method requires that single argument matches supplied', function(){
 	var myMock = new Mock('MyClass');
-	myMock.method('myMethod').at('any').with('string');
+	myMock.method('myMethod').at('any').withArg('string');
 	raises(function(){
 		myMock.myMethod('other string');
 	}, Error);
@@ -411,14 +411,14 @@ test('Method requires that single argument matches supplied', function(){
 
 test('Method can be called with required multiple arguments', function(){
 	var myMock = new Mock('MyClass');
-	myMock.method('myMethod').at('any').with('string', 'other string');
+	myMock.method('myMethod').at('any').withArg('string', 'other string');
 	myMock.myMethod('string', 'other string');
 	expect(0);
 });
 
 test('Method requires that multiple arguments are supplied', function(){
 	var myMock = new Mock('MyClass');
-	myMock.method('myMethod').at('any').with('string', 'other string');
+	myMock.method('myMethod').at('any').withArg('string', 'other string');
 	raises(function(){
 		myMock.myMethod('string');
 	}, Error);
@@ -426,8 +426,8 @@ test('Method requires that multiple arguments are supplied', function(){
 
 test('Method accepts different arguments at different calls', function(){
 	var myMock = new Mock('MyClass');
-	myMock.method('myMethod').at(0).with('first string');
-	myMock.method('myMethod').at(1).with('second string');
+	myMock.method('myMethod').at(0).withArg('first string');
+	myMock.method('myMethod').at(1).withArg('second string');
 	myMock.myMethod('first string');
 	myMock.myMethod('second string');
 	expect(0);
@@ -435,8 +435,8 @@ test('Method accepts different arguments at different calls', function(){
 
 test('Method requires different arguments at different calls', function(){
 	var myMock = new Mock('MyClass');
-	myMock.method('myMethod').at(0).with('first string');
-	myMock.method('myMethod').at(1).with('second string');
+	myMock.method('myMethod').at(0).withArg('first string');
+	myMock.method('myMethod').at(1).withArg('second string');
 	myMock.myMethod('first string');
 	raises(function(){
 		myMock.myMethod('first string');
