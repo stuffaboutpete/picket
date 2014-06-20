@@ -1368,10 +1368,11 @@
 					var script = document.createElement('script');
 					script.type = 'text/javascript';
 					script.src = filename;
+					script.dependencyKey = dependency;
 					script.onreadystatechange = script.onload = function(){
 						// Could check for ready state other than success
 						// http://stackoverflow.com/questions/6725272/dynamic-cross-browser-script-loading
-						loadCallback(this.getAttribute('src'));
+						loadCallback(this.dependencyKey);
 					};
 						document.getElementsByTagName('head')[0].appendChild(script);
 					includedDependencies.push(filename);
