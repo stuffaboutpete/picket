@@ -3053,6 +3053,7 @@ test('File will not be re-included if required multiple times', function(){
 		}
 	}
 	ok(count == 1);
+	Class.registerLoadedDependency('includes/File-3fb5gb.js');
 });
 
 test('Multiple required files are included in the DOM on class declaration', function(){
@@ -3077,6 +3078,8 @@ test('Multiple required files are included in the DOM on class declaration', fun
 		}
 	}
 	ok(p9s8chExists && vdf5v8Exists);
+	Class.registerLoadedDependency('includes/File-p9s8ch.js');
+	Class.registerLoadedDependency('includes/File-vdf5v8.js');
 });
 
 /*test('CSS file is included in the DOM on class declaration', function(){
@@ -3123,6 +3126,7 @@ test('Class can be required', function(){
 		var script = scripts[i].src;
 		if (script.substr(script.length - 17) == 'My/Test/sd8uds.js') {
 			ok(true);
+			Class.registerLoadedDependency('My/Test/sd8uds.js');
 			return;
 		}
 	}
@@ -3140,6 +3144,7 @@ test('Folder pattern matching can be set up for required classes', function(){
 		var script = scripts[i].src;
 		if (script.substr(script.length - 19) == 'subfolder/p9c88c.js') {
 			ok(true);
+			Class.registerLoadedDependency('subfolder/p9c88c.js');
 			return;
 		}
 	}
@@ -3169,6 +3174,8 @@ test('Multiple folder patterns can be set up for required classes', function(){
 		}
 	}
 	ok(d46fvbExists && ch732mExists);
+	Class.registerLoadedDependency('subfolder/d46fvb.js');
+	Class.registerLoadedDependency('other/subfolder/Example/ch732m.js');
 });
 
 test('Longest matching pattern is used to include class', function(){
@@ -3185,6 +3192,7 @@ test('Longest matching pattern is used to include class', function(){
 		var script = scripts[i].src;
 		if (script.substr(script.length - 17) == 'folder2/4rfc8u.js') {
 			ok(true);
+			Class.registerLoadedDependency('folder2/4rfc8u.js');
 			return;
 		}
 	}
@@ -3202,6 +3210,7 @@ test('Folder pattern matching can be set up for required files', function(){
 		var script = scripts[i].src;
 		if (script.substr(script.length - 19) == 'subfolder/4fcf9a.js') {
 			ok(true);
+			Class.registerLoadedDependency('subfolder/4fcf9a.js');
 			return;
 		}
 	}
@@ -3231,6 +3240,8 @@ test('Multiple folder patterns can be set up for required files', function(){
 		}
 	}
 	ok(f54dh4Exists && gpodlkExists);
+	Class.registerLoadedDependency('subfolder/f54dh4.js');
+	Class.registerLoadedDependency('other/subfolder/Example/gpodlk.js');
 });
 
 test('Longest matching pattern is used to include file', function(){
@@ -3247,6 +3258,7 @@ test('Longest matching pattern is used to include file', function(){
 		var script = scripts[i].src;
 		if (script.substr(script.length - 17) == 'folder2/ftr56h.js') {
 			ok(true);
+			Class.registerLoadedDependency('folder2/ftr56h.js');
 			return;
 		}
 	}
@@ -3268,4 +3280,48 @@ test('Loaded classes can be declared and will not be auto loaded in future', fun
 		}
 	}
 	ok(true);
+});
+
+asyncTest('File can be required inline and method is run on load', function(){
+	Class.define('MyClass', {
+		'public construct': function(){
+			Class.require('includes/File-jdc98d.js', 'fileHandler');
+		},
+		'private fileHandler': function(fileName){
+			ok(typeof jdc98d != 'undefined');
+			start();
+		}
+	});
+	new MyClass();
+});
+
+asyncTest('Multiple files can be required inline and method is run multiple times', function(){
+	Class.define('MyClass', {
+		'public loadedFiles': [],
+		'public construct': function(){
+			Class.require(
+				[
+					'includes/File-hckiak.js',
+					'includes/File-c8hs45.js'
+				],
+				'fileHandler'
+			);
+		},
+		'private fileHandler': function(fileName){
+			this.get('loadedFiles').push(fileName);
+			if (this.fileFound('includes/File-hckiak.js')
+			&&	this.fileFound('includes/File-c8hs45.js')) {
+				ok(typeof hckiak != 'undefined' && typeof c8hs45 != 'undefined');
+				start();
+			}
+		},
+		'private fileFound': function(fileName){
+			var loadedFiles = this.get('loadedFiles');
+			for (var i = 0; i < loadedFiles.length; i++) {
+				if (loadedFiles[i] == fileName) return true;
+			}
+			return false;
+		}
+	});
+	new MyClass();
 });

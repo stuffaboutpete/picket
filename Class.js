@@ -217,7 +217,7 @@
 			if (Object.prototype.toString.apply(definition.Require) != '[object Array]') {
 				definition.Require = [definition.Require];
 			}
-			processDependencies(definition.Require);
+			processDependencies(definition.Require, Class.registerLoadedDependency);
 			delete definition.Require;
 		}
 		if (definition.Abstract) {
@@ -1312,7 +1312,7 @@
 		return true;
 	}
 	
-	function processDependencies(dependencies)
+	function processDependencies(dependencies, loadCallback, doRegisterLoadingDependency)
 	{
 		
 		toProcessDependencies:
@@ -1360,7 +1360,7 @@
 			
 			if (includedDependencies.indexOf(filename) > -1) continue;
 			
-			registerLoadingDependency(filename);
+			if (doRegisterLoadingDependency !== false) registerLoadingDependency(filename);
 			
 			switch (extension) {
 				
@@ -1371,7 +1371,7 @@
 					script.onreadystatechange = script.onload = function(){
 						// Could check for ready state other than success
 						// http://stackoverflow.com/questions/6725272/dynamic-cross-browser-script-loading
-						registerLoadedDependency(filename);
+						loadCallback(this.getAttribute('src'));
 					};
 						document.getElementsByTagName('head')[0].appendChild(script);
 					includedDependencies.push(filename);
@@ -1410,6 +1410,20 @@
 		});
 	};
 	
+	Class.require = function(input, handlerMethod)
+	{
+		// @todo Check that a ClassyJS object called this
+		var object = arguments.callee.caller.parent;
+		if (Object.prototype.toString.call(input) != '[object Array]') input = [input];
+		processDependencies(input, function(filename){
+			var scope = object.type.methods[handlerMethod].scope;
+			var scopeLevel = scope.level;
+			scope.level = 1;
+			object[handlerMethod](filename);
+			scope.level = scopeLevel;
+		}, false);
+	}
+	
 	var loadedClasses = [];
 	var loadingDependencies = [];
 	var includedDependencies = [];
@@ -1425,7 +1439,7 @@
 		loadingDependencies.push(filename);
 	}
 	
-	function registerLoadedDependency(filename)
+	Class.registerLoadedDependency = function(filename)
 	{
 		var i = loadingDependencies.length;
 		while (i--) {

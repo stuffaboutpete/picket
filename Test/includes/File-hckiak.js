@@ -1,0 +1,1 @@
+window.hckiak = true;
