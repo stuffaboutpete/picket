@@ -1485,7 +1485,7 @@ if (!Array.prototype.indexOf) {
 		return true;
 	}
 	
-	function processDependencies(dependencies, loadCallback, doRegisterLoadingDependency)
+	function processDependencies(dependencies)
 	{
 		
 		toProcessDependencies:
@@ -1533,7 +1533,7 @@ if (!Array.prototype.indexOf) {
 			
 			if (includedDependencies.indexOf(filename) > -1) continue;
 			
-			if (doRegisterLoadingDependency !== false) registerLoadingDependency(filename);
+			registerLoadingDependency(filename);
 			
 			switch (extension) {
 				
@@ -1545,7 +1545,7 @@ if (!Array.prototype.indexOf) {
 					script.onreadystatechange = script.onload = function(){
 						// Could check for ready state other than success
 						// http://stackoverflow.com/questions/6725272/dynamic-cross-browser-script-loading
-						loadCallback(this.dependencyKey);
+						Class.registerLoadedDependency(this.getAttribute('src'));
 					};
 						document.getElementsByTagName('head')[0].appendChild(script);
 					includedDependencies.push(filename);
@@ -1589,13 +1589,15 @@ if (!Array.prototype.indexOf) {
 		// @todo Check that a ClassyJS object called this
 		var object = arguments.callee.caller.parent;
 		if (Object.prototype.toString.call(input) != '[object Array]') input = [input];
-		processDependencies(input, function(filename){
-			var scope = object.type.methods[handlerMethod].scope;
-			var scopeLevel = scope.level;
-			scope.level = 1;
-			object[handlerMethod](filename);
-			scope.level = scopeLevel;
-		}, false);
+		for (var i = 0; i < input.length; i++) {
+			registerWaitingCallback(
+				object.type.methods[handlerMethod].method,
+				object,
+				[input[i]],
+				handlerMethod
+			);
+		}
+		processDependencies(input);
 	}
 	
 	var loadedClasses = [];
@@ -1625,11 +1627,8 @@ if (!Array.prototype.indexOf) {
 			for (var i in waitingCallbacks) {
 				if (!waitingCallbacks.hasOwnProperty(i)) continue;
 				var c = waitingCallbacks[i];
-				if (c.methodName) {
-					c.callback.call(c.object, c.methodName, c.args);
-				} else {
-					c.callback.apply(c.object, c.args);
-				}
+				delete waitingCallbacks[i];
+				c.callback.apply(c.object, c.args);
 			}
 		}
 	}
