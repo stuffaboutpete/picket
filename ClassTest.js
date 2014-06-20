@@ -3325,3 +3325,17 @@ asyncTest('Multiple files can be required inline and method is run multiple time
 	});
 	new MyClass();
 });
+
+asyncTest('Class can be required inline and method is run on load', function(){
+	Class.define('MyClass', {
+		'public construct': function(){
+			Class.require('classes.has6sh', 'fileHandler');
+		},
+		'private fileHandler': function(className){
+			ok(className == 'classes.has6sh');
+			ok(typeof classes.has6sh != 'undefined');
+			start();
+		}
+	});
+	new MyClass();
+});
