@@ -422,6 +422,16 @@ if (!Array.prototype.indexOf) {
 			) != '[object Array]') {
 				definition.Implements = [definition.Implements];
 			}
+			for (var i in definition.Implements) {
+				if (typeof definition.Implements[i] == 'string') {
+					var interfaceParts = definition.Implements[i].split('.');
+					var interfaceType = window;
+					for (var j = 0; j < interfaceParts.length; j++) {
+						interfaceType = interfaceType[interfaceParts[j]];
+					}
+					definition.Implements[i] = interfaceType;
+				}
+			}
 			namespace[className].Implements = definition.Implements;
 			delete definition.Implements;
 		}
