@@ -1179,6 +1179,21 @@ test('Class can be instantiated with interface methods', function(){
 	ok(myObject instanceof MyClass);
 });
 
+test('Interface can be implemented as a string and methods must be implemented', function(){
+	Interface.define('MyInterface', ['myMethod']);
+	Class.define('MyClass', {
+		Implements: 'MyInterface'
+	});
+	raises(function(){
+		new MyClass();
+	}, InterfaceMethodNotImplementedFatal);
+	Class.define('MyOtherClass', {
+		Implements: 'MyInterface',
+		'public myMethod': function(){}
+	});
+	new MyOtherClass();
+});
+
 test('Implemented interface methods must be declared public', function(){
 	Interface.define('MyInterface', [
 		'myMethod'

@@ -46,6 +46,14 @@
 				for (var i in namespace[className].Implements) {
 					if (!namespace[className].Implements.hasOwnProperty(i)) continue;
 					var currentInterface = namespace[className].Implements[i];
+					if (typeof currentInterface == 'string') {
+						var interfaceParts = currentInterface.split('.');
+						var interfaceType = window;
+						for (var j = 0; j < interfaceParts.length; j++) {
+							interfaceType = interfaceType[interfaceParts[j]];
+						}
+						currentInterface = interfaceType;
+					}
 					for (var method in currentInterface.methods) {
 						if (!currentInterface.methods.hasOwnProperty(method)) continue;
 						var currentMethod = currentInterface.methods[method];
