@@ -260,6 +260,7 @@
 			namespace[className].Implements = definition.Implements;
 			delete definition.Implements;
 		}
+		if (!definition.Events) definition.Events = [];
 		if (definition.Events) {
 			if (Object.prototype.toString.apply(definition.Events) != '[object Array]') {
 				throw new InvalidSyntaxFatal(
@@ -267,6 +268,7 @@
 				);
 			}
 			var eventsTemp = {};
+			var changeEventFound = false;
 			for (var i in definition.Events) {
 				if (!definition.Events.hasOwnProperty(i)) continue;
 				if (typeof definition.Events[i] != 'string') {
@@ -282,9 +284,16 @@
 				var returnType = (definitionParts.length == 2)
 					? definitionParts.shift()
 					: undefined;
+				if (definitionParts[0] == 'change') changeEventFound = true;
 				eventsTemp[definitionParts[0]] = {
 					argTypes: argTypes,
 					returnType: returnType
+				}
+			}
+			if (!changeEventFound) {
+				eventsTemp.change = {
+					argTypes: ['string', 'object'],
+					returnType: undefined
 				}
 			}
 			namespace[className].Events = eventsTemp;
@@ -880,6 +889,15 @@
 			property.value = value;
 			this.propertyValues[propertyName] = property.value;
 		}
+		if (value.instanceOf(Class)) {
+			var that = this;
+			var callback = function(){
+				that.trigger('change', propertyName, that);
+			};
+			callback.id = 'set-change-callback';
+			value.bind('change', callback);
+		}
+		this.trigger('change', propertyName, this);
 	}
 	
 	Class.prototype.call = function(methodName)
@@ -954,7 +972,9 @@
 	Class.prototype.trigger = function()
 	{
 		var caller = arguments.callee.caller;
-		if (caller.parent.type.methods.construct
+		if (caller !== Class.prototype.set
+		&&	caller.id != 'set-change-callback'
+		&&	caller.parent.type.methods.construct
 		&&	caller == caller.parent.type.methods.construct.method) {
 			throw new RuntimeFatal('Cannot trigger an event from a constructor');
 		}
@@ -993,6 +1013,13 @@
 		}
 		if (!events) throw new UnknownEventFatal(eventName);
 		var object = getInstantiatedObject(this);
+		if (arguments.callee.caller === Class.prototype.set) {
+			events['change'].push({
+				object: object,
+				method: { method: methodName }
+			});
+			return;
+		}
 		var targetObject = arguments.callee.caller.parent;
 		var method = lookup(
 			'method',
