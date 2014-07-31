@@ -3016,6 +3016,70 @@ test('Typed events can be declared alongside non typed events', function(){
 	ok(true);
 });
 
+test('Object has change event by default', function(){
+	Class.define('MyClass', {
+		'public myProperty': null
+	});
+	Class.define('MyOtherClass', {
+		'public construct': function(){
+			var myObject = new MyClass();
+			myObject.bind('change', 'targetMethod');
+			myObject.set('myProperty', 'Some Value');
+		},
+		'public targetMethod': function(){
+			ok(true);
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Property name and object instance are provided on object change event', function(){
+	Class.define('MyClass', {
+		'public myProperty': null
+	});
+	Class.define('MyOtherClass', {
+		myObject: null,
+		'public construct': function(){
+			var myObject = new MyClass();
+			this.set('myObject', myObject);
+			myObject.bind('change', 'targetMethod');
+			myObject.set('myProperty', 'Some Value');
+		},
+		'public targetMethod': function(propertyName, changeObject){
+			ok(propertyName == 'myProperty');
+			ok(changeObject === this.get('myObject'));
+		}
+	});
+	new MyOtherClass();
+});
+
+test('Change event is triggered if a nested object is changed', function(){
+	Class.define('MyClass', {
+		'public otherObject': null,
+		'public construct': function(otherObject){
+			this.set('otherObject', otherObject);
+		}
+	});
+	Class.define('MyOtherClass', {
+		'public myProperty': null
+	});
+	Class.define('ThirdClass', {
+		myObject: null,
+		'public construct': function(){
+			var otherObject = new MyOtherClass();
+			var myObject = new MyClass(otherObject);
+			this.set('myObject', myObject);
+			myObject.bind('change', 'targetMethod');
+			otherObject.set('myProperty', 'Some Value');
+		},
+		'public targetMethod': function(propertyName, changeObject){
+			ok(propertyName == 'otherObject');
+			ok(changeObject === this.get('myObject'));
+		}
+	});
+	new ThirdClass();
+});
+
 test('Class can require a file', function(){
 	Class.define('MyClass', {
 		Require: 'includes/File-5ft78s.js'
