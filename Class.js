@@ -1401,7 +1401,10 @@
 				extension = 'js';
 			}
 			
-			if (includedDependencies.indexOf(filename) > -1) continue;
+			if (includedDependencies.indexOf(filename) > -1) {
+				Class.registerLoadedDependency(filename);
+				continue;
+			}
 			
 			registerLoadingDependency(filename);
 			
