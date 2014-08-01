@@ -66,6 +66,15 @@ test('Class property can be set', function(){
 	ok(myObject.get('myProperty') == 'My String');
 });
 
+test('Class property can be set to undefined', function(){
+	Class.define('MyClass', {
+		'public myProperty': 'Value'
+	});
+	var myObject = new MyClass();
+	myObject.set('myProperty', undefined);
+	ok(typeof myObject.get('myProperty') == 'undefined');
+});
+
 test('Class method can be called', function(){
 	Class.define('MyClass', {
 		'public myMethod': function(){return 'Return Value';}
