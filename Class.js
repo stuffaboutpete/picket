@@ -891,7 +891,15 @@
 		}
 		if (value.instanceOf(Class)) {
 			var that = this;
-			var callback = function(){
+			var callStack = [];
+			var callback = function(changedProperty, changedObject){
+				for (var i = 0; i < callStatic.length; i++) {
+					if (callStack[i] === changedObject) {
+						callStack.push(changedObject);
+						return;
+					}
+				}
+				callStack.push(changedObject);
 				that.trigger('change', propertyName, that);
 			};
 			callback.id = 'set-change-callback';
