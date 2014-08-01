@@ -3080,6 +3080,20 @@ test('Change event is triggered if a nested object is changed', function(){
 	new ThirdClass();
 });
 
+test('Cyclical properties do not break change events', function(){
+	Class.define('MyClass', {
+		'public myProperty': null
+	});
+	Class.define('MyOtherClass', {
+		'public myProperty': null
+	});
+	var myObject = new MyClass();
+	var myOtherObject = new MyOtherClass();
+	myObject.set('myProperty', myOtherObject);
+	myOtherObject.set('myProperty', myObject);
+	ok(true);
+});
+
 test('Class can require a file', function(){
 	Class.define('MyClass', {
 		Require: 'includes/File-5ft78s.js'
