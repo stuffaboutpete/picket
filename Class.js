@@ -889,7 +889,7 @@
 			property.value = value;
 			this.propertyValues[propertyName] = property.value;
 		}
-		if (value.instanceOf(Class)) {
+		if (typeof value != 'undefined' && value.instanceOf(Class)) {
 			var that = this;
 			var callStack = [];
 			var callback = function(changedProperty, changedObject){
