@@ -3366,6 +3366,42 @@ test('Longest matching pattern is used to include file', function(){
 	}
 });
 
+test('File can be included from different domain using pattern', function(){
+	Class.addClassAutoloadPattern('DomainTest', 'http://some.other.domain');
+	Class.define('MyClass', {
+		Require: 'DomainTest.h7fg7t'
+	});
+	var scripts = document.getElementsByTagName('script');
+	for (var i in scripts) {
+		if (i == 'length') continue;
+		if (!Object.prototype.hasOwnProperty.call(scripts, i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 34) == 'http://some.other.domain/h7fg7t.js') {
+			ok(true);
+			Class.registerLoadedDependency('http://some.other.domain/h7fg7t.js');
+			return;
+		}
+	}
+});
+
+test('File can be included from subfolder on different domain using pattern', function(){
+	Class.addClassAutoloadPattern('SubDomainTest', 'http://some.other.domain/subfolder');
+	Class.define('MyClass', {
+		Require: 'SubDomainTest.6yhg1w'
+	});
+	var scripts = document.getElementsByTagName('script');
+	for (var i in scripts) {
+		if (i == 'length') continue;
+		if (!Object.prototype.hasOwnProperty.call(scripts, i)) continue;
+		var script = scripts[i].src;
+		if (script.substr(script.length - 44) == 'http://some.other.domain/subfolder/6yhg1w.js') {
+			ok(true);
+			Class.registerLoadedDependency('http://some.other.domain/subfolder/6yhg1w.js');
+			return;
+		}
+	}
+});
+
 test('Loaded classes can be declared and will not be auto loaded in future', function(){
 	Class.registerLoadedClass('Pre.Loaded.Class.3fg9xh');
 	Class.define('MyClass', {

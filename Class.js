@@ -1389,17 +1389,19 @@
 				if (!map.hasOwnProperty(i)) continue;
 				var pattern = map[i].pattern;
 				if (dependency.substr(0, pattern.length) == pattern) {
-					var filename = map[i].target + dependency.substr(pattern.length);
+					var prependPath = map[i].target;
+					dependency = dependency.substr(pattern.length);
 					break;
 				}
 			}
 			
-			if (typeof filename == 'undefined') filename = dependency;
-			
 			if (isClass) {
-				filename = filename.split('.').join('/') + '.js';
+				dependency = dependency.split('.').join('/') + '.js';
 				extension = 'js';
 			}
+			
+			var filename = dependency;
+			if (prependPath) filename = prependPath + filename;
 			
 			if (includedDependencies.indexOf(filename) > -1) {
 				Class.registerLoadedDependency(filename);
