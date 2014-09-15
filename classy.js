@@ -36,7 +36,8 @@ if (!Array.prototype.indexOf) {
 		}
 		return -1;
 	};
-};(function(undefined){
+}
+;(function(undefined){
 	
 	InvalidSyntaxFatal = function(message){
 		this.message = message;
@@ -45,7 +46,8 @@ if (!Array.prototype.indexOf) {
 	InvalidSyntaxFatal.prototype = Object.create(Error.prototype);
 	InvalidSyntaxFatal.prototype.name = 'Fatal: InvalidSyntax';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	AbstractClassFatal = function(message){
 		this.message = message;
@@ -54,7 +56,8 @@ if (!Array.prototype.indexOf) {
 	AbstractClassFatal.prototype = Object.create(Error.prototype);
 	AbstractClassFatal.prototype.name = 'Fatal: AbstractClass';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	AbstractMethodNotImplementedFatal = function(message){
 		this.message = message;
@@ -63,7 +66,8 @@ if (!Array.prototype.indexOf) {
 	AbstractMethodNotImplementedFatal.prototype = Object.create(Error.prototype);
 	AbstractMethodNotImplementedFatal.prototype.name = 'Fatal: AbstractMethodNotImplemented';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	InvalidClassDeclarationFatal = function(message){
 		this.message = message;
@@ -72,7 +76,8 @@ if (!Array.prototype.indexOf) {
 	InvalidClassDeclarationFatal.prototype = Object.create(Error.prototype);
 	InvalidClassDeclarationFatal.prototype.name = 'Fatal: InvalidClassDeclaration';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	RuntimeFatal = function(message){
 		this.message = message;
@@ -81,7 +86,8 @@ if (!Array.prototype.indexOf) {
 	RuntimeFatal.prototype = Object.create(Error.prototype);
 	RuntimeFatal.prototype.name = 'Fatal: Runtime';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	ScopeFatal = function(message){
 		this.message = message;
@@ -90,7 +96,8 @@ if (!Array.prototype.indexOf) {
 	ScopeFatal.prototype = Object.create(Error.prototype);
 	ScopeFatal.prototype.name = 'Fatal: Scope';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	UnknownPropertyFatal = function(message){
 		this.message = message;
@@ -99,7 +106,8 @@ if (!Array.prototype.indexOf) {
 	UnknownPropertyFatal.prototype = Object.create(Error.prototype);
 	UnknownPropertyFatal.prototype.name = 'Fatal: UnknownProperty';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	UnknownMethodFatal = function(message){
 		this.message = message;
@@ -108,7 +116,8 @@ if (!Array.prototype.indexOf) {
 	UnknownMethodFatal.prototype = Object.create(Error.prototype);
 	UnknownMethodFatal.prototype.name = 'Fatal: UnknownMethod';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	UnknownEventFatal = function(message){
 		this.message = message;
@@ -117,7 +126,8 @@ if (!Array.prototype.indexOf) {
 	UnknownEventFatal.prototype = Object.create(Error.prototype);
 	UnknownEventFatal.prototype.name = 'Fatal: UnknownEvent';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	CannotInstantiateInterfaceFatal = function(message){
 		this.message = message;
@@ -126,7 +136,8 @@ if (!Array.prototype.indexOf) {
 	CannotInstantiateInterfaceFatal.prototype = Object.create(Error.prototype);
 	CannotInstantiateInterfaceFatal.prototype.name = 'Fatal: CannotInstantiateInterface';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	InterfaceMethodNotImplementedFatal = function(message){
 		this.message = message;
@@ -135,7 +146,8 @@ if (!Array.prototype.indexOf) {
 	InterfaceMethodNotImplementedFatal.prototype = Object.create(Error.prototype);
 	InterfaceMethodNotImplementedFatal.prototype.name = 'Fatal: InterfaceMethodNotImplemented';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	InterfaceIncorrectlyDefinedFatal = function(message){
 		this.message = message;
@@ -144,7 +156,8 @@ if (!Array.prototype.indexOf) {
 	InterfaceIncorrectlyDefinedFatal.prototype = Object.create(Error.prototype);
 	InterfaceIncorrectlyDefinedFatal.prototype.name = 'Fatal: InterfaceIncorrectlyDefined';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	InvalidReturnTypeFatal = function(message){
 		this.message = message;
@@ -153,7 +166,8 @@ if (!Array.prototype.indexOf) {
 	InvalidReturnTypeFatal.prototype = Object.create(Error.prototype);
 	InvalidReturnTypeFatal.prototype.name = 'Fatal: InvalidReturnType';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	InvalidArgumentTypeFatal = function(message){
 		this.message = message;
@@ -162,7 +176,8 @@ if (!Array.prototype.indexOf) {
 	InvalidArgumentTypeFatal.prototype = Object.create(Error.prototype);
 	InvalidArgumentTypeFatal.prototype.name = 'Fatal: InvalidArgumentType';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	CloneFatal = function(message){
 		this.message = message;
@@ -171,7 +186,8 @@ if (!Array.prototype.indexOf) {
 	CloneFatal.prototype = Object.create(Error.prototype);
 	CloneFatal.prototype.name = 'Fatal: Clone';
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	Class = function(){};
 	
@@ -1562,17 +1578,19 @@ if (!Array.prototype.indexOf) {
 				if (!map.hasOwnProperty(i)) continue;
 				var pattern = map[i].pattern;
 				if (dependency.substr(0, pattern.length) == pattern) {
-					var filename = map[i].target + dependency.substr(pattern.length);
+					var prependPath = map[i].target;
+					dependency = dependency.substr(pattern.length);
 					break;
 				}
 			}
 			
-			if (typeof filename == 'undefined') filename = dependency;
-			
 			if (isClass) {
-				filename = filename.split('.').join('/') + '.js';
+				dependency = dependency.split('.').join('/') + '.js';
 				extension = 'js';
 			}
+			
+			var filename = dependency;
+			if (prependPath) filename = prependPath + filename;
 			
 			if (includedDependencies.indexOf(filename) > -1) {
 				Class.registerLoadedDependency(filename);
@@ -1701,6 +1719,7 @@ if (!Array.prototype.indexOf) {
 	}
 	
 })();
+
 ;(function(undefined){
 	
 	Interface = function(){};
@@ -1748,7 +1767,8 @@ if (!Array.prototype.indexOf) {
 		
 	};
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	Class.Scope = function(level){
 		
@@ -1830,7 +1850,8 @@ if (!Array.prototype.indexOf) {
 		return this.checkCallingObject(callingFunction.parentType);
 	}
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	Class.Property = function(
 		name,
@@ -1858,7 +1879,8 @@ if (!Array.prototype.indexOf) {
 		this.setterType = setterType;
 	};
 	
-})();;(function(undefined){
+})();
+;(function(undefined){
 	
 	Class.Method = function(name, method, scope, isStatic, returnType, argTypes){
 		this.name = name;
