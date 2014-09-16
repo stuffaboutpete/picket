@@ -889,7 +889,7 @@
 			property.value = value;
 			this.propertyValues[propertyName] = property.value;
 		}
-		if (typeof value != 'undefined' && value.instanceOf(Class)) {
+		if (typeof value != 'undefined' && value.instanceOf && value.instanceOf(Class)) {
 			var that = this;
 			var callStack = [];
 			var callback = function(changedProperty, changedObject){
@@ -1121,7 +1121,7 @@
 		return returnVal;
 	}
 	
-	Object.prototype.instanceOf = function(type)
+	Class.prototype.instanceOf = function(type)
 	{
 		if (this.type === type) return true;
 		if (this.type && this.type.Implements) {
