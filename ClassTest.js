@@ -1329,19 +1329,6 @@ test('Object is instanceOf parent class', function(){
 	ok(myObject.instanceOf(MyParent));
 });
 
-test('All objects have instanceOf method', function(){
-	var myString = 'string';
-	var myNumber = 10;
-	var myObject = {};
-	var myArray = [];
-	var myBoolean = true;
-	ok(myString.instanceOf(Class) === false);
-	ok(myNumber.instanceOf(Class) === false);
-	ok(myObject.instanceOf(Class) === false);
-	ok(myArray.instanceOf(Class) === false);
-	ok(myBoolean.instanceOf(Class) === false);
-});
-
 test('Call to unknown method is dispatched to call if present', function(){
 	Class.define('MyClass', {
 		'public call': function(){
