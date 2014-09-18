@@ -900,6 +900,71 @@ test('Abstract method can specify return and argument types which must be implem
 	ok(myOtherObject instanceof MyOtherClass);
 });
 
+test('Abstract class can specify abstract event', function(){
+	Class.define('MyClass', {
+		Abstract: [
+			'public myMethod',
+			'event myEvent'
+		]
+	});
+	ok(typeof MyClass != 'undefined');
+});
+
+test('Class cannot be instantiated without abstract events', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'event myEvent'
+		]
+	});
+	raises(function(){
+		Class.define('MyChild', {
+			Extends: MyParent
+		});
+	}, AbstractEventNotImplementedFatal);
+});
+
+test('Class can be instantiated with abstract events', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'event myEvent',
+			'event myOtherEvent'
+		]
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		Events: [
+			'myEvent',
+			'myOtherEvent'
+		]
+	});
+	var myObject = new MyClass();
+	ok(myObject instanceof MyClass);
+});
+
+test('Abstract event can specify argument types which must be implemented', function(){
+	Class.define('MyParent', {
+		Abstract: [
+			'event myEvent : string boolean'
+		]
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		Events: [
+			'myEvent : string boolean'
+		]
+	});
+	new MyClass();
+	raises(function(){
+		Class.define('MyOtherClass', {
+			Extends: MyParent,
+			Events: [
+				'myEvent'
+			]
+		});
+		new MyClass();
+	}, AbstractEventNotImplementedFatal);
+});
+
 test('Class can define static property', function(){
 	Class.define('MyClass', {
 		'static myProperty': null
@@ -1402,6 +1467,64 @@ test('Interface method can specify return and argument types which must be imple
 		});
 		new MyClass();
 	});
+});
+
+test('Interface definition can specify list of events', function(){
+	Interface.define('MyInterface', [
+		'myMethod',
+		'event myEvent'
+	]);
+	ok(typeof MyInterface != 'undefined');
+});
+
+test('Class cannot be instantiated without interface events', function(){
+	Interface.define('MyInterface', [
+		'event myEvent'
+	]);
+	Class.define('MyClass', {
+		Implements: MyInterface
+	});
+	raises(function(){
+		var myObject = new MyClass();
+	}, InterfaceEventNotImplementedFatal);
+});
+
+test('Class can be instantiated with interface events', function(){
+	Interface.define('MyInterface', [
+		'event myEvent',
+		'event myOtherEvent'
+	]);
+	Class.define('MyClass', {
+		Implements: MyInterface,
+		Events: [
+			'myEvent',
+			'myOtherEvent'
+		]
+	});
+	var myObject = new MyClass();
+	ok(myObject instanceof MyClass);
+});
+
+test('Interface event can specify argument types which must be implemented', function(){
+	Interface.define('MyInterface', [
+		'event myEvent : string boolean'
+	]);
+	Class.define('MyClass', {
+		Implements: MyInterface,
+		Events: [
+			'myEvent : string boolean'
+		]
+	});
+	new MyClass();
+	raises(function(){
+		Class.define('MyClass', {
+			Implements: MyInterface,
+			Events: [
+				'myEvent'
+			]
+		});
+		new MyClass();
+	}, InvalidArgumentTypeFatal);
 });
 
 test('Object is instanceOf interface', function(){

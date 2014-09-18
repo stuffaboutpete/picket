@@ -8,6 +8,10 @@
 		
 		for (var i in methods) {
 			if (!methods.hasOwnProperty(i)) continue;
+			if (methods[i].substr(0, 6) == 'event ') {
+				var isEvent = true;
+				methods[i] = methods[i].substr(6);
+			}
 			var definitionParts = methods[i].split(':');
 			if (definitionParts.length == 2) {
 				var argTypes = definitionParts.pop().trim().split(' ');
@@ -23,7 +27,8 @@
 			}
 			methodList[definitionParts[0]] = {
 				argTypes: argTypes,
-				returnType: returnType
+				returnType: returnType,
+				isEvent: isEvent ? true : false
 			};
 		}
 		

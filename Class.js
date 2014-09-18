@@ -57,32 +57,64 @@
 					for (var method in currentInterface.methods) {
 						if (!currentInterface.methods.hasOwnProperty(method)) continue;
 						var currentMethod = currentInterface.methods[method];
-						if (typeof this.type.methods[method] == 'undefined') {
-							throw new InterfaceMethodNotImplementedFatal(
-								'Class \'' + name + '\' must define interface ' +
-								'method \'' + method + '\''
-							);
+						if (currentMethod.isEvent) {
+							if (typeof this.type.Events[method] == 'undefined') {
+								throw new InterfaceEventNotImplementedFatal(
+									'Class \'' + name + '\' must define interface ' +
+									'event \'' + method + '\''
+								);
+							}
+						} else {
+							if (typeof this.type.methods[method] == 'undefined') {
+								throw new InterfaceMethodNotImplementedFatal(
+									'Class \'' + name + '\' must define interface ' +
+									'method \'' + method + '\''
+								);
+							}
 						}
-						if (this.type.methods[method].scope.level != Class.Scope.PUBLIC) {
-							throw new InterfaceMethodNotImplementedFatal(
-								'Interface method \'' + method + '\' must be declared public'
-							);
+						if (!currentMethod.isEvent) {
+							if (this.type.methods[method].scope.level != Class.Scope.PUBLIC) {
+								throw new InterfaceMethodNotImplementedFatal(
+									'Interface method \'' + method + '\' must be declared public'
+								);
+							}
 						}
-						if (currentMethod.argTypes !== null
-						&&	!arrayEquals(
-								currentMethod.argTypes,
-								this.type.methods[method].argTypes
-							)
-						) {
-							throw new InvalidArgumentTypeFatal(
-								'Method \'' + method + '\' must match argument types of interface'
-							);
-						}
-						if (currentMethod.returnType !== undefined
-						&&	currentMethod.returnType != this.type.methods[method].returnType) {
-							throw new InvalidReturnTypeFatal(
-								'Method \'' + method + '\' must match return type of interface'
-							);
+						if (currentMethod.isEvent) {
+							if (currentMethod.argTypes !== null
+							&&	!arrayEquals(
+									currentMethod.argTypes,
+									this.type.Events[method].argTypes
+								)
+							) {
+								throw new InvalidArgumentTypeFatal(
+									'Event \'' + method + '\' must match ' +
+									'argument types of interface'
+								);
+							}
+							if (currentMethod.returnType !== undefined
+							&&	currentMethod.returnType != this.type.Events[method].returnType) {
+								throw new InvalidReturnTypeFatal(
+									'Event \'' + method + '\' must match return type of interface'
+								);
+							}
+						} else {
+							if (currentMethod.argTypes !== null
+							&&	!arrayEquals(
+									currentMethod.argTypes,
+									this.type.methods[method].argTypes
+								)
+							) {
+								throw new InvalidArgumentTypeFatal(
+									'Method \'' + method + '\' must match ' +
+									'argument types of interface'
+								);
+							}
+							if (currentMethod.returnType !== undefined
+							&&	currentMethod.returnType != this.type.methods[method].returnType) {
+								throw new InvalidReturnTypeFatal(
+									'Method \'' + method + '\' must match return type of interface'
+								);
+							}
 						}
 					}
 				}
@@ -230,18 +262,28 @@
 		}
 		if (definition.Abstract) {
 			
-			
 			if (Object.prototype.toString.apply(definition.Abstract) == '[object Array]') {
+				var abstractEvents = [];
 				for (var i in definition.Abstract) {
 					if (!definition.Abstract.hasOwnProperty(i)) continue;
+					if (definition.Abstract[i].substr(0, 6) == 'event ') {
+						var isEvent = true;
+						definition.Abstract[i] = definition.Abstract[i].substr(6);
+					}
 					var definitionParts = definition.Abstract[i].split(' ');
-					if (definitionParts[0] != 'public' && definitionParts[0] != 'protected') {
-						throw new InvalidSyntaxFatal(
-							'Abstract methods must be specified public or protected'
-						);
+					if (isEvent) {
+						abstractEvents.push(definition.Abstract[i]);
+						delete definition.Abstract[i];
+					} else {
+						if (definitionParts[0] != 'public' && definitionParts[0] != 'protected') {
+							throw new InvalidSyntaxFatal(
+								'Abstract methods must be specified public or protected'
+							);
+						}
 					}
 				}
 				namespace[className].AbstractMethods = definition.Abstract;
+				namespace[className].AbstractEvents = abstractEvents;
 			}
 			
 			namespace[className].Abstract = true;
@@ -705,13 +747,21 @@
 			// gather a list of all abstract methods
 			var parent = namespace[className].Extends;
 			var methods = [];
+			var events = [];
 			var methodObjects = {};
+			var eventObjects = {};
 			var methodsFound = false;
+			var eventsFound = false;
 			while (parent) {
 				for (var i in parent.AbstractMethods) {
 					if (!parent.AbstractMethods.hasOwnProperty(i)) continue;
 					methods.push(parent.AbstractMethods[i]);
 					methodsFound = true;
+				}
+				for (var i in parent.AbstractEvents) {
+					if (!parent.AbstractEvents.hasOwnProperty(i)) continue;
+					events.push(parent.AbstractEvents[i]);
+					eventsFound = true;
 				}
 				parent = parent.Extends || false;
 			}
@@ -739,6 +789,23 @@
 				methodObjects[methodName] = {
 					scope: scope,
 					//args: args,
+					implemented: false,
+					types: types
+				};
+			}
+			
+			for (var i in events) {
+				if (!events.hasOwnProperty(i)) continue;
+				var definitionParts = events[i].split(':');
+				if (typeof definitionParts[1] != 'undefined') {
+					var types = definitionParts[1].trim().split(' ');
+				} else {
+					var types = [];
+				}
+				definitionParts = definitionParts[0].trim().split(' ');
+				if (definitionParts.length == 2) types.unshift(definitionParts.shift());
+				var eventName = definitionParts.shift();
+				eventObjects[eventName] = {
 					implemented: false,
 					types: types
 				};
@@ -803,6 +870,44 @@
 					if (!methodObjects.hasOwnProperty(i)) continue;
 					if (methodObjects[i].implemented === false) {
 						throw new AbstractMethodNotImplementedFatal(i);
+					}
+				}
+				
+			}
+			
+			// Loop through all ancesters again
+			// and mark all the events that
+			// have been implemented
+			if (eventsFound) {
+				parent = namespace[className];
+				while (parent) {
+					for (var i in parent.Events) {
+						var eventMatches = false;
+						if (!parent.Events.hasOwnProperty(i)) continue;
+						if (typeof eventObjects[i] == 'undefined') continue;
+						var eventTypes = eventObjects[i].types;
+						eventMatches = true;
+						
+						if (typeof parent.Events[i].argTypes == 'undefined') {
+							parent.Events[i].argTypes = [];
+						}
+						
+						for (var j in eventObjects[i].types) {
+							if (parent.Events[i].argTypes[j] != eventObjects[i].types[j]) {
+								eventMatches = false;
+							}
+						}
+						if (eventMatches) eventObjects[i].implemented = true;
+					}
+					parent = parent.Extends || false;
+				}
+				
+				// If any events are still marked
+				// as missing, throw a fatal
+				for (var i in eventObjects) {
+					if (!eventObjects.hasOwnProperty(i)) continue;
+					if (eventObjects[i].implemented === false) {
+						throw new AbstractEventNotImplementedFatal(i);
 					}
 				}
 				
