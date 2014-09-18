@@ -3584,3 +3584,23 @@ asyncTest('Class can be required inline and method is run on load', function(){
 	});
 	new MyClass();
 });
+
+asyncTest('Function within method can access private class properties', function(){
+	Class.define('MyClass', {
+		'private myProperty': 'Original Value',
+		'public changeValue': function(){
+			setTimeout(this.proxyMethod(function(){
+				this.set('myProperty', 'New Value');
+			}), 10);
+		},
+		'public getMyProperty': function(){
+			return this.get('myProperty');
+		}
+	});
+	var myObject = new MyClass();
+	myObject.changeValue();
+	setTimeout(function(){
+		ok(myObject.getMyProperty() == 'New Value');
+		start();
+	}, 20);
+});

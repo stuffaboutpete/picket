@@ -1358,6 +1358,15 @@ if (!Array.prototype.indexOf) {
 		return Object.prototype.toString.call(this);
 	}
 	
+	Class.prototype.proxyMethod = function(proxyFunction)
+	{
+		var parentMethod = arguments.callee.caller;
+		return function(){
+			proxyFunction.proxyMethod = parentMethod;
+			proxyFunction.apply(parentMethod.parent, arguments);
+		};
+	}
+	
 	function cloneObject(object)
 	{
 		
@@ -1848,6 +1857,7 @@ if (!Array.prototype.indexOf) {
 	}
 	
 	Class.Scope.prototype.checkCallingFunction = function(callingFunction){
+		if (callingFunction.proxyMethod) callingFunction = callingFunction.proxyMethod;
 		return this.checkCallingObject(callingFunction.parentType);
 	}
 	

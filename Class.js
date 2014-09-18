@@ -1169,6 +1169,15 @@
 		return Object.prototype.toString.call(this);
 	}
 	
+	Class.prototype.proxyMethod = function(proxyFunction)
+	{
+		var parentMethod = arguments.callee.caller;
+		return function(){
+			proxyFunction.proxyMethod = parentMethod;
+			proxyFunction.apply(parentMethod.parent, arguments);
+		};
+	}
+	
 	function cloneObject(object)
 	{
 		

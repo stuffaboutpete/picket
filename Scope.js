@@ -77,6 +77,7 @@
 	}
 	
 	Class.Scope.prototype.checkCallingFunction = function(callingFunction){
+		if (callingFunction.proxyMethod) callingFunction = callingFunction.proxyMethod;
 		return this.checkCallingObject(callingFunction.parentType);
 	}
 	
