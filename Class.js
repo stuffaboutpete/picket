@@ -886,6 +886,7 @@
 			property.value = value;
 			this.propertyValues[propertyName] = property.value;
 		} else {
+			property.scope.checkCallingFunction(arguments.callee.caller);
 			property.value = value;
 			this.propertyValues[propertyName] = property.value;
 		}

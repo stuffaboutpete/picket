@@ -386,6 +386,126 @@ test('Private properties cannot be accessed from outside of object', function(){
 	}, ScopeFatal);
 });
 
+test('Public properties can be set from inside of object', function(){
+	Class.define('MyClass', {
+		'public myProperty': 'Original Value',
+		'public setValue': function(){
+			return this.set('myProperty', 'New Value');
+		}
+	});
+	var myObject = new MyClass();
+	myObject.setValue();
+	ok('New Value' == myObject.get('myProperty'));
+});
+
+test('Public properties can be set from subclasses', function(){
+	Class.define('MyParent', {
+		'public myProperty': 'Original Value'
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'public setValue': function(){
+			return this.set('myProperty', 'New Value');
+		}
+	});
+	var myChild = new MyChild();
+	myChild.setValue();
+	ok('New Value' == myChild.get('myProperty'));
+});
+
+test('Public properties can be set from outside of object', function(){
+	Class.define('MyClass', {
+		'public myProperty': 'Original Value'
+	});
+	var myObject = new MyClass();
+	myObject.set('myProperty', 'New Value');
+	ok('New Value' == myObject.get('myProperty'));
+});
+
+test('Protected properties can be set from inside of object', function(){
+	Class.define('MyClass', {
+		'protected myProperty': 'Original Value',
+		'public setValue': function(){
+			return this.set('myProperty', 'New Value');
+		},
+		'public getValue': function(){
+			return this.get('myProperty');
+		}
+	});
+	var myObject = new MyClass();
+	myObject.setValue();
+	ok('New Value' == myObject.getValue());
+});
+
+test('Protected properties can be set from subclasses', function(){
+	Class.define('MyParent', {
+		'protected myProperty': 'Original Value',
+		'public getValue': function(){
+			return this.get('myProperty');
+		}
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'public setValue': function(){
+			return this.set('myProperty', 'New Value');
+		}
+	});
+	var myChild = new MyChild();
+	myChild.setValue();
+	ok('New Value' == myChild.getValue());
+});
+
+test('Protected properties cannot be set from outside of object', function(){
+	Class.define('MyClass', {
+		'protected myProperty': 'Original Value'
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.set('myProperty', 'New Value');
+	}, ScopeFatal);
+});
+
+test('Private properties can be set from inside class', function(){
+	Class.define('MyClass', {
+		'private myProperty': 'Original Value',
+		'public setValue': function(){
+			return this.set('myProperty', 'New Value');
+		},
+		'public getValue': function(){
+			return this.get('myProperty');
+		}
+	});
+	var myObject = new MyClass();
+	myObject.setValue();
+	ok('New Value' == myObject.getValue());
+});
+
+test('Private properties cannot be set from subclasses', function(){
+	Class.define('MyParent', {
+		'private myProperty': 'Original Value'
+	});
+	Class.define('MyChild', {
+		Extends: MyParent,
+		'public setValue': function(){
+			return this.set('myProperty', 'New Value');
+		}
+	});
+	var myChild = new MyChild();
+	raises(function(){
+		myChild.setValue();
+	}, ScopeFatal);
+});
+
+test('Private properties cannot be set from outside of object', function(){
+	Class.define('MyClass', {
+		'private myProperty': 'Original Value'
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.get('myProperty');
+	}, ScopeFatal);
+});
+
 test('Public methods can be accessed from inside of object', function(){
 	Class.define('MyClass', {
 		'public myValueMethod': function(){
