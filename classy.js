@@ -1602,10 +1602,7 @@ if (!Array.prototype.indexOf) {
 			var filename = dependency;
 			if (prependPath) filename = prependPath + filename;
 			
-			if (includedDependencies.indexOf(filename) > -1) {
-				Class.registerLoadedDependency(filename);
-				continue;
-			}
+			if (includedDependencies.indexOf(filename) > -1) continue;
 			
 			registerLoadingDependency(filename);
 			
