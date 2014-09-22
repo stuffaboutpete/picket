@@ -135,7 +135,7 @@ test('Properties are declared private if not specified', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myChildMethod': function(){
 			return this.get('myProperty');
 		}
@@ -160,7 +160,7 @@ test('Methods are declared private if not specified', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myChildMethod': function(){
 			return this.myValueMethod();
 		}
@@ -193,7 +193,7 @@ test('Classes can be subclassed using the Extends keyword', function(){
 		'public parentMethod': function(){return 'Returned from Parent';}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent
+		Extends: 'MyParent'
 	});
 	var myChild = new MyChild();
 	ok(myChild.parentMethod() == 'Returned from Parent');
@@ -204,7 +204,7 @@ test('Child methods override parent methods', function(){
 		'public myMethod': function(){return 'Returned from Parent';}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myMethod': function(){return 'Returned from Child';}
 	});
 	var myChild = new MyChild();
@@ -216,7 +216,7 @@ test('Child methods can call overridden parent methods', function(){
 		'public myMethod': function(){return 'Returned from Parent';}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myMethod': function(){
 			return this.parent.myMethod();
 		}
@@ -230,7 +230,7 @@ test('Child methods can call non overridden parent methods', function(){
 		'public myMethod': function(){return 'Returned from Parent';}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myOtherMethod': function(){
 			return this.parent.myMethod();
 		}
@@ -247,7 +247,7 @@ test('Child methods can call parent construct method', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public construct': function(myProperty){
 			this.parent.construct(myProperty);
 		}
@@ -297,7 +297,7 @@ test('Public properties can be accessed from subclasses', function(){
 		'public myProperty': 'myValue'
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myMethod': function(){
 			return this.get('myProperty');
 		}
@@ -330,7 +330,7 @@ test('Protected properties can be accessed from subclasses', function(){
 		'protected myProperty': 'myValue'
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myMethod': function(){
 			return this.get('myProperty');
 		}
@@ -365,7 +365,7 @@ test('Private properties cannot be accessed from subclasses', function(){
 		'private myProperty': 'myValue'
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myMethod': function(){
 			return this.get('myProperty');
 		}
@@ -403,7 +403,7 @@ test('Public properties can be set from subclasses', function(){
 		'public myProperty': 'Original Value'
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public setValue': function(){
 			return this.set('myProperty', 'New Value');
 		}
@@ -445,7 +445,7 @@ test('Protected properties can be set from subclasses', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public setValue': function(){
 			return this.set('myProperty', 'New Value');
 		}
@@ -485,7 +485,7 @@ test('Private properties cannot be set from subclasses', function(){
 		'private myProperty': 'Original Value'
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public setValue': function(){
 			return this.set('myProperty', 'New Value');
 		}
@@ -526,7 +526,7 @@ test('Public methods can be accessed from subclasses', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myAccessMethod': function(){
 			return this.myValueMethod();
 		}
@@ -565,7 +565,7 @@ test('Protected methods can be accessed from subclasses', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myAccessMethod': function(){
 			return this.myValueMethod();
 		}
@@ -606,7 +606,7 @@ test('Private methods cannot be accessed from subclasses', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myAccessMethod': function(){
 			return this.myValueMethod();
 		}
@@ -644,7 +644,7 @@ test('Extending classes can implement abstract classes', function(){
 		'public myProperty': 'myValue'
 	});
 	Class.define('MyChild', {
-		Extends: MyParent
+		Extends: 'MyParent'
 	});
 	var myChild = new MyChild();
 	ok(myChild.get('myProperty') == 'myValue');
@@ -666,7 +666,7 @@ test('Abstract method can be implemented in child and called', function(){
 		]
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myMethod': function(){
 			ok(true);
 		}
@@ -682,7 +682,7 @@ test('Abstract class can define multiple abstract methods', function(){
 		]
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public myMethod': function(){
 			return 'first value';
 		},
@@ -702,7 +702,7 @@ test('Extending class must implement abstract method', function(){
 	});
 	raises(function(){
 		Class.define('MyChild', {
-			Extends: MyParent
+			Extends: 'MyParent'
 		});
 	}, AbstractMethodNotImplementedFatal);
 });
@@ -716,7 +716,7 @@ test('Extending class must implement multiple abstract methods', function(){
 	});
 	raises(function(){
 		Class.define('MyChild', {
-			Extends: MyParent,
+			Extends: 'MyParent',
 			'public myMethod': function(){}
 		});
 	}, AbstractMethodNotImplementedFatal);
@@ -729,7 +729,7 @@ test('Extending class may not implement abstract methods if it is also abstract'
 		]
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		Abstract: true
 	});
 	ok(true);
@@ -743,12 +743,12 @@ test('Extending class may implement some abstract methods and not others', funct
 		]
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		Abstract: true,
 		'public myMethod': function(){}
 	});
 	Class.define('MyGrandChild', {
-		Extends: MyChild,
+		Extends: 'MyChild',
 		'public myOtherMethod': function(){}
 	});
 	ok(true);
@@ -762,7 +762,7 @@ test('Abstract child class can list extra abstract methods that must be implemen
 		]
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		Abstract: [
 			'public myThirdMethod'
 		],
@@ -770,7 +770,7 @@ test('Abstract child class can list extra abstract methods that must be implemen
 	});
 	raises(function(){
 		Class.define('MyGrandChild', {
-			Extends: MyChild,
+			Extends: 'MyChild',
 			'public myOtherMethod': function(){}
 		});
 	}, AbstractMethodNotImplementedFatal);
@@ -783,12 +783,12 @@ test('Abstract method can specify implementing method must be public', function(
 		]
 	});
 	Class.define('MyOtherClass', {
-		Extends: MyClass,
+		Extends: 'MyClass',
 		'public myMethod': function(){}
 	});
 	raises(function(){
 		Class.define('ThirdClass', {
-			Extends: MyClass,
+			Extends: 'MyClass',
 			'protected myMethod': function(){}
 		});
 	}, AbstractMethodNotImplementedFatal);
@@ -803,12 +803,12 @@ test('Abstract method can specify implementing method must be protected', functi
 		]
 	});
 	Class.define('MyOtherClass', {
-		Extends: MyClass,
+		Extends: 'MyClass',
 		'protected myMethod': function(){}
 	});
 	raises(function(){
 		Class.define('ThirdClass', {
-			Extends: MyClass,
+			Extends: 'MyClass',
 			'public myMethod': function(){}
 		});
 	}, AbstractMethodNotImplementedFatal);
@@ -843,14 +843,14 @@ test('Abstract method can specify return type which must be implemented', functi
 		]
 	});
 	Class.define('MyOtherClass', {
-		Extends: MyClass,
+		Extends: 'MyClass',
 		'public boolean myMethod': function(){
 			return true;
 		}
 	});
 	raises(function(){
 		Class.define('ThirdClass', {
-			Extends: MyClass,
+			Extends: 'MyClass',
 			'public myMethod': function(){
 				return true;
 			}
@@ -867,12 +867,12 @@ test('Abstract method can specify argument types which must be implemented', fun
 		]
 	});
 	Class.define('MyOtherClass', {
-		Extends: MyClass,
+		Extends: 'MyClass',
 		'public myMethod : string number': function(arg1, arg2){}
 	});
 	raises(function(){
 		Class.define('ThirdClass', {
-			Extends: MyClass,
+			Extends: 'MyClass',
 			'public myMethod': function(arg1, arg2){}
 		});
 	}, AbstractMethodNotImplementedFatal);
@@ -887,12 +887,12 @@ test('Abstract method can specify return and argument types which must be implem
 		]
 	});
 	Class.define('MyOtherClass', {
-		Extends: MyClass,
+		Extends: 'MyClass',
 		'public boolean myMethod : string number': function(arg1, arg2){}
 	});
 	raises(function(){
 		Class.define('ThirdClass', {
-			Extends: MyClass,
+			Extends: 'MyClass',
 			'public object myMethod : string number': function(arg1, arg2){}
 		});
 	}, AbstractMethodNotImplementedFatal);
@@ -918,7 +918,7 @@ test('Class cannot be instantiated without abstract events', function(){
 	});
 	raises(function(){
 		Class.define('MyChild', {
-			Extends: MyParent
+			Extends: 'MyParent'
 		});
 	}, AbstractEventNotImplementedFatal);
 });
@@ -931,7 +931,7 @@ test('Class can be instantiated with abstract events', function(){
 		]
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		Events: [
 			'myEvent',
 			'myOtherEvent'
@@ -948,7 +948,7 @@ test('Abstract event can specify argument types which must be implemented', func
 		]
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		Events: [
 			'myEvent : string boolean'
 		]
@@ -956,7 +956,7 @@ test('Abstract event can specify argument types which must be implemented', func
 	new MyClass();
 	raises(function(){
 		Class.define('MyOtherClass', {
-			Extends: MyParent,
+			Extends: 'MyParent',
 			Events: [
 				'myEvent'
 			]
@@ -1082,7 +1082,7 @@ test('Static methods in parent are available to child', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent
+		Extends: 'MyParent'
 	});
 	ok(MyChild.myMethod() == 'my value');
 });
@@ -1165,7 +1165,7 @@ test('Protected static property can be accessed by static method of child class'
 		'static protected myProperty': 'my value'
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'static public myMethod': function(){
 			return MyParent.get('myProperty');
 		}
@@ -1267,7 +1267,7 @@ test('Protected static method can be accessed by static method of child class', 
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'static public myOtherMethod': function(){
 			return MyChild.myMethod();
 		}
@@ -1565,7 +1565,7 @@ test('Object is not instanceOf other class', function(){
 test('Object is instanceOf parent class', function(){
 	Class.define('MyParent');
 	Class.define('MyChild', {
-		Extends: MyParent
+		Extends: 'MyParent'
 	});
 	var myObject = new MyChild();
 	ok(myObject.instanceOf(MyChild));
@@ -1610,7 +1610,7 @@ test('Parent object methods can be called magically on child', function(){
 		'public myMethod': function(){ return 'Returned from parent class'; }
 	});
 	Class.define('MyChild', {
-		Extends: MyParent
+		Extends: 'MyParent'
 	});
 	var myObject = new MyChild();
 	ok('Returned from parent class' === myObject.myMethod());
@@ -1692,7 +1692,7 @@ test('Child objects inherit parent toString method', function(){
 		'public toString': function(){return '[object MyObject]';}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent
+		Extends: 'MyParent'
 	});
 	var myChild = new MyChild();
 	ok(myChild.toString() == '[object MyObject]');
@@ -2417,7 +2417,7 @@ test('Inheriting object can get property without using getter', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public getterMethod': function(){
 			return this.get('myProperty');
 		}
@@ -2440,7 +2440,7 @@ test('Inheriting object can use getter whilst parent object does not', function(
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public childGetterMethod': function(){
 			return this.get('myProperty');
 		}
@@ -2465,7 +2465,7 @@ test('Parent object can use getter whilst inheriting object does not', function(
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public childGetterMethod': function(){
 			return this.get('myProperty');
 		}
@@ -2518,7 +2518,7 @@ test('Inheriting object can set property without using setter', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public setterMethod': function(value){
 			this.set('myProperty', value);
 		}
@@ -2541,7 +2541,7 @@ test('Inheriting object can use setter whilst parent object does not', function(
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public childSetterMethod': function(value){
 			this.set('myProperty', value);
 		}
@@ -2567,7 +2567,7 @@ test('Parent object can use setter whilst inheriting object does not', function(
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public childSetterMethod': function(value){
 			this.set('myProperty', value);
 		}
@@ -2593,7 +2593,7 @@ test('Public getter is used if no protected getter is specified for inheriting o
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public getterMethod': function(){
 			return this.get('myProperty');
 		}
@@ -2629,7 +2629,7 @@ test('Public getter is assumed true if not specified', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public getterMethod': function(){
 			return this.get('myProperty');
 		}
@@ -2651,7 +2651,7 @@ test('Public setter is used if no protected setter is specified for inheriting o
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public setterMethod': function(){
 			this.set('myProperty', 'anything');
 		}
@@ -2793,7 +2793,7 @@ test('Object can trigger event in parent class', function(){
 		]
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'public triggerEvent': function(){
 			this.bind('myEvent', 'targetMethod');
 			this.trigger('myEvent');
@@ -2816,7 +2816,7 @@ test('Object can trigger event in child class', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		Events: [
 			'myEvent'
 		]
@@ -2919,7 +2919,7 @@ test('Client can bind protected method to event if target is parent', function()
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		Events: [
 			'myEvent'
 		],
@@ -2942,7 +2942,7 @@ test('Client can bind protected method to event if target is child', function(){
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'protected targetMethod': function(){
 			ok(true);
 		}
@@ -2955,7 +2955,7 @@ test('Client cannot bind private method to event if target is parent', function(
 		'private targetMethod': function(){}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		Events: [
 			'myEvent'
 		],
@@ -2978,7 +2978,7 @@ test('Client cannot bind private method to event if target is child', function()
 		}
 	});
 	Class.define('MyChild', {
-		Extends: MyParent,
+		Extends: 'MyParent',
 		'private targetMethod': function(){}
 	});
 	raises(function(){

@@ -290,6 +290,16 @@
 			delete definition.Abstract;
 		}
 		if (definition.Extends) {
+			if (typeof definition.Extends == 'string') {
+				var classParts = definition.Extends.split('.');
+				var extendsNamespace = window;
+				for (var i = 0; i < classParts.length; i++) {
+					if (i == classParts.length - 1) {
+						definition.Extends = extendsNamespace[classParts[i]];
+					}
+					extendsNamespace = extendsNamespace[classParts[i]];
+				}
+			}
 			namespace[className].Extends = definition.Extends;
 			delete definition.Extends;
 		}
