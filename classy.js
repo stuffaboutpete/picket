@@ -352,6 +352,16 @@ if (!Array.prototype.indexOf) {
 			// If this class extends another,
 			// we must instantiate it
 			if (this.type.Extends) {
+				if (typeof this.type.Extends == 'object' && typeof this.type.ExtendsClassName) {
+					var classParts = this.type.ExtendsClassName.split('.');
+					var extendsNamespace = window;
+					for (var i = 0; i < classParts.length; i++) {
+						if (i == classParts.length - 1) {
+							this.type.Extends = extendsNamespace[classParts[i]];
+						}
+						extendsNamespace = extendsNamespace[classParts[i]];
+					}
+				}
 				this.parent = new this.type.Extends();
 				
 			// Otherwise, assume that it extends
@@ -500,6 +510,7 @@ if (!Array.prototype.indexOf) {
 		}
 		if (definition.Extends) {
 			if (typeof definition.Extends == 'string') {
+				namespace[className].ExtendsClassName = definition.Extends;
 				var classParts = definition.Extends.split('.');
 				var extendsNamespace = window;
 				for (var i = 0; i < classParts.length; i++) {
