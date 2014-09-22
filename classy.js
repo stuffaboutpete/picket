@@ -1692,6 +1692,7 @@ if (!Array.prototype.indexOf) {
 			for (var j in loadedClasses) {
 				if (!loadedClasses.hasOwnProperty(j)) continue;
 				if (loadedClasses[j] == dependency) {
+					Class.registerLoadedDependency();
 					continue toProcessDependencies;
 				}
 			}
@@ -1709,11 +1710,11 @@ if (!Array.prototype.indexOf) {
 			
 			var filename = undefined;
 			
-			for (var i in map) {
-				if (!map.hasOwnProperty(i)) continue;
-				var pattern = map[i].pattern;
+			for (var j in map) {
+				if (!map.hasOwnProperty(j)) continue;
+				var pattern = map[j].pattern;
 				if (dependency.substr(0, pattern.length) == pattern) {
-					var prependPath = map[i].target;
+					var prependPath = map[j].target;
 					dependency = dependency.substr(pattern.length);
 					break;
 				}
@@ -1737,11 +1738,12 @@ if (!Array.prototype.indexOf) {
 					var script = document.createElement('script');
 					script.type = 'text/javascript';
 					script.src = filename;
-					script.dependencyKey = dependency;
+					script.dependencyClass = isClass ? dependencies[i] : undefined;
 					script.onreadystatechange = script.onload = function(){
 						// Could check for ready state other than success
 						// http://stackoverflow.com/questions/6725272/dynamic-cross-browser-script-loading
 						Class.registerLoadedDependency(this.getAttribute('src'));
+						if (this.dependencyClass) Class.registerLoadedClass(this.dependencyClass);
 					};
 						document.getElementsByTagName('head')[0].appendChild(script);
 					includedDependencies.push(filename);
