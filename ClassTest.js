@@ -1865,6 +1865,28 @@ test('Method must implement class instance return type', function(){
 	}, InvalidReturnTypeFatal);
 });
 
+test('Method can be defined with native object return type', function(){
+	Class.define('MyClass', {
+		'public HTMLElement myMethod': function(){
+			return document.getElementsByTagName('body')[0];
+		}
+	});
+	var myObject = new MyClass();
+	ok(myObject.myMethod() instanceof HTMLElement);
+});
+
+test('Method must implement native object return type', function(){
+	Class.define('MyClass', {
+		'public HTMLElement myMethod': function(){
+			return { some: 'object' };
+		}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		myObject.myMethod();
+	}, InvalidReturnTypeFatal);
+});
+
 test('Method can be defined with array return type', function(){
 	Class.define('MyClass', {
 		'public array myMethod': function(){
@@ -2030,6 +2052,26 @@ test('Method must implement class instance argument type', function(){
 	var myObject = new MyClass();
 	raises(function(){
 		myObject.myMethod(null);
+	}, InvalidArgumentTypeFatal);
+});
+
+test('Method can be defined with native object argument type', function(){
+	Class.define('MyClass', {
+		'public myMethod : HTMLElement': function(arg){}
+	});
+	var myObject = new MyClass();
+	myObject.myMethod(document.getElementsByTagName('body')[0]);
+	ok('true');
+});
+
+test('Method must implement native object argument type', function(){
+	Class.define('MyClass', {
+		'public myMethod : HTMLElement': function(arg){}
+	});
+	var myObject = new MyClass();
+	raises(function(){
+		// Note that we are passing an array of HTMLElements
+		myObject.myMethod(document.getElementsByTagName('body'));
 	}, InvalidArgumentTypeFatal);
 });
 

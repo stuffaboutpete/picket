@@ -1660,6 +1660,9 @@ if (!Array.prototype.indexOf) {
 	
 	function validateType(argument, targetType)
 	{
+		if (typeof window[targetType] == 'function' && argument instanceof window[targetType]) {
+			return true;
+		}
 		if (Object.prototype.toString.call(argument) == '[object Array]') {
 			if (targetType.substr(0, 1) == '[' && targetType.substr(targetType.length-1) == ']') {
 				var returnType = targetType.substr(1, targetType.length - 2);
