@@ -1486,10 +1486,12 @@ if (!Array.prototype.indexOf) {
 	Class.prototype.proxyMethod = function(proxyFunction)
 	{
 		var parentMethod = arguments.callee.caller;
-		return function(){
-			proxyFunction.proxyMethod = parentMethod;
-			proxyFunction.apply(parentMethod.parent, arguments);
-		};
+		return (function(parent){
+			return function(){
+				proxyFunction.proxyMethod = parentMethod;
+				proxyFunction.apply(parent, arguments);
+			};
+		})(parentMethod.parent);
 	}
 	
 	function cloneObject(object)
