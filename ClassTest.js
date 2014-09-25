@@ -2347,7 +2347,6 @@ test('Property can be defined with getter and setter methods', function(){
 	});
 	var myObject = new MyClass();
 	myObject.set('myProperty', 'My Value');
-	// debugger;
 	ok(myObject.get('myProperty') == 'My Value - edited');
 });
 
