@@ -1225,7 +1225,10 @@ if (!Array.prototype.indexOf) {
 			property.value = value;
 			this.propertyValues[propertyName] = property.value;
 		}
-		if (typeof value != 'undefined' && value.instanceOf && value.instanceOf(Class)) {
+		if (typeof value != 'undefined'
+		&&	value.instanceOf
+		&&	value.instanceOf(Class)
+		&&	value.bind) {
 			var that = this;
 			var callStack = [];
 			var callback = function(changedProperty, changedObject){
