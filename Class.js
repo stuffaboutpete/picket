@@ -1091,7 +1091,7 @@
 				}
 			}
 		}
-		if (methodName == 'construct' && isLoadingDependencies()) {
+		if (methodName == 'construct' && Class.isLoadingDependencies()) {
 			registerWaitingCallback(copiedMethod.method, object, args, methodName);
 			return;
 		}
@@ -1623,7 +1623,7 @@
 	var includedDependencies = [];
 	var waitingCallbacks = [];
 	
-	function isLoadingDependencies()
+	Class.isLoadingDependencies = function()
 	{
 		return (loadingDependencies.length);
 	}
