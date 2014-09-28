@@ -1300,7 +1300,7 @@ if (!Array.prototype.indexOf) {
 				}
 			}
 		}
-		if (methodName == 'construct' && isLoadingDependencies()) {
+		if (methodName == 'construct' && Class.isLoadingDependencies()) {
 			registerWaitingCallback(copiedMethod.method, object, args, methodName);
 			return;
 		}
@@ -1832,7 +1832,7 @@ if (!Array.prototype.indexOf) {
 	var includedDependencies = [];
 	var waitingCallbacks = [];
 	
-	function isLoadingDependencies()
+	Class.isLoadingDependencies = function()
 	{
 		return (loadingDependencies.length);
 	}
