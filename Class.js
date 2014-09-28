@@ -1091,7 +1091,7 @@
 				}
 			}
 		}
-		if (isLoadingDependencies()) {
+		if (methodName == 'construct' && isLoadingDependencies()) {
 			registerWaitingCallback(copiedMethod.method, object, args, methodName);
 			return;
 		}
