@@ -5,7 +5,11 @@
 		"gulp-concat": "*",
 		"gulp-watch": "*",
 		"gulp-uglify": "*",
-		"gulp-rename": "*"
+		"gulp-gzip": "*",
+		"gulp-rename": "*",
+		"gulp-karma": "*",
+		"karma-jasmine": "*",
+		"karma-phantomjs-launcher": "*"
 	}
 	
 }
