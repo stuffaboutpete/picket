@@ -1,1 +1,0 @@
-window.c8hs45 = true;
