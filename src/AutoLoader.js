@@ -60,8 +60,8 @@
 				_getScriptLoadedCallback(this, className, scriptLocation),
 				_getScriptFailedCallback(this, className, scriptLocation)
 			);
+			this._loadingScripts++;
 		}
-		this._loadingScripts++;
 	};
 	
 	_.AutoLoader.prototype.addClassAutoloadPattern = function(pattern, target)

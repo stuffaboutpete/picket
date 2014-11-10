@@ -883,7 +883,10 @@ if (!Object.create) {
 		var classMatch = signature.match(/\bclass\b/);
 		var interfaceMatch = signature.match(/\binterface\b/);
 		if (classMatch && interfaceMatch || !classMatch && !interfaceMatch) {
-			throw new _.DefinitionFactory.Fatal('AMBIGUOUS_SIGNATURE');
+			throw new _.DefinitionFactory.Fatal(
+				'AMBIGUOUS_SIGNATURE',
+				'Signature: ' + signature
+			);
 		}
 		var factory = (classMatch)
 			? this._classDefinitionFactory
@@ -3261,6 +3264,9 @@ if (!Object.create) {
 		this._memberRegistry;
 		this._typeChecker;
 		this._accessController;
+		this._autoLoader;
+		this._includer;
+		this._autoLoadInstantiator;
 	};
 	
 	_.Instantiator.prototype.getTypeFactory = function()
@@ -3457,6 +3463,34 @@ if (!Object.create) {
 		return this._accessController;
 	};
 	
+	_.Instantiator.prototype.getAutoLoader = function()
+	{
+		if (!this._autoLoader) {
+			this._autoLoader = new ClassyJS.AutoLoader(
+				this.getIncluder(),
+				this.getAutoLoadInstantiator(),
+				this.getNamespaceManager()
+			);
+		}
+		return this._autoLoader;
+	};
+	
+	_.Instantiator.prototype.getIncluder = function()
+	{
+		if (!this._includer) {
+			this._includer = new ClassyJS.AutoLoader.Includer.Script();
+		}
+		return this._includer;
+	};
+	
+	_.Instantiator.prototype.getAutoLoadInstantiator = function()
+	{
+		if (!this._autoLoadInstantiator) {
+			this._autoLoadInstantiator = new ClassyJS.AutoLoader.Instantiator();
+		}
+		return this._autoLoadInstantiator;
+	};
+	
 })(window.ClassyJS = window.ClassyJS || {});
 
 (function(){
@@ -3470,7 +3504,7 @@ if (!Object.create) {
 	
 	// Create one global function which
 	// is used to declare all types
-	window.define = function(signature, members){
+	window.define = function(signature){
 		
 		/**
 		 *	Read class/interface signature
@@ -3484,6 +3518,20 @@ if (!Object.create) {
 		 */
 		
 		var typeObject = instantiator.getTypeFactory().build(signature);
+		
+		var metaStatements = [];
+		
+		for (var i = 1; i < arguments.length; i++) {
+			if (typeof arguments[i] == 'string') {
+				metaStatements.push(arguments[i]);
+			} else {
+				if (arguments.length != i + 1) {
+					// @todo Throw better
+					throw new Error('Bad args to define');
+				}
+				var members = arguments[i];
+			}
+		}
 		
 		// Ensure members is provided as the relevant
 		// format for the identified type
@@ -3596,6 +3644,26 @@ if (!Object.create) {
 			
 		}
 		
+		if (instantiator.getAutoLoader().isRunning()) {
+			
+			for (var i in metaStatements) {
+				// @todo Throw if incorrect format
+				var match = metaStatements[i].match(/^(?:\s+)?require\s+([A-Za-z0-9.]+)(?:\s+)?$/);
+				instantiator.getAutoLoader().continue(match[1]);
+			}
+			
+		}
+		
+	};
+	
+	window.start = function(className, methodName)
+	{
+		instantiator.getAutoLoader().start(className, methodName);
+	};
+	
+	window.start.addAutoLoadPattern = function(pattern, target)
+	{
+		instantiator.getAutoLoader().addClassAutoloadPattern(pattern, target);
 	};
 	
 	var _typeCheckMembers = function(members, definition)

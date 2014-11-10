@@ -73,12 +73,18 @@ describe('Type.DefinitionFactory', function(){
 	});
 	
 	it('throws error if signature contains both \'class\' and \'interface\'', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal('AMBIGUOUS_SIGNATURE');
+		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+			'AMBIGUOUS_SIGNATURE',
+			'Signature: class interface MySomething'
+		);
 		expect(function(){ factory.build('class interface MySomething'); }).toThrow(expectedFatal);
 	});
 	
 	it('throws error if signature contains neither \'class\' or \'interface\'', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal('AMBIGUOUS_SIGNATURE');
+		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+			'AMBIGUOUS_SIGNATURE',
+			'Signature: MySomething'
+		);
 		expect(function(){ factory.build('MySomething'); }).toThrow(expectedFatal);
 	});
 	
