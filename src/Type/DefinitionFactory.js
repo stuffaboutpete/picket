@@ -29,7 +29,10 @@
 		var classMatch = signature.match(/\bclass\b/);
 		var interfaceMatch = signature.match(/\binterface\b/);
 		if (classMatch && interfaceMatch || !classMatch && !interfaceMatch) {
-			throw new _.DefinitionFactory.Fatal('AMBIGUOUS_SIGNATURE');
+			throw new _.DefinitionFactory.Fatal(
+				'AMBIGUOUS_SIGNATURE',
+				'Signature: ' + signature
+			);
 		}
 		var factory = (classMatch)
 			? this._classDefinitionFactory

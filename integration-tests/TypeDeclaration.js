@@ -16,9 +16,9 @@ describe('Type declaration', function(){
 	it('results in error if class members are provided as non object', function(){
 		var expectedFatal = new ClassyJS.Main.Fatal(
 			'NON_OBJECT_CLASS_MEMBERS',
-			'Provided type: string'
+			'Provided type: number'
 		);
-		expect(function(){ define('class MyClass', 'example'); }).toThrow(expectedFatal);
+		expect(function(){ define('class MyClass', 123); }).toThrow(expectedFatal);
 	});
 	
 	it('results in error if interface members are provided as object', function(){

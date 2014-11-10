@@ -9,7 +9,7 @@
 	
 	// Create one global function which
 	// is used to declare all types
-	window.define = function(signature, members){
+	window.define = function(signature){
 		
 		/**
 		 *	Read class/interface signature
@@ -23,6 +23,20 @@
 		 */
 		
 		var typeObject = instantiator.getTypeFactory().build(signature);
+		
+		var metaStatements = [];
+		
+		for (var i = 1; i < arguments.length; i++) {
+			if (typeof arguments[i] == 'string') {
+				metaStatements.push(arguments[i]);
+			} else {
+				if (arguments.length != i + 1) {
+					// @todo Throw better
+					throw new Error('Bad args to define');
+				}
+				var members = arguments[i];
+			}
+		}
 		
 		// Ensure members is provided as the relevant
 		// format for the identified type
@@ -135,6 +149,26 @@
 			
 		}
 		
+		if (instantiator.getAutoLoader().isRunning()) {
+			
+			for (var i in metaStatements) {
+				// @todo Throw if incorrect format
+				var match = metaStatements[i].match(/^(?:\s+)?require\s+([A-Za-z0-9.]+)(?:\s+)?$/);
+				instantiator.getAutoLoader().continue(match[1]);
+			}
+			
+		}
+		
+	};
+	
+	window.start = function(className, methodName)
+	{
+		instantiator.getAutoLoader().start(className, methodName);
+	};
+	
+	window.start.addAutoLoadPattern = function(pattern, target)
+	{
+		instantiator.getAutoLoader().addClassAutoloadPattern(pattern, target);
 	};
 	
 	var _typeCheckMembers = function(members, definition)

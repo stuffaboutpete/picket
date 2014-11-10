@@ -98,7 +98,14 @@ module.exports = function(config) {
 			'../integration-tests/Events.js',
 			'../integration-tests/Constants.js',
 			'../integration-tests/Inheritance.js',
-			'../integration-tests/Interfaces.js'
+			'../integration-tests/Interfaces.js',
+			'../integration-tests/Autoloading.js',
+			{
+				pattern: '../integration-tests/Autoloading/**/*.js',
+				watched: true,
+				included: false,
+				served: true
+			}
 		],
 		frameworks: ['jasmine'],
 		browsers: ['PhantomJS']

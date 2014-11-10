@@ -23,6 +23,9 @@
 		this._memberRegistry;
 		this._typeChecker;
 		this._accessController;
+		this._autoLoader;
+		this._includer;
+		this._autoLoadInstantiator;
 	};
 	
 	_.Instantiator.prototype.getTypeFactory = function()
@@ -217,6 +220,34 @@
 			this._accessController = new ClassyJS.Access.Controller();
 		}
 		return this._accessController;
+	};
+	
+	_.Instantiator.prototype.getAutoLoader = function()
+	{
+		if (!this._autoLoader) {
+			this._autoLoader = new ClassyJS.AutoLoader(
+				this.getIncluder(),
+				this.getAutoLoadInstantiator(),
+				this.getNamespaceManager()
+			);
+		}
+		return this._autoLoader;
+	};
+	
+	_.Instantiator.prototype.getIncluder = function()
+	{
+		if (!this._includer) {
+			this._includer = new ClassyJS.AutoLoader.Includer.Script();
+		}
+		return this._includer;
+	};
+	
+	_.Instantiator.prototype.getAutoLoadInstantiator = function()
+	{
+		if (!this._autoLoadInstantiator) {
+			this._autoLoadInstantiator = new ClassyJS.AutoLoader.Instantiator();
+		}
+		return this._autoLoadInstantiator;
 	};
 	
 })(window.ClassyJS = window.ClassyJS || {});
