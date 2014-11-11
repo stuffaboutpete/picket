@@ -51,7 +51,9 @@
 		}
 		if (!this._isRunning) throw new _.AutoLoader.Fatal('NOT_RUNNING');
 		if (_classExists(this, className)) {
-			this._targetConstructor = _getClassConstructor(this, className);
+			if (className == this._targetClassName) {
+				this._targetConstructor = _getClassConstructor(this, className);
+			}
 			_attemptFinish(this);
 		} else {
 			var scriptLocation = _getScriptLocation(this, className);
@@ -125,13 +127,6 @@
 	{
 		return (function(_this, className, scriptLocation){
 			return function(){
-				if (!_classExists(_this, className)) {
-					throw new _.AutoLoader.Fatal(
-						'CLASS_NOT_FOUND',
-						'Provided class name: ' + className + '; ' +
-						'Included script: ' + scriptLocation
-					);
-				}
 				if (className == _this._targetClassName) {
 					_this._targetConstructor = _getClassConstructor(_this, className);
 				}
