@@ -15,6 +15,7 @@ gulp.task('build', function(){
 		'./src/Shim.js',
 		'./src/Fatal.js',
 		'./src/NamespaceManager.js',
+		'./src/NamespaceManager/Fatal.js',
 		'./src/TypeChecker.js',
 		'./src/TypeChecker/Fatal.js',
 		'./src/Access/Type.js',
@@ -70,8 +71,13 @@ gulp.task('build', function(){
 		'./src/Registry/Member.js',
 		'./src/Registry/Member/Fatal.js',
 		'./src/Instantiator.js',
+		'./src/AutoLoader.js',
+		'./src/AutoLoader/Fatal.js',
+		'./src/AutoLoader/Instantiator.js',
+		'./src/AutoLoader/Includer/Script.js',
+		'./src/AutoLoader/Includer/Script/Fatal.js',
 		'./src/Main.js',
-		'./src/Main/Fatal.js'
+		'./src/Main/Fatal.js',
 	])
 		.pipe(concat('classy.js'))
 		.pipe(gulp.dest('./build/'))
