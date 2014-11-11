@@ -258,24 +258,6 @@ describe('AutoLoader', function(){
 		expect(function(){ errorCallback(); }).toThrow(expectedFatal);
 	});
 	
-	it('throws error if included script does not provide expected class', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
-			'CLASS_NOT_FOUND',
-			'Provided class name: Example.Class; ' +
-			'Included script: /Example/Class.js'
-		);
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
-		);
-		var successCallback;
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
-		spyOn(includer, 'include').and.callFake(function(script, success, error){
-			successCallback = success;
-		});
-		autoloader.start('Example.Class');
-		expect(function(){ successCallback(); }).toThrow(expectedFatal);
-	});
-	
 	it('allows class loading pattern to be registered', function(){
 		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
 			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
