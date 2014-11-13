@@ -219,4 +219,12 @@
 		}
 	};
 	
+	Reflection.Type.acceptClassDependencies(
+		instantiator.getNamespaceManager(),
+		instantiator.getTypeRegistry(),
+		instantiator.getMemberRegistry()
+	);
+	
+	Reflection.Member.acceptClassDependencies(instantiator.getMemberRegistry());
+	
 })();

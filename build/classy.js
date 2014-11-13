@@ -1,15 +1,21 @@
-if (!Object.create) {
-	Object.create = (function(){
-		function F(){}
-		return function(o){
-			if (arguments.length != 1) {
-				throw new Error('Object.create implementation only accepts one parameter.');
-			}
-			F.prototype = o;
-			return new F()
-		}
-	})()
-}
+(function(_){
+	
+	_.Inheritance = function(){};
+	
+	_.Inheritance.makeChild = function(child, parent)
+	{
+		child.prototype = _createObject(parent.prototype);
+		child.prototype.constructor = child;
+	};
+	
+	_createObject = function(prototype)
+	{
+		function F(){};
+		F.prototype = prototype;
+		return new F();
+	};
+	
+})(window.ClassyJS = window.ClassyJS || {});
 
 (function(_){
 	
@@ -3559,7 +3565,9 @@ if (!Object.create) {
 		}
 		if (!this._isRunning) throw new _.AutoLoader.Fatal('NOT_RUNNING');
 		if (_classExists(this, className)) {
-			this._targetConstructor = _getClassConstructor(this, className);
+			if (className == this._targetClassName) {
+				this._targetConstructor = _getClassConstructor(this, className);
+			}
 			_attemptFinish(this);
 		} else {
 			var scriptLocation = _getScriptLocation(this, className);
@@ -3633,13 +3641,6 @@ if (!Object.create) {
 	{
 		return (function(_this, className, scriptLocation){
 			return function(){
-				if (!_classExists(_this, className)) {
-					throw new _.AutoLoader.Fatal(
-						'CLASS_NOT_FOUND',
-						'Provided class name: ' + className + '; ' +
-						'Included script: ' + scriptLocation
-					);
-				}
 				if (className == _this._targetClassName) {
 					_this._targetConstructor = _getClassConstructor(_this, className);
 				}
@@ -3727,6 +3728,122 @@ if (!Object.create) {
 	window.ClassyJS.AutoLoader.Includer = window.ClassyJS.AutoLoader.Includer || {}
 );
 
+
+(function(_){
+	
+	_.Type = function(name)
+	{
+		this._name = name;
+	};
+	
+	_.Type.acceptClassDependencies = function(namespaceManager, typeRegistry, memberRegistry)
+	{
+		_.Type._namespaceManager = namespaceManager;
+		_.Type._typeRegistry = typeRegistry;
+		_.Type._memberRegistry = memberRegistry;
+	};
+	
+	_.Type.prototype.getMethods = function()
+	{
+		var members = _.Type._memberRegistry.getMembers(
+			_.Type._typeRegistry.getClass(
+				_.Type._namespaceManager.getNamespaceObject(this._name)
+			)
+		);
+		var methods = [];
+		for (var i in members) {
+			if (members[i] instanceof ClassyJS.Member.Method) {
+				methods.push(new Reflection.Method(members[i]));
+			}
+		}
+		return methods;
+	};
+	
+})(window.Reflection = window.Reflection || {});
+
+(function(ClassyJS, Reflection, _){
+	
+	_.Class = function(className)
+	{
+		return _.call(this, className);
+	};
+	
+	ClassyJS.Inheritance.makeChild(_.Class, _);
+	Reflection.Class = _.Class;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.Reflection = window.Reflection || {},
+	window.Reflection.Type = window.Reflection.Type || {}
+);
+
+(function(_){
+	
+	_.Member = function(identifier)
+	{
+		this._memberObject = identifier;
+	};
+	
+	_.Member.acceptClassDependencies = function(memberRegistry)
+	{
+		_.Member._memberRegistry = memberRegistry;
+	};
+	
+	
+	_.Member.prototype.getName = function()
+	{
+		return this._memberObject.getName();
+	};
+	
+})(window.Reflection = window.Reflection || {});
+
+(function(ClassyJS, Reflection, _){
+	
+	_.Method = function(identifier)
+	{
+		return _.call(this, identifier);
+	};
+	
+	ClassyJS.Inheritance.makeChild(_.Method, _);
+	
+	_.Method.prototype.getArguments = function()
+	{
+		var arguments = [];
+		var argumentIdentifiers = this._memberObject.getArgumentTypes();
+		for (var i in argumentIdentifiers) {
+			arguments.push(new Reflection.Method.Argument(argumentIdentifiers[i]));
+		}
+		return arguments;
+	};
+	
+	Reflection.Method = _.Method;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.Reflection = window.Reflection || {},
+	window.Reflection.Member = window.Reflection.Member || {}
+);
+
+(function(ClassyJS, Reflection, Member, _){
+	
+	_.Argument = function(identifier)
+	{
+		this._identifier = identifier;
+	};
+	
+	_.Argument.prototype.getIdentifier = function()
+	{
+		return this._identifier;
+	};
+	
+	Reflection.Method.Argument = _.Argument;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.Reflection = window.Reflection || {},
+	window.Reflection.Member = window.Reflection.Member || {},
+	window.Reflection.Member.Method = window.Reflection.Member.Method || {}
+);
 
 (function(){
 	
@@ -3948,6 +4065,14 @@ if (!Object.create) {
 			}
 		}
 	};
+	
+	Reflection.Type.acceptClassDependencies(
+		instantiator.getNamespaceManager(),
+		instantiator.getTypeRegistry(),
+		instantiator.getMemberRegistry()
+	);
+	
+	Reflection.Member.acceptClassDependencies(instantiator.getMemberRegistry());
 	
 })();
 
