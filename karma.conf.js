@@ -3,6 +3,7 @@ module.exports = function(config) {
 		basePath: 'src',
 		files: [
 			'Shim.js',
+			'Inheritance.js',
 			'Fatal.js',
 			'NamespaceManager.js',
 			'NamespaceManagerTest.js',
@@ -89,6 +90,11 @@ module.exports = function(config) {
 			'AutoLoader/Instantiator.js',
 			'AutoLoader/Includer/Script.js',
 			'AutoLoader/Includer/Script/Fatal.js',
+			'Reflection/Type.js',
+			'Reflection/Type/Class.js',
+			'Reflection/Member.js',
+			'Reflection/Member/Method.js',
+			'Reflection/Member/Method/Argument.js',
 			'Main.js',
 			'Main/Fatal.js',
 			'../integration-tests/TypeDeclaration.js',
@@ -100,6 +106,7 @@ module.exports = function(config) {
 			'../integration-tests/Inheritance.js',
 			'../integration-tests/Interfaces.js',
 			'../integration-tests/Autoloading.js',
+			'../integration-tests/Reflection.js',
 			{
 				pattern: '../integration-tests/Autoloading/**/*.js',
 				watched: true,
