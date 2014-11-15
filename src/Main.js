@@ -9,7 +9,7 @@
 	
 	// Create one global function which
 	// is used to declare all types
-	window.define = function(signature){
+	window.define = function(){
 		
 		/**
 		 *	Read class/interface signature
@@ -22,11 +22,9 @@
 		 *	Check members is array or object dependent on class/interface
 		 */
 		
-		var typeObject = instantiator.getTypeFactory().build(signature);
-		
 		var metaStatements = [];
 		
-		for (var i = 1; i < arguments.length; i++) {
+		for (var i = 0; i < arguments.length; i++) {
 			if (typeof arguments[i] == 'string') {
 				metaStatements.push(arguments[i]);
 			} else {
@@ -37,6 +35,10 @@
 				var members = arguments[i];
 			}
 		}
+		
+		var signature = metaStatements.pop();
+		
+		var typeObject = instantiator.getTypeFactory().build(signature);
 		
 		// Ensure members is provided as the relevant
 		// format for the identified type
@@ -169,6 +171,15 @@
 	window.start.addAutoLoadPattern = function(pattern, target)
 	{
 		instantiator.getAutoLoader().addClassAutoloadPattern(pattern, target);
+	};
+	
+	window.require = function(className, targetMethod)
+	{
+		instantiator.getAutoLoader().require(
+			className,
+			arguments.callee.caller.$$owner,
+			targetMethod
+		);
 	};
 	
 	var _typeCheckMembers = function(members, definition)

@@ -23,22 +23,58 @@
 		this._includer = includer;
 		this._instantiator = instantiator;
 		this._namespaceManager = namespaceManager;
-		this._isRunning = false;
+		this._stacks = [];
+		this._continueBuffer = [];
 		this._classMaps = [];
 	};
+	
 	_.AutoLoader.prototype.isRunning = function()
 	{
-		return this._isRunning;
+		return (this._stacks.length > 0) ? true : false;
 	};
 	
 	_.AutoLoader.prototype.start = function(className, methodName)
 	{
-		if (this._isRunning) throw new _.AutoLoader.Fatal('ALREADY_RUNNING');
-		this._targetClassName = className;
-		this._targetMethod = methodName;
-		this._isRunning = true;
-		this._loadingScripts = 0;
-		this.continue(className);
+		// @todo Check methodName is string
+		if (typeof className != 'string') {
+			throw new _.AutoLoader.Fatal(
+				'NON_STRING_CLASS_NAME',
+				'Provided type: ' + typeof className
+			);
+		}
+		var stack = {
+			className:        className,
+			methodName:       methodName,
+			classConstructor: undefined,
+			loadingScripts:   []
+		};
+		this._stacks.push(stack);
+		if (_classExists(this, className)) {
+			stack.classConstructor = _getClassConstructor(this, className);
+			_attemptFinish(this);
+		} else {
+			stack.loadingScripts.push(_getScriptLocation(this, className));
+			_load(this, className);
+		}
+	};
+	
+	_.AutoLoader.prototype.require = function(className, targetObject, methodName)
+	{
+		// @todo Check className and methodName are strings
+		// @todo Check targetObject is object and has method
+		var stack = {
+			className:        className,
+			targetInstance:   targetObject,
+			targetMethodName: methodName,
+			loadingScripts:   []
+		};
+		this._stacks.push(stack);
+		if (_classExists(this, className)) {
+			_attemptFinish(this);
+		} else {
+			stack.loadingScripts.push(_getScriptLocation(this, className));
+			_load(this, className);
+		}
 	};
 	
 	_.AutoLoader.prototype.continue = function(className)
@@ -49,21 +85,9 @@
 				'Provided type: ' + typeof className
 			);
 		}
-		if (!this._isRunning) throw new _.AutoLoader.Fatal('NOT_RUNNING');
-		if (_classExists(this, className)) {
-			if (className == this._targetClassName) {
-				this._targetConstructor = _getClassConstructor(this, className);
-			}
-			_attemptFinish(this);
-		} else {
-			var scriptLocation = _getScriptLocation(this, className);
-			this._includer.include(
-				scriptLocation,
-				_getScriptLoadedCallback(this, className, scriptLocation),
-				_getScriptFailedCallback(this, className, scriptLocation)
-			);
-			this._loadingScripts++;
-		}
+		if (!this.isRunning()) throw new _.AutoLoader.Fatal('NOT_RUNNING');
+		this._continueBuffer.push(_getScriptLocation(this, className));
+		_load(this, className);
 	};
 	
 	_.AutoLoader.prototype.addClassAutoloadPattern = function(pattern, target)
@@ -75,6 +99,20 @@
 		this._classMaps.sort(function(a, b){
 			return b.pattern.length - a.pattern.length;
 		});
+	};
+	
+	var _load = function(_this, className)
+	{
+		if (_classExists(_this, className)) {
+			_attemptFinish(_this);
+		} else {
+			var scriptLocation = _getScriptLocation(_this, className);
+			_this._includer.include(
+				scriptLocation,
+				_getScriptLoadedCallback(_this, className, scriptLocation),
+				_getScriptFailedCallback(_this, className, scriptLocation)
+			);
+		}
 	};
 	
 	var _classExists = function(_this, className)
@@ -98,14 +136,23 @@
 	
 	var _attemptFinish = function(_this)
 	{
-		// @todo Check constructor is () -> undefined
-		if (_this._loadingScripts > 0) return;
-		var instance = _this._instantiator.instantiate(_this._targetConstructor);
-		if (_this._targetMethod) {
-			// @todo Check exists. And is () -> undefined
-			instance[_this._targetMethod].call(instance);
+		var index = _this._stacks.length;
+		while (index--) {
+			var stack = _this._stacks[index];
+			// @todo Check constructor is () -> undefined
+			if (stack.loadingScripts.length > 0) continue;
+			if (typeof stack.classConstructor != 'undefined') {
+				var instance = _this._instantiator.instantiate(stack.classConstructor);
+				if (stack.methodName) instance[stack.methodName].call(instance);
+			} else {
+				// @todo Check method is (string) -> undefined
+				stack.targetInstance[stack.targetMethodName].call(
+					stack.targetInstance,
+					stack.className
+				);
+			}
+			_this._stacks.splice(index, 1);
 		}
-		_this._isRunning = false;
 	};
 	
 	var _getScriptLocation = function(_this, className)
@@ -127,11 +174,7 @@
 	{
 		return (function(_this, className, scriptLocation){
 			return function(){
-				if (className == _this._targetClassName) {
-					_this._targetConstructor = _getClassConstructor(_this, className);
-				}
-				_this._loadingScripts--;
-				_attemptFinish(_this);
+				_handleLoadedScript(_this, className, scriptLocation);
 			};
 		})(_this, className, scriptLocation);
 	};
@@ -147,6 +190,33 @@
 				);
 			};
 		})(className, scriptLocation);
+	};
+	
+	var _handleLoadedScript = function(_this, className, scriptLocation)
+	{
+		var index = _this._stacks.length;
+		while (index--) {
+			if (className == _this._stacks[index].className
+			&&	typeof _this._stacks[index].targetInstance == 'undefined') {
+				// @todo Catch error?
+				_this._stacks[index].classConstructor = _getClassConstructor(
+					_this,
+					className
+				);
+			}
+			var scriptIndex = _this._stacks[index].loadingScripts.indexOf(scriptLocation);
+			if (scriptIndex > -1) {
+				_this._stacks[index].loadingScripts.splice(scriptIndex, 1);
+				for (var j in _this._continueBuffer) {
+					_this._stacks[index].loadingScripts.push(_this._continueBuffer[j]);
+				}
+			}
+			if (_this._stacks[index].loadingScripts.length == 0) {
+				_attemptFinish(_this);
+			}
+			
+		}
+		_this._continueBuffer = [];
 	};
 	
 })(window.ClassyJS = window.ClassyJS || {});

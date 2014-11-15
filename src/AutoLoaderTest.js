@@ -1,11 +1,22 @@
 describe('AutoLoader', function(){
 	
+	/**
+	 * @todo
+	 * 
+	 * Keep track of what has been loaded - dont load same class twice
+	 * When using file patterns, dont include same script location twice
+	 * Error if constructor or method are not () -> undefined
+	 * Can include non-blocking dependencies
+	 */
+	
 	var autoloader;
 	var includer;
 	var instantiator;
 	var namespaceManager;
+	var namespaceObjectDoesNotExistError;
 	
 	beforeEach(function(){
+		delete window.My;
 		includer = new ClassyJS.AutoLoader.Includer.Script();
 		instantiator = new ClassyJS.AutoLoader.Instantiator();
 		namespaceManager = new ClassyJS.NamespaceManager();
@@ -13,6 +24,9 @@ describe('AutoLoader', function(){
 			includer,
 			instantiator,
 			namespaceManager
+		);
+		namespaceObjectDoesNotExistError = new ClassyJS.NamespaceManager.Fatal(
+			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
 		);
 	});
 	
@@ -109,10 +123,9 @@ describe('AutoLoader', function(){
 	});
 	
 	it('passes script location, callbacks to includer if class does not exist', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		autoloader.start('Example.Class');
 		expect(includer.include.calls.argsFor(0)[0]).toBe('/Example/Class.js');
@@ -121,14 +134,15 @@ describe('AutoLoader', function(){
 	});
 	
 	it('creates object via instantiator after being loaded', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
-		);
 		var targetObject = { startMethod: function(){} };
 		var successCallback;
+		var namespaceObjectExists = false;
 		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(){
-			if (this.getNamespaceObject.calls.count() == 1) throw namespaceManagerError;
-			return function(){};
+			if (namespaceObjectExists) {
+				return function(){};
+			} else {
+				throw namespaceObjectDoesNotExistError;
+			}
 		});
 		spyOn(includer, 'include').and.callFake(function(script, success, error){
 			successCallback = success;
@@ -136,19 +150,21 @@ describe('AutoLoader', function(){
 		spyOn(instantiator, 'instantiate').and.returnValue(targetObject);
 		spyOn(targetObject, 'startMethod');
 		autoloader.start('Example.Class', 'startMethod');
+		namespaceObjectExists = true;
 		successCallback();
 		expect(instantiator.instantiate).toHaveBeenCalledWith(constructor);
 		expect(targetObject.startMethod).toHaveBeenCalledWith();
 	});
 	
 	it('indicates running whilst loading a file', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
-		);
 		var successCallback;
+		var namespaceObjectExists = false;
 		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(){
-			if (this.getNamespaceObject.calls.count() == 1) throw namespaceManagerError;
-			return function(){};
+			if (namespaceObjectExists) {
+				return function(){};
+			} else {
+				throw namespaceObjectDoesNotExistError;
+			}
 		});
 		spyOn(includer, 'include').and.callFake(function(script, success, error){
 			successCallback = success;
@@ -157,30 +173,15 @@ describe('AutoLoader', function(){
 		expect(autoloader.isRunning()).toBe(false);
 		autoloader.start('Example.Class');
 		expect(autoloader.isRunning()).toBe(true);
+		namespaceObjectExists = true;
 		successCallback();
 		expect(autoloader.isRunning()).toBe(false);
 	});
 	
-	it('throws error on call to start whilst running', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal('ALREADY_RUNNING');
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
-		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(){
-			if (this.getNamespaceObject.calls.count() == 1) throw namespaceManagerError;
-			return function(){};
-		});
-		spyOn(includer, 'include');
-		spyOn(instantiator, 'instantiate').and.returnValue({});
-		autoloader.start('Example.Class');
-		expect(function(){ autoloader.start('Other.Class'); }).toThrow(expectedFatal);
-	});
-	
 	it('can load further class before instantiating target class', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		spyOn(instantiator, 'instantiate');
 		autoloader.start('Example.Class');
@@ -195,10 +196,9 @@ describe('AutoLoader', function(){
 			'NON_STRING_CLASS_NAME',
 			'Provided type: undefined'
 		);
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		autoloader.start('Example.Class');
 		expect(function(){ autoloader.continue(); }).toThrow(expectedFatal);
@@ -210,9 +210,6 @@ describe('AutoLoader', function(){
 	});
 	
 	it('instantiates target class after all scripts have been loaded', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
-		);
 		var targetObject = { startMethod: function(){} };
 		var successCallbacks = {};
 		var returnNamespaceObjects = false;
@@ -220,7 +217,7 @@ describe('AutoLoader', function(){
 			if (returnNamespaceObjects) {
 				return function(){};
 			} else {
-				throw namespaceManagerError;
+				throw namespaceObjectDoesNotExistError;
 			}
 		});
 		spyOn(includer, 'include').and.callFake(function(script, success, error){
@@ -245,11 +242,10 @@ describe('AutoLoader', function(){
 			'Provided class name: Other.Class; ' +
 			'Included script: /Other/Class.js'
 		);
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
-		);
 		var errorCallback;
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
+		);
 		spyOn(includer, 'include').and.callFake(function(script, success, error){
 			if (this.include.calls.count() == 2) errorCallback = error;
 		});
@@ -259,10 +255,9 @@ describe('AutoLoader', function(){
 	});
 	
 	it('allows class loading pattern to be registered', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		autoloader.addClassAutoloadPattern('Example', 'subfolder');
 		autoloader.start('Example.Class');
@@ -270,10 +265,9 @@ describe('AutoLoader', function(){
 	});
 	
 	it('allows multiple class loading patterns to be registered', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		autoloader.addClassAutoloadPattern('Example', 'subfolder');
 		autoloader.addClassAutoloadPattern('Other', 'otherSubfolder');
@@ -283,10 +277,9 @@ describe('AutoLoader', function(){
 	});
 	
 	it('allows nested class loading patterns to be registered', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		autoloader.addClassAutoloadPattern('Example.My', 'my');
 		autoloader.start('Example.My.Class');
@@ -294,10 +287,9 @@ describe('AutoLoader', function(){
 	});
 	
 	it('uses longest available class name matching pattern', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		autoloader.addClassAutoloadPattern('My', 'subfolder');
 		autoloader.addClassAutoloadPattern('My.Test.Something', 'otherSubfolder');
@@ -307,10 +299,9 @@ describe('AutoLoader', function(){
 	});
 	
 	it('allows class matching patterns using different domain', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		autoloader.addClassAutoloadPattern('DomainTest', 'http://some.other.domain');
 		autoloader.start('DomainTest.Class');
@@ -318,10 +309,9 @@ describe('AutoLoader', function(){
 	});
 	
 	it('allows class matching patterns using subfolder on different domain', function(){
-		var namespaceManagerError = new ClassyJS.NamespaceManager.Fatal(
-			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
 		);
-		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(namespaceManagerError);
 		spyOn(includer, 'include');
 		autoloader.addClassAutoloadPattern('SubDomainTest', 'http://some.other.domain/subfolder');
 		autoloader.start('SubDomainTest.Class');
@@ -330,25 +320,116 @@ describe('AutoLoader', function(){
 		);
 	});
 	
-	/**
-	 *	Require includer
-	 *	Require type registry
-	 *	Allow passing of file patterns
-	 *	Allow passing of class name - will require
-	 * Keep track of what has been loaded - dont load same class twice
-	 * When using file patterns, dont include same script location twice
-	 *	Asks type registry if class exists before loading
-	 *	Passes callback to includer to call on completion - then checks for all completeness
-	 *	Make first call with start(className, methodCall)
-	 *	On all completed, instantiate and call methodName in class
-	 *	Actually, method is optional - just construct if not
-	 * Error if constructor or method are not () -> undefined
-	 *	Further calls are to continue(className)
-	 *	Error if continue called whilst not loading
-	 *	Cannot start whilst already started
-	 *	Pass error callback to includer
-	 * Can include non-blocking dependencies
-	 *	Throw if included script does not create class
-	 */
+	it('allows two independent stacks to load simultaneously', function(){
+		
+		var namespaceObjectsAvailable = {};
+		var exampleClassConstructor = function(){};
+		var otherClassConstructor = function(){};
+		var successCallbacks = {};
+		
+		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(name){
+			if (typeof namespaceObjectsAvailable[name] === 'function') {
+				return namespaceObjectsAvailable[name];
+			} else if (namespaceObjectsAvailable[name] === 'true') {
+				return function(){};
+			} else {
+				throw namespaceObjectDoesNotExistError;
+			}
+		});
+		
+		spyOn(includer, 'include').and.callFake(function(script, success, error){
+			successCallbacks[script] = success;
+		});
+		
+		spyOn(instantiator, 'instantiate');
+		
+		autoloader.start('Example.Class');
+		autoloader.start('Other.Class');
+		
+		// All triggered by Other.Class loading
+		autoloader.continue('FromOther.One');
+		autoloader.continue('FromOther.Two');
+		namespaceObjectsAvailable['Other.Class'] = otherClassConstructor;
+		successCallbacks['/Other/Class.js']();
+		
+		expect(instantiator.instantiate.calls.count()).toBe(0);
+		
+		// Triggered by FromOther.Two loading
+		namespaceObjectsAvailable['FromOther.Two'] = true;
+		successCallbacks['/FromOther/Two.js']();
+		
+		expect(instantiator.instantiate.calls.count()).toBe(0);
+		
+		// Triggered by Example.Class loading
+		autoloader.continue('FromExample.One');
+		autoloader.continue('FromExample.Two');
+		namespaceObjectsAvailable['Example.Class'] = exampleClassConstructor;
+		successCallbacks['/Example/Class.js']();
+		
+		expect(instantiator.instantiate.calls.count()).toBe(0);
+		
+		// Triggered by FromOther.One loading
+		namespaceObjectsAvailable['FromOther.One'] = true;
+		successCallbacks['/FromOther/One.js']();
+		
+		expect(instantiator.instantiate.calls.count()).toBe(1);
+		expect(instantiator.instantiate.calls.mostRecent().args[0]).toBe(otherClassConstructor);
+		
+		namespaceObjectsAvailable['FromExample.One'] = true;
+		successCallbacks['/FromExample/One.js']();
+		
+		expect(instantiator.instantiate.calls.count()).toBe(1);
+		
+		namespaceObjectsAvailable['FromExample.Two'] = true;
+		successCallbacks['/FromExample/Two.js']();
+		
+		expect(instantiator.instantiate.calls.count()).toBe(2);
+		expect(instantiator.instantiate.calls.mostRecent().args[0]).toBe(exampleClassConstructor);
+		
+	});
+	
+	it('allows class to be required and method be called if already loaded', function(){
+		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(name){
+			return function(){};
+		});
+		define('class My.Class', {
+			'public targetMethod (string) -> undefined': function(className){}
+		});
+		var myObject = new My.Class();
+		spyOn(myObject, 'targetMethod');
+		autoloader.require('Example.Class', myObject, 'targetMethod');
+		expect(myObject.targetMethod).toHaveBeenCalledWith('Example.Class');
+		expect(namespaceManager.getNamespaceObject).toHaveBeenCalledWith('Example.Class');
+	});
+	
+	it('allows class to be required and method be called when loaded', function(){
+		var namespaceObjectExists = false;
+		var successCallbacks = {};
+		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(name){
+			if (namespaceObjectExists) {
+				return function(){};
+			} else {
+				throw namespaceObjectDoesNotExistError;
+			}
+		});
+		spyOn(includer, 'include').and.callFake(function(script, success, error){
+			successCallbacks[script] = success;
+		});
+		define('class My.Class', {
+			'public targetMethod (string) -> undefined': function(className){}
+		});
+		var myObject = new My.Class();
+		spyOn(myObject, 'targetMethod');
+		autoloader.require('Example.Class', myObject, 'targetMethod');
+		autoloader.continue('Other.Class');
+		autoloader.continue('Third.Class');
+		namespaceObjectExists = true;
+		expect(myObject.targetMethod).not.toHaveBeenCalled();
+		successCallbacks['/Example/Class.js']();
+		successCallbacks['/Other/Class.js']();
+		expect(myObject.targetMethod).not.toHaveBeenCalled();
+		successCallbacks['/Third/Class.js']();
+		expect(myObject.targetMethod).toHaveBeenCalledWith('Example.Class');
+	});
 	
 });

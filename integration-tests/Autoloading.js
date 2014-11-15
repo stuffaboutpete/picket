@@ -5,21 +5,23 @@ describe('Autoloading', function(){
 		'/absolute/classyjs/integration-tests/Autoloading'
 	);
 	
-	// @todo We have an issue running multiple starts at the same time.
-	// it('can include external class file', function(done){
-	// 	define('class AutoloadComplete', {
-	// 		'public static complete () -> undefined': function(){
-	// 			expect(typeof AutoLoad.Classg7H6th).toBe('function');
-	// 			done();
-	// 		}
-	// 	});
-	// 	start('AutoLoad.Classg7H6th');
-	// });
+	beforeEach(function(){
+		delete window.My;
+	});
 	
-	it('will process all downstream dependencies before instantiating target class', function(done){
+	it('can include external class file', function(done){
 		define('class AutoloadComplete', {
 			'public static complete () -> undefined': function(){
-				debugger;
+				expect(typeof AutoLoad.Classg7H6th).toBe('function');
+				done();
+			}
+		});
+		start('AutoLoad.Classg7H6th');
+	});
+	
+	it('will process all downstream dependencies before instantiating target class', function(done){
+		define('class My.AutoloadComplete', {
+			'public static complete () -> undefined': function(){
 				expect(typeof AutoLoad.ClassU6gh0h).toBe('function');
 				expect(typeof AutoLoad.Class7oYdR4).toBe('function');
 				expect(typeof AutoLoad.ClassuYU9dD).toBe('function');
@@ -28,6 +30,21 @@ describe('Autoloading', function(){
 			}
 		});
 		start('AutoLoad.ClassU6gh0h');
+	});
+	
+	it('allows inline class loading', function(done){
+		define('class My.Class', {
+			'public construct () -> undefined': function(){
+				expect(typeof AutoLoad.ClassT6hGhj).toBe('undefined');
+				require('AutoLoad.ClassT6hGhj', 'targetMethod');
+			},
+			'public targetMethod (string) -> undefined': function(className){
+				expect(className).toBe('AutoLoad.ClassT6hGhj');
+				expect(typeof AutoLoad.ClassT6hGhj).toBe('function');
+				done();
+			}
+		});
+		new My.Class();
 	});
 	
 });
