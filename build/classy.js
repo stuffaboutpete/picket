@@ -3562,8 +3562,7 @@ if (!Object.create) {
 			stack.classConstructor = _getClassConstructor(this, className);
 			_attemptFinish(this);
 		} else {
-			stack.loadingScripts.push(_getScriptLocation(this, className));
-			_load(this, className);
+			_load(this, className, stack);
 		}
 	};
 	
@@ -3581,8 +3580,7 @@ if (!Object.create) {
 		if (_classExists(this, className)) {
 			_attemptFinish(this);
 		} else {
-			stack.loadingScripts.push(_getScriptLocation(this, className));
-			_load(this, className);
+			_load(this, className, stack);
 		}
 	};
 	
@@ -3610,7 +3608,7 @@ if (!Object.create) {
 		});
 	};
 	
-	var _load = function(_this, className)
+	var _load = function(_this, className, stack)
 	{
 		if (_classExists(_this, className)) {
 			_attemptFinish(_this);
@@ -3625,6 +3623,7 @@ if (!Object.create) {
 					_getScriptFailedCallback(_this, className, scriptLocation)
 				);
 				_this._requestedScripts.push(scriptLocation);
+				if (stack) stack.loadingScripts.push(scriptLocation);
 			}
 		}
 	};
