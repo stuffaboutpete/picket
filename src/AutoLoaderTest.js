@@ -3,8 +3,6 @@ describe('AutoLoader', function(){
 	/**
 	 * @todo
 	 * 
-	 * Keep track of what has been loaded - dont load same class twice
-	 * When using file patterns, dont include same script location twice
 	 * Error if constructor or method are not () -> undefined
 	 * Can include non-blocking dependencies
 	 */
@@ -210,7 +208,6 @@ describe('AutoLoader', function(){
 	});
 	
 	it('instantiates target class after all scripts have been loaded', function(){
-		var targetObject = { startMethod: function(){} };
 		var successCallbacks = {};
 		var returnNamespaceObjects = false;
 		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(){
@@ -330,7 +327,7 @@ describe('AutoLoader', function(){
 		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(name){
 			if (typeof namespaceObjectsAvailable[name] === 'function') {
 				return namespaceObjectsAvailable[name];
-			} else if (namespaceObjectsAvailable[name] === 'true') {
+			} else if (namespaceObjectsAvailable[name] === true) {
 				return function(){};
 			} else {
 				throw namespaceObjectDoesNotExistError;
@@ -430,6 +427,37 @@ describe('AutoLoader', function(){
 		expect(myObject.targetMethod).not.toHaveBeenCalled();
 		successCallbacks['/Third/Class.js']();
 		expect(myObject.targetMethod).toHaveBeenCalledWith('Example.Class');
+	});
+	
+	it('does not load same script twice', function(){
+		var successCallbacks = {};
+		var namespaceObjectsAvailable = {};
+		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(name){
+			if (typeof namespaceObjectsAvailable[name] === 'function') {
+				return namespaceObjectsAvailable[name];
+			} else if (namespaceObjectsAvailable[name] === true) {
+				return function(){};
+			} else {
+				throw namespaceObjectDoesNotExistError;
+			}
+		});
+		spyOn(includer, 'include').and.callFake(function(script, success, error){
+			successCallbacks[script] = success;
+		});
+		spyOn(instantiator, 'instantiate').and.returnValue({});
+		autoloader.start('Example.Class');
+		autoloader.continue('Other.Class');
+		autoloader.continue('MultiDependency.Class');
+		namespaceObjectsAvailable['Example.Class'] = true;
+		successCallbacks['/Example/Class.js']();
+		autoloader.continue('MultiDependency.Class');
+		successCallbacks['/Other/Class.js']();
+		successCallbacks['/MultiDependency/Class.js']();
+		var includerCalls = includer.include.calls.allArgs();
+		expect(includerCalls.length).toBe(3);
+		expect(includerCalls[0][0]).toBe('/Example/Class.js');
+		expect(includerCalls[1][0]).toBe('/Other/Class.js');
+		expect(includerCalls[2][0]).toBe('/MultiDependency/Class.js');
 	});
 	
 });
