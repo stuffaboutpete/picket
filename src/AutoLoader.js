@@ -26,6 +26,7 @@
 		this._stacks = [];
 		this._continueBuffer = [];
 		this._classMaps = [];
+		this._requestedScripts = [];
 	};
 	
 	_.AutoLoader.prototype.isRunning = function()
@@ -107,11 +108,16 @@
 			_attemptFinish(_this);
 		} else {
 			var scriptLocation = _getScriptLocation(_this, className);
-			_this._includer.include(
-				scriptLocation,
-				_getScriptLoadedCallback(_this, className, scriptLocation),
-				_getScriptFailedCallback(_this, className, scriptLocation)
-			);
+			if (_this._requestedScripts.indexOf(scriptLocation) > -1) {
+				_attemptFinish(_this);
+			} else {
+				_this._includer.include(
+					scriptLocation,
+					_getScriptLoadedCallback(_this, className, scriptLocation),
+					_getScriptFailedCallback(_this, className, scriptLocation)
+				);
+				_this._requestedScripts.push(scriptLocation);
+			}
 		}
 	};
 	
