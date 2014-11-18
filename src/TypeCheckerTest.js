@@ -231,6 +231,17 @@ describe('TypeChecker', function(){
 		expect(checker.isValidType([], '[HTMLElement]')).toBe(true);
 	});
 	
+	it('allows mixed type which ignores type checking', function(){
+		expect(checker.isValidType('string', 'mixed')).toBe(true);
+		expect(checker.isValidType(123, 'mixed')).toBe(true);
+		expect(checker.isValidType(true, 'mixed')).toBe(true);
+		expect(checker.isValidType(undefined, 'mixed')).toBe(true);
+		expect(checker.isValidType(null, 'mixed')).toBe(true);
+		expect(checker.isValidType([1, 2, 3], 'mixed')).toBe(true);
+		expect(checker.isValidType(function(){}, 'mixed')).toBe(true);
+		expect(checker.isValidType({}, 'mixed')).toBe(true);
+	});
+	
 	it('can accept multiple variables to type check in one call', function(){
 		expect(checker.areValidTypes(
 			['example', 123, { key: 'value' }, ['one', 'two']],
