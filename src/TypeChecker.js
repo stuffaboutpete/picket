@@ -13,8 +13,9 @@
 				for (var i in value) if (!this.isValidType(value[i], match[1])) return false;
 				return true;
 			}
-			return (type == 'array');
+			return (type == 'array' || type == 'mixed');
 		}
+		if (type === 'mixed') return true;
 		if (value === null) return (type == 'null');
 		if (typeof value == type) return true;
 		var typeParts = type.split('.');
