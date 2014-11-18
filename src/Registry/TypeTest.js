@@ -468,12 +468,12 @@ describe('Registry.Type', function(){
 	
 	it('can register interface against class object', function(){
 		registry.registerClass(classObject, classConstructor);
-		registry.registerInterfaceAgainstClass(interfaceObject, classObject);
+		registry.registerInterfaceAgainstClass('My.IInterface', classObject);
 	});
 	
 	it('will throw error if non interface is provided to registerInterfaceAgainstClass', function(){
 		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
-			'NON_INTERFACE_OBJECT_PROVIDED',
+			'NON_STRING_INTERFACE_NAME_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
@@ -487,21 +487,28 @@ describe('Registry.Type', function(){
 			'Provided type: object'
 		);
 		expect(function(){
-			registry.registerInterfaceAgainstClass(interfaceObject, {});
+			registry.registerInterfaceAgainstClass('My.IInterface', {});
 		}).toThrow(expectedFatal);
 	});
 	
 	it('can register multiple interfaces against class object', function(){
 		registry.registerClass(classObject, classConstructor);
-		registry.registerInterfaceAgainstClass(interfaceObject, classObject);
-		registry.registerInterfaceAgainstClass(interfaceObject2, classObject);
+		registry.registerInterfaceAgainstClass('My.IInterface', classObject);
+		registry.registerInterfaceAgainstClass('My.IOtherInterface', classObject);
 	});
 	
 	it('can return array of interfaces for specified class', function(){
 		registry.registerClass(classObject, classConstructor);
-		registry.registerInterfaceAgainstClass(interfaceObject, classObject);
-		registry.registerInterfaceAgainstClass(interfaceObject2, classObject);
-		expect(registry.getInterfacesFromClass(classObject)).toEqual([interfaceObject, interfaceObject2]);
+		registry.registerInterfaceAgainstClass('My.IInterface', classObject);
+		registry.registerInterfaceAgainstClass('My.IOtherInterface', classObject);
+		spyOn(registry, 'getInterface').and.callFake(function(name){
+			if (name == 'My.IInterface') return interfaceObject;
+			if (name == 'My.IOtherInterface') return interfaceObject2;
+		});
+		expect(registry.getInterfacesFromClass(classObject)).toEqual([
+			interfaceObject,
+			interfaceObject2
+		]);
 	});
 	
 	it('will throw error if non class object is provided to getInterface', function(){
@@ -522,7 +529,7 @@ describe('Registry.Type', function(){
 	it('will throw error if class provided to register interface does not exist', function(){
 		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		expect(function(){
-			registry.registerInterfaceAgainstClass(interfaceObject, classObject);
+			registry.registerInterfaceAgainstClass('My.IInterface', classObject);
 		}).toThrow(expectedFatal);
 	});
 	
