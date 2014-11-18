@@ -3535,6 +3535,7 @@ if (!Object.create) {
 		this._continueBuffer = [];
 		this._classMaps = [];
 		this._requestedScripts = [];
+		this._loadedScripts = [];
 	};
 	
 	_.AutoLoader.prototype.isRunning = function()
@@ -3709,26 +3710,31 @@ if (!Object.create) {
 	{
 		var index = _this._stacks.length;
 		while (index--) {
-			if (className == _this._stacks[index].className
-			&&	typeof _this._stacks[index].targetInstance == 'undefined') {
+			var stack = _this._stacks[index];
+			if (className == stack.className
+			&&	typeof stack.targetInstance == 'undefined') {
 				// @todo Catch error?
-				_this._stacks[index].classConstructor = _getClassConstructor(
+				stack.classConstructor = _getClassConstructor(
 					_this,
 					className
 				);
 			}
-			var scriptIndex = _this._stacks[index].loadingScripts.indexOf(scriptLocation);
+			var scriptIndex = stack.loadingScripts.indexOf(scriptLocation);
 			if (scriptIndex > -1) {
-				_this._stacks[index].loadingScripts.splice(scriptIndex, 1);
+				stack.loadingScripts.splice(scriptIndex, 1);
 				for (var j in _this._continueBuffer) {
-					_this._stacks[index].loadingScripts.push(_this._continueBuffer[j]);
+					if (_this._loadedScripts.indexOf(_this._continueBuffer[j]) == -1
+					&&	stack.loadingScripts.indexOf(_this._continueBuffer[j]) == -1) {
+						stack.loadingScripts.push(_this._continueBuffer[j]);
+					}
 				}
 			}
-			if (_this._stacks[index].loadingScripts.length == 0) {
+			if (stack.loadingScripts.length == 0) {
 				_attemptFinish(_this);
 			}
 			
 		}
+		_this._loadedScripts.push(scriptLocation);
 		_this._continueBuffer = [];
 	};
 	
