@@ -55,12 +55,7 @@
 	_.Class.prototype.getInterfaces = function()
 	{
 		// @todo Not tested method
-		var interfaces = [];
-		var interfaceNames = this._definition.getInterfaces();
-		for (var i in interfaceNames) {
-			interfaces.push(this._typeRegistry.getInterface(interfaceNames[i]));
-		}
-		return interfaces;
+		return this._definition.getInterfaces();
 	};
 	
 	_.Class.prototype.requestInstantiation = function()

@@ -98,12 +98,12 @@
 		this._interfaces[interfaceObject.getName()] = interfaceObject;
 	};
 	
-	_.Type.prototype.registerInterfaceAgainstClass = function(interfaceObject, classObject)
+	_.Type.prototype.registerInterfaceAgainstClass = function(interfaceName, classObject)
 	{
-		if (!(interfaceObject instanceof ClassyJS.Type.Interface)) {
+		if (typeof interfaceName != 'string') {
 			throw new _.Type.Fatal(
-				'NON_INTERFACE_OBJECT_PROVIDED',
-				'Provided type: ' + typeof interfaceObject
+				'NON_STRING_INTERFACE_NAME_PROVIDED',
+				'Provided type: ' + typeof interfaceName
 			);
 		}
 		if (!(classObject instanceof ClassyJS.Type.Class)) {
@@ -115,7 +115,7 @@
 		if (!_classObjectIsRegistered(this, classObject)) {
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
-		_getClassData(this, classObject).interfaces.push(interfaceObject);
+		_getClassData(this, classObject).interfaces.push(interfaceName);
 	};
 	
 	_.Type.prototype.classExists = function(classIdentifier)
@@ -160,7 +160,12 @@
 		if (!_classObjectIsRegistered(this, classObject)) {
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
-		return _getClassData(this, classObject).interfaces;
+		var interfaceNames = _getClassData(this, classObject).interfaces;
+		var interfaces = [];
+		for (var i in interfaceNames) {
+			interfaces.push(this.getInterface(interfaceNames[i]));
+		}
+		return interfaces;
 	};
 	
 	_.Type.prototype.hasParent = function(classObject)

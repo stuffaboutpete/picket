@@ -292,12 +292,7 @@ if (!Object.create) {
 	_.Class.prototype.getInterfaces = function()
 	{
 		// @todo Not tested method
-		var interfaces = [];
-		var interfaceNames = this._definition.getInterfaces();
-		for (var i in interfaceNames) {
-			interfaces.push(this._typeRegistry.getInterface(interfaceNames[i]));
-		}
-		return interfaces;
+		return this._definition.getInterfaces();
 	};
 	
 	_.Class.prototype.requestInstantiation = function()
@@ -2363,12 +2358,12 @@ if (!Object.create) {
 		this._interfaces[interfaceObject.getName()] = interfaceObject;
 	};
 	
-	_.Type.prototype.registerInterfaceAgainstClass = function(interfaceObject, classObject)
+	_.Type.prototype.registerInterfaceAgainstClass = function(interfaceName, classObject)
 	{
-		if (!(interfaceObject instanceof ClassyJS.Type.Interface)) {
+		if (typeof interfaceName != 'string') {
 			throw new _.Type.Fatal(
-				'NON_INTERFACE_OBJECT_PROVIDED',
-				'Provided type: ' + typeof interfaceObject
+				'NON_STRING_INTERFACE_NAME_PROVIDED',
+				'Provided type: ' + typeof interfaceName
 			);
 		}
 		if (!(classObject instanceof ClassyJS.Type.Class)) {
@@ -2380,7 +2375,7 @@ if (!Object.create) {
 		if (!_classObjectIsRegistered(this, classObject)) {
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
-		_getClassData(this, classObject).interfaces.push(interfaceObject);
+		_getClassData(this, classObject).interfaces.push(interfaceName);
 	};
 	
 	_.Type.prototype.classExists = function(classIdentifier)
@@ -2425,7 +2420,12 @@ if (!Object.create) {
 		if (!_classObjectIsRegistered(this, classObject)) {
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
-		return _getClassData(this, classObject).interfaces;
+		var interfaceNames = _getClassData(this, classObject).interfaces;
+		var interfaces = [];
+		for (var i in interfaceNames) {
+			interfaces.push(this.getInterface(interfaceNames[i]));
+		}
+		return interfaces;
 	};
 	
 	_.Type.prototype.hasParent = function(classObject)
@@ -2526,8 +2526,7 @@ if (!Object.create) {
 	var messages = {
 		NON_CLASS_OBJECT_PROVIDED:
 			'Provided class object is not an instance of ClassyJS.Type.Class',
-		NON_INTERFACE_OBJECT_PROVIDED:
-			'Provided interface object is not an instance of ClassyJS.Type.Interface',
+		NON_STRING_INTERFACE_NAME_PROVIDED: 'Provided interface name is not a string',
 		NON_CLASS_CONSTRUCTOR_PROVIDED: 'Provided class constructor is not a function',
 		INVALID_CLASS_LOOKUP: 'Class object was looked up using a non instance or constructor',
 		CLASS_ALREADY_REGISTERED: 'Provided class object is already registered',
