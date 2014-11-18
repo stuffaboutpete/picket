@@ -298,12 +298,7 @@
 	_.Class.prototype.getInterfaces = function()
 	{
 		// @todo Not tested method
-		var interfaces = [];
-		var interfaceNames = this._definition.getInterfaces();
-		for (var i in interfaceNames) {
-			interfaces.push(this._typeRegistry.getInterface(interfaceNames[i]));
-		}
-		return interfaces;
+		return this._definition.getInterfaces();
 	};
 	
 	_.Class.prototype.requestInstantiation = function()
@@ -2369,12 +2364,12 @@
 		this._interfaces[interfaceObject.getName()] = interfaceObject;
 	};
 	
-	_.Type.prototype.registerInterfaceAgainstClass = function(interfaceObject, classObject)
+	_.Type.prototype.registerInterfaceAgainstClass = function(interfaceName, classObject)
 	{
-		if (!(interfaceObject instanceof ClassyJS.Type.Interface)) {
+		if (typeof interfaceName != 'string') {
 			throw new _.Type.Fatal(
-				'NON_INTERFACE_OBJECT_PROVIDED',
-				'Provided type: ' + typeof interfaceObject
+				'NON_STRING_INTERFACE_NAME_PROVIDED',
+				'Provided type: ' + typeof interfaceName
 			);
 		}
 		if (!(classObject instanceof ClassyJS.Type.Class)) {
@@ -2386,7 +2381,7 @@
 		if (!_classObjectIsRegistered(this, classObject)) {
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
-		_getClassData(this, classObject).interfaces.push(interfaceObject);
+		_getClassData(this, classObject).interfaces.push(interfaceName);
 	};
 	
 	_.Type.prototype.classExists = function(classIdentifier)
@@ -2431,7 +2426,12 @@
 		if (!_classObjectIsRegistered(this, classObject)) {
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
-		return _getClassData(this, classObject).interfaces;
+		var interfaceNames = _getClassData(this, classObject).interfaces;
+		var interfaces = [];
+		for (var i in interfaceNames) {
+			interfaces.push(this.getInterface(interfaceNames[i]));
+		}
+		return interfaces;
 	};
 	
 	_.Type.prototype.hasParent = function(classObject)
@@ -2532,8 +2532,7 @@
 	var messages = {
 		NON_CLASS_OBJECT_PROVIDED:
 			'Provided class object is not an instance of ClassyJS.Type.Class',
-		NON_INTERFACE_OBJECT_PROVIDED:
-			'Provided interface object is not an instance of ClassyJS.Type.Interface',
+		NON_STRING_INTERFACE_NAME_PROVIDED: 'Provided interface name is not a string',
 		NON_CLASS_CONSTRUCTOR_PROVIDED: 'Provided class constructor is not a function',
 		INVALID_CLASS_LOOKUP: 'Class object was looked up using a non instance or constructor',
 		CLASS_ALREADY_REGISTERED: 'Provided class object is already registered',
@@ -3541,6 +3540,7 @@
 		this._continueBuffer = [];
 		this._classMaps = [];
 		this._requestedScripts = [];
+		this._loadedScripts = [];
 	};
 	
 	_.AutoLoader.prototype.isRunning = function()
@@ -3715,26 +3715,31 @@
 	{
 		var index = _this._stacks.length;
 		while (index--) {
-			if (className == _this._stacks[index].className
-			&&	typeof _this._stacks[index].targetInstance == 'undefined') {
+			var stack = _this._stacks[index];
+			if (className == stack.className
+			&&	typeof stack.targetInstance == 'undefined') {
 				// @todo Catch error?
-				_this._stacks[index].classConstructor = _getClassConstructor(
+				stack.classConstructor = _getClassConstructor(
 					_this,
 					className
 				);
 			}
-			var scriptIndex = _this._stacks[index].loadingScripts.indexOf(scriptLocation);
+			var scriptIndex = stack.loadingScripts.indexOf(scriptLocation);
 			if (scriptIndex > -1) {
-				_this._stacks[index].loadingScripts.splice(scriptIndex, 1);
+				stack.loadingScripts.splice(scriptIndex, 1);
 				for (var j in _this._continueBuffer) {
-					_this._stacks[index].loadingScripts.push(_this._continueBuffer[j]);
+					if (_this._loadedScripts.indexOf(_this._continueBuffer[j]) == -1
+					&&	stack.loadingScripts.indexOf(_this._continueBuffer[j]) == -1) {
+						stack.loadingScripts.push(_this._continueBuffer[j]);
+					}
 				}
 			}
-			if (_this._stacks[index].loadingScripts.length == 0) {
+			if (stack.loadingScripts.length == 0) {
 				_attemptFinish(_this);
 			}
 			
 		}
+		_this._loadedScripts.push(scriptLocation);
 		_this._continueBuffer = [];
 	};
 	

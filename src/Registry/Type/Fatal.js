@@ -3,8 +3,7 @@
 	var messages = {
 		NON_CLASS_OBJECT_PROVIDED:
 			'Provided class object is not an instance of ClassyJS.Type.Class',
-		NON_INTERFACE_OBJECT_PROVIDED:
-			'Provided interface object is not an instance of ClassyJS.Type.Interface',
+		NON_STRING_INTERFACE_NAME_PROVIDED: 'Provided interface name is not a string',
 		NON_CLASS_CONSTRUCTOR_PROVIDED: 'Provided class constructor is not a function',
 		INVALID_CLASS_LOOKUP: 'Class object was looked up using a non instance or constructor',
 		CLASS_ALREADY_REGISTERED: 'Provided class object is already registered',
