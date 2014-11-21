@@ -3655,6 +3655,7 @@ if (!Object.create) {
 			var stack = _this._stacks[index];
 			// @todo Check constructor is () -> undefined
 			if (stack.loadingScripts.length > 0) continue;
+			_this._stacks.splice(index, 1);
 			if (typeof stack.classConstructor != 'undefined') {
 				var instance = _this._instantiator.instantiate(stack.classConstructor);
 				if (stack.methodName) instance[stack.methodName].call(instance);
@@ -3665,7 +3666,6 @@ if (!Object.create) {
 					stack.className
 				);
 			}
-			_this._stacks.splice(index, 1);
 		}
 	};
 	
