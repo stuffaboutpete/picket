@@ -231,6 +231,19 @@ describe('TypeChecker', function(){
 		expect(checker.isValidType([], '[HTMLElement]')).toBe(true);
 	});
 	
+	it('will verify valid instance of interface', function(){
+		var spy = jasmine.createSpyObj('spy', ['conformsTo']);
+		spy.conformsTo.and.returnValue(true);
+		expect(checker.isValidType(spy, 'My.IInterface')).toBe(true);
+		expect(spy.conformsTo).toHaveBeenCalledWith('My.IInterface');
+	});
+	
+	it('will reject non instance of interface', function(){
+		var spy = jasmine.createSpyObj('spy', ['conformsTo']);
+		spy.conformsTo.and.returnValue(false);
+		expect(checker.isValidType(spy, 'My.IInterface')).toBe(false);
+	});
+	
 	it('allows mixed type which ignores type checking', function(){
 		expect(checker.isValidType('string', 'mixed')).toBe(true);
 		expect(checker.isValidType(123, 'mixed')).toBe(true);
