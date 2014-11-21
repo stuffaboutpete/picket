@@ -127,6 +127,9 @@ if (!Object.create) {
 		if (type === 'mixed') return true;
 		if (value === null) return (type == 'null');
 		if (typeof value == type) return true;
+		if (typeof value == 'object'
+		&&	typeof value.conformsTo == 'function'
+		&&	value.conformsTo(type)) return true;
 		var typeParts = type.split('.');
 		var namespace = window;
 		do {
