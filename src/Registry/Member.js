@@ -299,6 +299,7 @@
 				args
 			);
 		}
+		_ensureClassInstanceIsInRegistry(this, classInstance);
 		var classObject = _getClassObjectFromInstanceOrConstructor(this, classInstance);
 		var classInstanceData = _getClassInstanceDataFromClassInstance(this, classInstance);
 		try {
