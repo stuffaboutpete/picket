@@ -69,20 +69,62 @@
 			}
 			
 			for (var i in properties) {
-				var name = properties[i];
-				this[name] = (function(name){
+				var name = properties[i].getName();
+				this[name] = (function(name, property){
 					return function(value){
-						if (typeof value != 'undefined') {
-							return this.set(name, value);
-						} else {
-							return this.get(name);
-						} 
+						// @todo All this magic stuff should probably be elsewhere
+						var objectChanged = false;
+						var type = property.getTypeIdentifier();
+						if (type == 'string' && arguments.length == 2) {
+							if (value === '+=') {
+								var returnValue = this.set(name, this.get(name) + arguments[1]);
+								objectChanged = true;
+							} else if (value === '=+') {
+								var returnValue = this.set(name, arguments[1] + this.get(name));
+								objectChanged = true;
+							}
+						} else if (type == 'number' && typeof value == 'string') {
+							var match = value.match(/^(\+|-)((?:\+|-)|[0-9]+)$/);
+							if (match) {
+								if (match[1] == '+' && match[2] == '+') {
+									var returnValue = this.set(name, this.get(name) + 1);
+								} else if (match[1] == '-' && match[2] == '-') {
+									var returnValue = this.set(name, this.get(name) - 1);
+								} else {
+									value = this.get(name);
+									value = (match[1] == '+')
+										? value + parseInt(match[2])
+										: value - parseInt(match[2]);
+									var returnValue = this.set(name, value);
+								}
+								objectChanged = true;
+							}
+						} else if (typeof value == 'string'
+						&& (type == 'array' || type.match(/^\[(.+)\]$/))) {
+							var match = value.match(/push|pop|shift|unshift/);
+							if (match) {
+								var returnValue = this.get(name)[match[0]].call(
+									this.get(name),
+									arguments[1]
+								);
+								objectChanged = true;
+							}
+						}
+						if (!objectChanged) {
+							if (typeof value != 'undefined') {
+								var returnValue = this.set(name, value);
+							} else {
+								return this.get(name);
+							}
+						}
+						this.trigger('change', [name, this]);
+						return returnValue;
 					};
-				})(name);
+				})(name, properties[i]);
 			}
 			
 			for (var i in methods) {
-				var name = methods[i];
+				var name = methods[i].getName();
 				this[name] = (function(name){
 					return function(){
 						return memberRegistry.callMethod(
@@ -141,9 +183,9 @@
 			var members = memberRegistry.getMembers(classObject);
 			for (var i in members) {
 				if (members[i] instanceof ClassyJS.Member.Property) {
-					properties.push(members[i].getName());
+					properties.push(members[i]);
 				} else if (members[i] instanceof ClassyJS.Member.Method) {
-					methods.push(members[i].getName());
+					methods.push(members[i]);
 				}
 			}
 		};
