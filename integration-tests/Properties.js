@@ -74,4 +74,44 @@ describe('Properties', function(){
 		expect(myObject2.myProperty()).toBe('Object 2 value');
 	});
 	
+	it('can be concatenated when strings', function(){
+		define('class My.Class', {
+			'public myProperty (string)': 'start'
+		});
+		var myObject = new My.Class();
+		myObject.myProperty('+=', ' after');
+		expect(myObject.myProperty()).toBe('start after');
+		myObject.myProperty('=+', 'before ');
+		expect(myObject.myProperty()).toBe('before start after');
+	});
+	
+	it('can be incremented and decremented when numbers', function(){
+		define('class My.Class', {
+			'public myProperty (number)': 98
+		});
+		var myObject = new My.Class();
+		myObject.myProperty('++');
+		expect(myObject.myProperty()).toBe(99);
+		myObject.myProperty('--');
+		expect(myObject.myProperty()).toBe(98);
+		myObject.myProperty('+3');
+		expect(myObject.myProperty()).toBe(101);
+		myObject.myProperty('-6');
+		expect(myObject.myProperty()).toBe(95);
+	});
+	
+	it('can be manipulated when arrays', function(){
+		define('class My.Class', {
+			'public myProperty (array)': ['one', 'two', 'three']
+		});
+		var myObject = new My.Class();
+		expect(myObject.myProperty('pop')).toBe('three');
+		expect(myObject.myProperty().length).toBe(2);
+		expect(myObject.myProperty('shift')).toBe('one');
+		expect(myObject.myProperty().length).toBe(1);
+		myObject.myProperty('push', 'dog');
+		myObject.myProperty('unshift', 'cat');
+		expect(myObject.myProperty()).toEqual(['cat', 'two', 'dog']);
+	});
+	
 });
