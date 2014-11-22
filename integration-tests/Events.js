@@ -67,4 +67,27 @@ describe('Events', function(){
 		expect(function(){ new My.TargetClass(eventObject); }).toThrow(expectedFatal);
 	});
 	
+	it('include change by default', function(){
+		define('class My.EventClass', {
+			'public myProperty (boolean)': false
+		});
+		define('class My.TargetClass', {
+			'public myProperty (boolean)': false,
+			'public eventObject (My.EventClass)': null,
+			'public construct (My.EventClass) -> undefined': function(eventObject){
+				eventObject.bind('change', 'targetMethod');
+			},
+			'public targetMethod (string, object) -> undefined': function(property, object){
+				this.myProperty(eventObject[property]());
+				this.eventObject(eventObject);
+			}
+		});
+		var eventObject = new My.EventClass();
+		var targetObject = new My.TargetClass(eventObject);
+		expect(targetObject.myProperty()).toBe(false);
+		eventObject.myProperty(true);
+		expect(targetObject.myProperty()).toBe(true);
+		expect(targetObject.eventObject()).toBe(eventObject);
+	});
+	
 });
