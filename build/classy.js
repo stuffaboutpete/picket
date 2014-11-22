@@ -390,20 +390,50 @@ if (!Object.create) {
 			}
 			
 			for (var i in properties) {
-				var name = properties[i];
-				this[name] = (function(name){
+				var name = properties[i].getName();
+				this[name] = (function(name, property){
 					return function(value){
+						// @todo All this magic stuff should be elsewhere
+						var type = property.getTypeIdentifier();
+						if (type == 'string' && arguments.length == 2) {
+							if (value === '+=') {
+								return this.set(name, this.get(name) + arguments[1]);
+							} else if (value === '=+') {
+								return this.set(name, arguments[1] + this.get(name));
+							}
+						} else if (type == 'number' && typeof value == 'string') {
+							var match = value.match(/^(\+|-)((?:\+|-)|[0-9]+)$/);
+							if (match) {
+								if (match[1] == '+' && match[2] == '+') {
+									return this.set(name, this.get(name) + 1);
+								} else if (match[1] == '-' && match[2] == '-') {
+									return this.set(name, this.get(name) - 1);
+								} else {
+									value = this.get(name);
+									value = (match[1] == '+')
+										? value + parseInt(match[2])
+										: value - parseInt(match[2]);
+									return this.set(name, value);
+								}
+							}
+						} else if (typeof value == 'string'
+						&&	(type == 'array' || type.match(/^\[(.+)\]$/))) {
+							var match = value.match(/push|pop|shift|unshift/);
+							if (match) {
+								return this.get(name)[match[0]].call(this.get(name), arguments[1]);
+							}
+						}
 						if (typeof value != 'undefined') {
 							return this.set(name, value);
 						} else {
 							return this.get(name);
 						} 
 					};
-				})(name);
+				})(name, properties[i]);
 			}
 			
 			for (var i in methods) {
-				var name = methods[i];
+				var name = methods[i].getName();
 				this[name] = (function(name){
 					return function(){
 						return memberRegistry.callMethod(
@@ -462,9 +492,9 @@ if (!Object.create) {
 			var members = memberRegistry.getMembers(classObject);
 			for (var i in members) {
 				if (members[i] instanceof ClassyJS.Member.Property) {
-					properties.push(members[i].getName());
+					properties.push(members[i]);
 				} else if (members[i] instanceof ClassyJS.Member.Method) {
-					methods.push(members[i].getName());
+					methods.push(members[i]);
 				}
 			}
 		};
@@ -979,6 +1009,11 @@ if (!Object.create) {
 		this._defaultValue = value;
 		this._typeChecker = typeChecker;
 		this._accessController = accessController;
+	};
+	
+	_.Property.prototype.getTypeIdentifier = function()
+	{
+		return this._definition.getTypeIdentifier();
 	};
 	
 	_.Property.prototype.getDefaultValue = function(targetInstance, accessInstance)

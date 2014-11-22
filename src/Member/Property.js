@@ -41,6 +41,11 @@
 		this._accessController = accessController;
 	};
 	
+	_.Property.prototype.getTypeIdentifier = function()
+	{
+		return this._definition.getTypeIdentifier();
+	};
+	
 	_.Property.prototype.getDefaultValue = function(targetInstance, accessInstance)
 	{
 		_requestAccess(this, targetInstance, accessInstance);
