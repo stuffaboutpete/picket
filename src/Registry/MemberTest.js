@@ -20,14 +20,17 @@ describe('Registry.Member', function(){
 	var accessInstance;
 	
 	beforeEach(function(){
-		typeRegistry = new ClassyJS.Registry.Type();
+		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
 		typeChecker = new ClassyJS.TypeChecker();
 		accessController = new ClassyJS.Access.Controller();
 		registry = new ClassyJS.Registry.Member(typeRegistry, typeChecker);
 		classObject = new ClassyJS.Type.Class(
 			new ClassyJS.Type.Class.Definition('class MyClass'),
-			new ClassyJS.Registry.Type(),
-			new ClassyJS.Registry.Member(new ClassyJS.Registry.Type(), new ClassyJS.TypeChecker()),
+			new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
+			new ClassyJS.Registry.Member(
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
+				new ClassyJS.TypeChecker()
+			),
 			new ClassyJS.NamespaceManager()
 		);
 		interfaceObject = new ClassyJS.Type.Interface();
@@ -178,18 +181,18 @@ describe('Registry.Member', function(){
 			);
 			parentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
 			);
 			grandParentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
@@ -919,18 +922,18 @@ describe('Registry.Member', function(){
 			grandParentClassInstance = {};
 			parentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
 			);
 			grandParentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
@@ -1071,18 +1074,18 @@ describe('Registry.Member', function(){
 			grandParentClassInstance = {};
 			parentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
 			);
 			grandParentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
@@ -1196,18 +1199,18 @@ describe('Registry.Member', function(){
 			grandParentClassConstructor = function(){};
 			parentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
 			);
 			grandParentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
@@ -1327,18 +1330,18 @@ describe('Registry.Member', function(){
 			grandParentClassInstance = {};
 			parentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
 			);
 			grandParentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
@@ -1480,18 +1483,18 @@ describe('Registry.Member', function(){
 			grandParentClassConstructor = function(){};
 			parentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
 			);
 			grandParentClassObject = new ClassyJS.Type.Class(
 				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(),
+				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(),
+					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 					new ClassyJS.TypeChecker()
 				),
 				new ClassyJS.NamespaceManager()
