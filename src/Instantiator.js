@@ -190,7 +190,9 @@
 	_.Instantiator.prototype.getTypeRegistry = function()
 	{
 		if (!this._typeRegistry) {
-			this._typeRegistry = new ClassyJS.Registry.Type();
+			this._typeRegistry = new ClassyJS.Registry.Type(
+				this.getNamespaceManager()
+			);
 		}
 		return this._typeRegistry;
 	};

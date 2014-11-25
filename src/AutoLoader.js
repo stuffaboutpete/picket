@@ -28,6 +28,7 @@
 		this._classMaps = [];
 		this._requestedScripts = [];
 		this._loadedScripts = [];
+		this._classCallbacks = {};
 	};
 	
 	_.AutoLoader.prototype.isRunning = function()
@@ -77,7 +78,7 @@
 		}
 	};
 	
-	_.AutoLoader.prototype.continue = function(className)
+	_.AutoLoader.prototype.continue = function(className, callback)
 	{
 		if (typeof className != 'string') {
 			throw new _.AutoLoader.Fatal(
@@ -87,6 +88,12 @@
 		}
 		if (!this.isRunning()) throw new _.AutoLoader.Fatal('NOT_RUNNING');
 		this._continueBuffer.push(_getScriptLocation(this, className));
+		if (typeof callback == 'function') {
+			if (typeof this._classCallbacks[className] == 'undefined') {
+				this._classCallbacks[className] = [];
+			}
+			this._classCallbacks[className].push(callback);
+		}
 		_load(this, className);
 	};
 	
@@ -200,6 +207,12 @@
 	
 	var _handleLoadedScript = function(_this, className, scriptLocation)
 	{
+		if (typeof _this._classCallbacks[className] != 'undefined') {
+			for (var i in _this._classCallbacks[className]) {
+				_this._classCallbacks[className][i]();
+			};
+			delete _this._classCallbacks[className];
+		}
 		var index = _this._stacks.length;
 		while (index--) {
 			var stack = _this._stacks[index];

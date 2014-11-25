@@ -9,37 +9,60 @@ describe('Registry.Type', function(){
 	var grandParentClassObject;
 	var interfaceObject;
 	var interfaceObject2;
+	var namespaceManager;
 	
 	beforeEach(function(){
 		classConstructor = function(){};
 		parentClassConstructor = function(){};
 		grandParentClassConstructor = function(){};
+		namespaceManager = new ClassyJS.NamespaceManager();
 		classObject = new ClassyJS.Type.Class(
 			new ClassyJS.Type.Class.Definition('class MyClass'),
-			new ClassyJS.Registry.Type(),
-			new ClassyJS.Registry.Member(new ClassyJS.Registry.Type(), new ClassyJS.TypeChecker()),
+			new ClassyJS.Registry.Type(namespaceManager),
+			new ClassyJS.Registry.Member(
+				new ClassyJS.Registry.Type(namespaceManager),
+				new ClassyJS.TypeChecker()
+			),
 			new ClassyJS.NamespaceManager()
 		);
 		parentClassObject = new ClassyJS.Type.Class(
 			new ClassyJS.Type.Class.Definition('class MyClass'),
-			new ClassyJS.Registry.Type(),
-			new ClassyJS.Registry.Member(new ClassyJS.Registry.Type(), new ClassyJS.TypeChecker()),
+			new ClassyJS.Registry.Type(namespaceManager),
+			new ClassyJS.Registry.Member(
+				new ClassyJS.Registry.Type(namespaceManager),
+				new ClassyJS.TypeChecker()
+			),
 			new ClassyJS.NamespaceManager()
 		);
 		grandParentClassObject = new ClassyJS.Type.Class(
 			new ClassyJS.Type.Class.Definition('class MyClass'),
-			new ClassyJS.Registry.Type(),
-			new ClassyJS.Registry.Member(new ClassyJS.Registry.Type(), new ClassyJS.TypeChecker()),
+			new ClassyJS.Registry.Type(namespaceManager),
+			new ClassyJS.Registry.Member(
+				new ClassyJS.Registry.Type(namespaceManager),
+				new ClassyJS.TypeChecker()
+			),
 			new ClassyJS.NamespaceManager()
 		);
 		interfaceObject = new ClassyJS.Type.Interface();
 		interfaceObject2 = new ClassyJS.Type.Interface();
-		registry = new ClassyJS.Registry.Type();
+		registry = new ClassyJS.Registry.Type(namespaceManager);
+		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(className){
+			if (className == 'My.ParentClass') return parentClassConstructor;
+			if (className == 'My.GrandParentClass') return grandParentClassConstructor;
+		});
 	});
 	
 	it('can be instantiated', function(){
-		var registry = new ClassyJS.Registry.Type();
+		var registry = new ClassyJS.Registry.Type(namespaceManager);
 		expect(registry instanceof ClassyJS.Registry.Type).toBe(true);
+	});
+	
+	it('requires namespace manager', function(){
+		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+			'NON_NAMESPACE_MANAGER_PROVIDED',
+			'Provided type: undefined'
+		);
+		expect(function(){ new ClassyJS.Registry.Type(); }).toThrow(expectedFatal);
 	});
 	
 	it('can register class constructor against class object', function(){
@@ -99,15 +122,15 @@ describe('Registry.Type', function(){
 		expect(function(){ registry.getClass(new classConstructor()); }).toThrow(expectedFatal);
 	});
 	
-	it('can register class object as child of other class object', function(){
+	it('can register class object as child of other class name', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 	});
 	
-	it('throws error if parent class object is non class object', function(){
+	it('throws error if parent class object is non string', function(){
 		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
-			'NON_CLASS_OBJECT_PROVIDED',
+			'NON_STRING_PARENT_PROVIDED',
 			'Provided type: object'
 		);
 		expect(function(){
@@ -121,30 +144,22 @@ describe('Registry.Type', function(){
 			'Provided type: object'
 		);
 		expect(function(){
-			registry.registerClassChild(parentClassObject, {});
+			registry.registerClassChild('My.ParentClass', {});
 		}).toThrow(expectedFatal);
 	});
 	
-	it('throws error if parent class object is not already registered', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('PARENT_CLASS_NOT_REGISTERED');
-		registry.registerClass(classObject, classConstructor);
-		expect(function(){
-			registry.registerClassChild(parentClassObject, classObject);
-		}).toThrow(expectedFatal);
-	});
-	
-	it('throws error if parent class object is not already registered', function(){
+	it('throws error if child class object is not already registered', function(){
 		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CHILD_CLASS_NOT_REGISTERED');
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		expect(function(){
-			registry.registerClassChild(parentClassObject, classObject);
+			registry.registerClassChild('My.ParentClass', classObject);
 		}).toThrow(expectedFatal);
 	});
 	
 	it('indicates when class object has parent', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		expect(registry.hasParent(classObject)).toBe(true);
 	});
 	
@@ -157,7 +172,7 @@ describe('Registry.Type', function(){
 	it('indicates when class constructor has parent', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		expect(registry.hasParent(classConstructor)).toBe(true);
 	});
 	
@@ -200,7 +215,7 @@ describe('Registry.Type', function(){
 	it('returns parent class object', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		expect(registry.getParent(classObject)).toBe(parentClassObject);
 	});
 	
@@ -208,15 +223,15 @@ describe('Registry.Type', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		registry.registerClass(grandParentClassObject, grandParentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
-		registry.registerClassChild(grandParentClassObject, parentClassObject);
+		registry.registerClassChild('My.ParentClass', classObject);
+		registry.registerClassChild('My.GrandParentClass', parentClassObject);
 		expect(registry.getParent(registry.getParent(classObject))).toBe(grandParentClassObject);
 	});
 	
 	it('returns parent class constructor', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		registry.getParent(classConstructor);
 		expect(registry.getParent(classConstructor)).toBe(parentClassConstructor);
 	});
@@ -225,8 +240,8 @@ describe('Registry.Type', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		registry.registerClass(grandParentClassObject, grandParentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
-		registry.registerClassChild(grandParentClassObject, parentClassObject);
+		registry.registerClassChild('My.ParentClass', classObject);
+		registry.registerClassChild('My.GrandParentClass', parentClassObject);
 		expect(registry.getParent(
 			registry.getParent(classConstructor)
 		)).toBe(grandParentClassConstructor);
@@ -237,7 +252,7 @@ describe('Registry.Type', function(){
 	it('can register class instance', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		registry.registerClassInstance([
 			new classConstructor(),
 			new parentClassConstructor()
@@ -288,7 +303,7 @@ describe('Registry.Type', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		registry.registerClass(grandParentClassObject, grandParentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		expect(function(){
 			registry.registerClassInstance([
 				new classConstructor(),
@@ -304,8 +319,8 @@ describe('Registry.Type', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		registry.registerClass(grandParentClassObject, grandParentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
-		registry.registerClassChild(grandParentClassObject, parentClassObject);
+		registry.registerClassChild('My.ParentClass', classObject);
+		registry.registerClassChild('My.GrandParentClass', parentClassObject);
 		expect(function(){
 			registry.registerClassInstance([new classConstructor(), new parentClassConstructor()]);
 		}).toThrow(expectedFatal);
@@ -318,7 +333,7 @@ describe('Registry.Type', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		registry.registerClass(grandParentClassObject, grandParentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		expect(function(){
 			registry.registerClassInstance([
 				new classConstructor(),
@@ -336,7 +351,7 @@ describe('Registry.Type', function(){
 		];
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		registry.registerClassInstance(classInstance);
 		expect(function(){ registry.registerClassInstance(classInstance); }).toThrow(expectedFatal);
 	});
@@ -345,7 +360,7 @@ describe('Registry.Type', function(){
 		var classInstance = [new classConstructor(), new parentClassConstructor()];
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		registry.registerClassInstance(classInstance);
 		expect(registry.hasParent(classInstance[0])).toBe(true);
 	});
@@ -365,8 +380,8 @@ describe('Registry.Type', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		registry.registerClass(grandParentClassObject, grandParentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
-		registry.registerClassChild(grandParentClassObject, parentClassObject);
+		registry.registerClassChild('My.ParentClass', classObject);
+		registry.registerClassChild('My.GrandParentClass', parentClassObject);
 		registry.registerClassInstance(classInstance);
 		expect(registry.hasParent(classInstance[0])).toBe(true);
 		expect(registry.hasParent(classInstance[1])).toBe(true);
@@ -386,7 +401,7 @@ describe('Registry.Type', function(){
 		var classInstance = [new classConstructor(), new parentClassConstructor()];
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
+		registry.registerClassChild('My.ParentClass', classObject);
 		registry.registerClassInstance(classInstance);
 		expect(registry.getParent(classInstance[0])).toBe(classInstance[1]);
 	});
@@ -400,8 +415,8 @@ describe('Registry.Type', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		registry.registerClass(grandParentClassObject, grandParentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
-		registry.registerClassChild(grandParentClassObject, parentClassObject);
+		registry.registerClassChild('My.ParentClass', classObject);
+		registry.registerClassChild('My.GrandParentClass', parentClassObject);
 		registry.registerClassInstance(classInstance);
 		expect(registry.getParent(registry.getParent(classInstance[0]))).toBe(classInstance[2]);
 	});
@@ -435,8 +450,8 @@ describe('Registry.Type', function(){
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		registry.registerClass(grandParentClassObject, grandParentClassConstructor);
-		registry.registerClassChild(parentClassObject, classObject);
-		registry.registerClassChild(grandParentClassObject, parentClassObject);
+		registry.registerClassChild('My.ParentClass', classObject);
+		registry.registerClassChild('My.GrandParentClass', parentClassObject);
 		registry.registerClassInstance(classInstance);
 		expect(registry.getInstantiatedInstance(classInstance[0])).toBe(classInstance[0]);
 		expect(registry.getInstantiatedInstance(classInstance[1])).toBe(classInstance[0]);

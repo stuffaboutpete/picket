@@ -460,4 +460,17 @@ describe('AutoLoader', function(){
 		expect(includerCalls[2][0]).toBe('/MultiDependency/Class.js');
 	});
 	
+	it('runs continue callback when certain class is loaded', function(){
+		var callback = jasmine.createSpy('callback');
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
+		);
+		spyOn(includer, 'include').and.callFake(function(script, success){
+			if (script === '/Other/Class.js') success();
+		});
+		autoloader.start('Example.Class');
+		autoloader.continue('Other.Class', callback);
+		expect(callback).toHaveBeenCalled();
+	});
+	
 });

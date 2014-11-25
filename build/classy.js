@@ -286,11 +286,7 @@ if (!Object.create) {
 	_.Class.prototype.getParentClass = function()
 	{
 		if (!this.isExtension()) throw new _.Class.Fatal('NO_PARENT_CLASS_RELATIONSHIP');
-		return this._typeRegistry.getClass(
-			this._namespaceManager.getNamespaceObject(
-				this._definition.getParentClass()
-			)
-		);
+		return this._definition.getParentClass();
 	};
 	
 	_.Class.prototype.getInterfaces = function()
@@ -2311,11 +2307,18 @@ if (!Object.create) {
 
 ;(function(ClassyJS, _){
 	
-	_.Type = function()
+	_.Type = function(namespaceManager)
 	{
+		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+			throw new _.Type.Fatal(
+				'NON_NAMESPACE_MANAGER_PROVIDED',
+				'Provided type: ' + typeof namespaceManager
+			);
+		}
 		this._classes = [];
 		this._instances = [];
 		this._interfaces = {};
+		this._namespaceManager = namespaceManager;
 	};
 	
 	_.Type.prototype.registerClass = function(classObject, classConstructor)
@@ -2339,16 +2342,16 @@ if (!Object.create) {
 			classObject:		classObject,
 			constructor:		classConstructor,
 			interfaces:			[],
-			parentClassObject:	undefined
+			parentClassName:	undefined
 		});
 	};
 	
-	_.Type.prototype.registerClassChild = function(parentClassObject, childClassObject)
+	_.Type.prototype.registerClassChild = function(parentClassName, childClassObject)
 	{
-		if (!(parentClassObject instanceof ClassyJS.Type.Class)) {
+		if (typeof parentClassName != 'string') {
 			throw new _.Type.Fatal(
-				'NON_CLASS_OBJECT_PROVIDED',
-				'Provided type: ' + typeof parentClassObject
+				'NON_STRING_PARENT_PROVIDED',
+				'Provided type: ' + typeof parentClassName
 			);
 		}
 		if (!(childClassObject instanceof ClassyJS.Type.Class)) {
@@ -2357,13 +2360,10 @@ if (!Object.create) {
 				'Provided type: ' + typeof childClassObject
 			);
 		}
-		if (!_classObjectIsRegistered(this, parentClassObject)) {
-			throw new _.Type.Fatal('PARENT_CLASS_NOT_REGISTERED');
-		}
 		if (!_classObjectIsRegistered(this, childClassObject)) {
 			throw new _.Type.Fatal('CHILD_CLASS_NOT_REGISTERED');
 		}
-		_getClassData(this, childClassObject).parentClassObject = parentClassObject;
+		_getClassData(this, childClassObject).parentClassName = parentClassName;
 	};
 	
 	_.Type.prototype.registerClassInstance = function(instanceObjects)
@@ -2511,10 +2511,13 @@ if (!Object.create) {
 		if (returnType == 'classObject' || returnType == 'constructor') {
 			var classData = _getClassData(this, classObject);
 			if (classData) {
-				if (!classData.parentClassObject) {
+				if (!classData.parentClassName) {
 					throw new _.Type.Fatal('NON_EXISTENT_PARENT_REQUESTED');
 				}
-				var parentClassObject = classData.parentClassObject;
+				var parentConstructor = this._namespaceManager.getNamespaceObject(
+					classData.parentClassName
+				);
+				var parentClassObject = this.getClass(parentConstructor);
 				if (returnType == 'classObject') return parentClassObject;
 				if (returnType == 'constructor') {
 					return _getClassData(this, parentClassObject).constructor;
@@ -2575,6 +2578,8 @@ if (!Object.create) {
 ;(function(ClassyJS, Registry, _){
 	
 	var messages = {
+		NON_NAMESPACE_MANAGER_PROVIDED:
+			'Instance of ClassyJS.NamespaceManager must be provided to the constructor',
 		NON_CLASS_OBJECT_PROVIDED:
 			'Provided class object is not an instance of ClassyJS.Type.Class',
 		NON_STRING_INTERFACE_NAME_PROVIDED: 'Provided interface name is not a string',
@@ -2583,8 +2588,6 @@ if (!Object.create) {
 		CLASS_ALREADY_REGISTERED: 'Provided class object is already registered',
 		CLASS_NOT_REGISTERED: 'No class object could be found matching ' +
 			'the provided constructor or instance',
-		PARENT_CLASS_NOT_REGISTERED: 'No class object could be found matching ' +
-			'the provided parent class object',
 		CHILD_CLASS_NOT_REGISTERED: 'No class object could be found matching ' +
 			'the provided child class object',
 		NON_EXISTENT_PARENT_REQUESTED:
@@ -2606,7 +2609,8 @@ if (!Object.create) {
 		NON_CLASS_CONSTRUCTOR_OR_INSTANCE_PROVIDED:
 			'An argument which was neither class object, class ' +
 			'constructor or class instance was provided',
-		NON_CLASS_INSTANCE_PROVIDED: 'Provided argument is not a class instance'
+		NON_CLASS_INSTANCE_PROVIDED: 'Provided argument is not a class instance',
+		NON_STRING_PARENT_PROVIDED: 'The provided parent class name must be a string'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Registry.Type.Fatal', messages);
@@ -3495,7 +3499,9 @@ if (!Object.create) {
 	_.Instantiator.prototype.getTypeRegistry = function()
 	{
 		if (!this._typeRegistry) {
-			this._typeRegistry = new ClassyJS.Registry.Type();
+			this._typeRegistry = new ClassyJS.Registry.Type(
+				this.getNamespaceManager()
+			);
 		}
 		return this._typeRegistry;
 	};
@@ -3587,6 +3593,7 @@ if (!Object.create) {
 		this._classMaps = [];
 		this._requestedScripts = [];
 		this._loadedScripts = [];
+		this._classCallbacks = {};
 	};
 	
 	_.AutoLoader.prototype.isRunning = function()
@@ -3636,7 +3643,7 @@ if (!Object.create) {
 		}
 	};
 	
-	_.AutoLoader.prototype.continue = function(className)
+	_.AutoLoader.prototype.continue = function(className, callback)
 	{
 		if (typeof className != 'string') {
 			throw new _.AutoLoader.Fatal(
@@ -3646,6 +3653,12 @@ if (!Object.create) {
 		}
 		if (!this.isRunning()) throw new _.AutoLoader.Fatal('NOT_RUNNING');
 		this._continueBuffer.push(_getScriptLocation(this, className));
+		if (typeof callback == 'function') {
+			if (typeof this._classCallbacks[className] == 'undefined') {
+				this._classCallbacks[className] = [];
+			}
+			this._classCallbacks[className].push(callback);
+		}
 		_load(this, className);
 	};
 	
@@ -3759,6 +3772,12 @@ if (!Object.create) {
 	
 	var _handleLoadedScript = function(_this, className, scriptLocation)
 	{
+		if (typeof _this._classCallbacks[className] != 'undefined') {
+			for (var i in _this._classCallbacks[className]) {
+				_this._classCallbacks[className][i]();
+			};
+			delete _this._classCallbacks[className];
+		}
 		var index = _this._stacks.length;
 		while (index--) {
 			var stack = _this._stacks[index];
@@ -3868,17 +3887,6 @@ if (!Object.create) {
 	// is used to declare all types
 	window.define = function(){
 		
-		/**
-		 *	Read class/interface signature
-		 *	Look for class vs interface
-		 *	Get the constructor function
-		 * Look for location so we can register the class/interface
-		 * Register in directory with info about extensions and implementations and abstractiness
-		 *	Loop through members and pass to front factory
-		 *	Register each member against the class in a registry
-		 *	Check members is array or object dependent on class/interface
-		 */
-		
 		var metaStatements = [];
 		
 		for (var i = 0; i < arguments.length; i++) {
@@ -3920,12 +3928,41 @@ if (!Object.create) {
 			var constants = [];
 			
 			if (typeObject.isExtension()) {
-				var parentClass = typeObject.getParentClass();
-				instantiator.getTypeRegistry().registerClassChild(parentClass, typeObject);
-				var parentConstructor = instantiator.getTypeRegistry().getParent(constructor);
-				constructor.prototype = _createObject(parentConstructor.prototype);
-				constructor.prototype.constructor = constructor;
-				_appendMemberNames(staticMethods, constants, parentClass);
+				var autoloader = instantiator.getAutoLoader();
+				try {
+					var parentConstructor = namespaceManager.getNamespaceObject(
+						typeObject.getParentClass()
+					);
+				} catch (error) {
+					if ((!error instanceof ClassyJS.NamespaceManager.Fatal)
+					||	error.code != 'NAMESPACE_OBJECT_DOES_NOT_EXIST') {
+						throw error;
+					}
+				}
+				var createAssociationCallback = (function(childConstructor, parentClassName){
+					return function(){
+						if (typeof parentConstructor == 'undefined') {
+							parentConstructor = namespaceManager.getNamespaceObject(
+								parentClassName
+							);
+						}
+						var parentClass = instantiator.getTypeRegistry().getClass(
+							parentConstructor
+						);
+						instantiator.getTypeRegistry().registerClassChild(
+							typeObject.getParentClass(),
+							typeObject
+						);
+						constructor.prototype = _createObject(parentConstructor.prototype);
+						constructor.prototype.constructor = constructor;
+						_appendMemberNames(staticMethods, constants, parentClass);
+					};
+				})(constructor, typeObject.getParentClass());
+				if (typeof parentConstructor == 'undefined' && autoloader.isRunning()) {
+					autoloader.continue(typeObject.getParentClass(), createAssociationCallback);
+				} else {
+					createAssociationCallback();
+				}
 			}
 			
 			constructor.prototype.toString = function(){
