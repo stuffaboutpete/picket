@@ -45,11 +45,7 @@
 	_.Class.prototype.getParentClass = function()
 	{
 		if (!this.isExtension()) throw new _.Class.Fatal('NO_PARENT_CLASS_RELATIONSHIP');
-		return this._typeRegistry.getClass(
-			this._namespaceManager.getNamespaceObject(
-				this._definition.getParentClass()
-			)
-		);
+		return this._definition.getParentClass();
 	};
 	
 	_.Class.prototype.getInterfaces = function()
