@@ -1,6 +1,8 @@
 ;(function(ClassyJS, Registry, _){
 	
 	var messages = {
+		NON_NAMESPACE_MANAGER_PROVIDED:
+			'Instance of ClassyJS.NamespaceManager must be provided to the constructor',
 		NON_CLASS_OBJECT_PROVIDED:
 			'Provided class object is not an instance of ClassyJS.Type.Class',
 		NON_STRING_INTERFACE_NAME_PROVIDED: 'Provided interface name is not a string',
@@ -9,8 +11,6 @@
 		CLASS_ALREADY_REGISTERED: 'Provided class object is already registered',
 		CLASS_NOT_REGISTERED: 'No class object could be found matching ' +
 			'the provided constructor or instance',
-		PARENT_CLASS_NOT_REGISTERED: 'No class object could be found matching ' +
-			'the provided parent class object',
 		CHILD_CLASS_NOT_REGISTERED: 'No class object could be found matching ' +
 			'the provided child class object',
 		NON_EXISTENT_PARENT_REQUESTED:
@@ -32,7 +32,8 @@
 		NON_CLASS_CONSTRUCTOR_OR_INSTANCE_PROVIDED:
 			'An argument which was neither class object, class ' +
 			'constructor or class instance was provided',
-		NON_CLASS_INSTANCE_PROVIDED: 'Provided argument is not a class instance'
+		NON_CLASS_INSTANCE_PROVIDED: 'Provided argument is not a class instance',
+		NON_STRING_PARENT_PROVIDED: 'The provided parent class name must be a string'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Registry.Type.Fatal', messages);

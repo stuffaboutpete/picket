@@ -10,7 +10,7 @@ describe('Autoloading', function(){
 	});
 	
 	it('can include external class file', function(done){
-		define('class AutoloadComplete', {
+		define('class My.AutoloadComplete', {
 			'public static complete () -> undefined': function(){
 				expect(typeof AutoLoad.Classg7H6th).toBe('function');
 				done();
@@ -45,6 +45,18 @@ describe('Autoloading', function(){
 			}
 		});
 		new My.Class();
+	});
+	
+	it('allows parent class to be loaded and relationship is intact', function(done){
+		define('class My.AutoloadComplete', {
+			'public static complete (AutoLoad.ClassS9yhHw) -> undefined': function(child){
+				expect(child instanceof AutoLoad.ClassS9yhHw).toBe(true);
+				expect(child instanceof AutoLoad.ClassHJ4Vxs).toBe(true);
+				expect(child.myMethod('String')).toBe('Edited: String');
+				done();
+			}
+		});
+		start('AutoLoad.ClassS9yhHw');
 	});
 	
 });

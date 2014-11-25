@@ -11,17 +11,6 @@
 	// is used to declare all types
 	window.define = function(){
 		
-		/**
-		 *	Read class/interface signature
-		 *	Look for class vs interface
-		 *	Get the constructor function
-		 * Look for location so we can register the class/interface
-		 * Register in directory with info about extensions and implementations and abstractiness
-		 *	Loop through members and pass to front factory
-		 *	Register each member against the class in a registry
-		 *	Check members is array or object dependent on class/interface
-		 */
-		
 		var metaStatements = [];
 		
 		for (var i = 0; i < arguments.length; i++) {
@@ -63,12 +52,41 @@
 			var constants = [];
 			
 			if (typeObject.isExtension()) {
-				var parentClass = typeObject.getParentClass();
-				instantiator.getTypeRegistry().registerClassChild(parentClass, typeObject);
-				var parentConstructor = instantiator.getTypeRegistry().getParent(constructor);
-				constructor.prototype = _createObject(parentConstructor.prototype);
-				constructor.prototype.constructor = constructor;
-				_appendMemberNames(staticMethods, constants, parentClass);
+				var autoloader = instantiator.getAutoLoader();
+				try {
+					var parentConstructor = namespaceManager.getNamespaceObject(
+						typeObject.getParentClass()
+					);
+				} catch (error) {
+					if ((!error instanceof ClassyJS.NamespaceManager.Fatal)
+					||	error.code != 'NAMESPACE_OBJECT_DOES_NOT_EXIST') {
+						throw error;
+					}
+				}
+				var createAssociationCallback = (function(childConstructor, parentClassName){
+					return function(){
+						if (typeof parentConstructor == 'undefined') {
+							parentConstructor = namespaceManager.getNamespaceObject(
+								parentClassName
+							);
+						}
+						var parentClass = instantiator.getTypeRegistry().getClass(
+							parentConstructor
+						);
+						instantiator.getTypeRegistry().registerClassChild(
+							typeObject.getParentClass(),
+							typeObject
+						);
+						constructor.prototype = _createObject(parentConstructor.prototype);
+						constructor.prototype.constructor = constructor;
+						_appendMemberNames(staticMethods, constants, parentClass);
+					};
+				})(constructor, typeObject.getParentClass());
+				if (typeof parentConstructor == 'undefined' && autoloader.isRunning()) {
+					autoloader.continue(typeObject.getParentClass(), createAssociationCallback);
+				} else {
+					createAssociationCallback();
+				}
 			}
 			
 			constructor.prototype.toString = function(){

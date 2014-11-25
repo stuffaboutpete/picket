@@ -13,7 +13,7 @@ describe('Type.Class', function(){
 	
 	beforeEach(function(){
 		definition = new ClassyJS.Type.Class.Definition('class MyClass');
-		typeRegistry = new ClassyJS.Registry.Type();
+		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
 		memberRegistry = new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker());
 		namespaceManager = new ClassyJS.NamespaceManager();
 		classObject = new ClassyJS.Type.Class(
@@ -115,14 +115,10 @@ describe('Type.Class', function(){
 		expect(classObject.isExtension()).toBe(false);
 	});
 	
-	it('returns parent from registry after getting constructor from namespace manager', function(){
+	it('returns parent name', function(){
 		spyOn(definition, 'isExtension').and.returnValue(true);
 		spyOn(definition, 'getParentClass').and.returnValue('My.Parent');
-		spyOn(namespaceManager, 'getNamespaceObject').and.returnValue(parentConstructor);
-		spyOn(typeRegistry, 'getClass').and.returnValue(parentClass);
-		expect(classObject.getParentClass()).toBe(parentClass);
-		expect(namespaceManager.getNamespaceObject).toHaveBeenCalledWith('My.Parent');
-		expect(typeRegistry.getClass).toHaveBeenCalledWith(parentConstructor);
+		expect(classObject.getParentClass()).toBe('My.Parent');
 	});
 	
 	it('throws error if parent class is requested when isExtension is false', function(){

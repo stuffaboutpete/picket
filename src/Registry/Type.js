@@ -1,10 +1,17 @@
 ;(function(ClassyJS, _){
 	
-	_.Type = function()
+	_.Type = function(namespaceManager)
 	{
+		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+			throw new _.Type.Fatal(
+				'NON_NAMESPACE_MANAGER_PROVIDED',
+				'Provided type: ' + typeof namespaceManager
+			);
+		}
 		this._classes = [];
 		this._instances = [];
 		this._interfaces = {};
+		this._namespaceManager = namespaceManager;
 	};
 	
 	_.Type.prototype.registerClass = function(classObject, classConstructor)
@@ -28,16 +35,16 @@
 			classObject:		classObject,
 			constructor:		classConstructor,
 			interfaces:			[],
-			parentClassObject:	undefined
+			parentClassName:	undefined
 		});
 	};
 	
-	_.Type.prototype.registerClassChild = function(parentClassObject, childClassObject)
+	_.Type.prototype.registerClassChild = function(parentClassName, childClassObject)
 	{
-		if (!(parentClassObject instanceof ClassyJS.Type.Class)) {
+		if (typeof parentClassName != 'string') {
 			throw new _.Type.Fatal(
-				'NON_CLASS_OBJECT_PROVIDED',
-				'Provided type: ' + typeof parentClassObject
+				'NON_STRING_PARENT_PROVIDED',
+				'Provided type: ' + typeof parentClassName
 			);
 		}
 		if (!(childClassObject instanceof ClassyJS.Type.Class)) {
@@ -46,13 +53,10 @@
 				'Provided type: ' + typeof childClassObject
 			);
 		}
-		if (!_classObjectIsRegistered(this, parentClassObject)) {
-			throw new _.Type.Fatal('PARENT_CLASS_NOT_REGISTERED');
-		}
 		if (!_classObjectIsRegistered(this, childClassObject)) {
 			throw new _.Type.Fatal('CHILD_CLASS_NOT_REGISTERED');
 		}
-		_getClassData(this, childClassObject).parentClassObject = parentClassObject;
+		_getClassData(this, childClassObject).parentClassName = parentClassName;
 	};
 	
 	_.Type.prototype.registerClassInstance = function(instanceObjects)
@@ -200,10 +204,13 @@
 		if (returnType == 'classObject' || returnType == 'constructor') {
 			var classData = _getClassData(this, classObject);
 			if (classData) {
-				if (!classData.parentClassObject) {
+				if (!classData.parentClassName) {
 					throw new _.Type.Fatal('NON_EXISTENT_PARENT_REQUESTED');
 				}
-				var parentClassObject = classData.parentClassObject;
+				var parentConstructor = this._namespaceManager.getNamespaceObject(
+					classData.parentClassName
+				);
+				var parentClassObject = this.getClass(parentConstructor);
 				if (returnType == 'classObject') return parentClassObject;
 				if (returnType == 'constructor') {
 					return _getClassData(this, parentClassObject).constructor;

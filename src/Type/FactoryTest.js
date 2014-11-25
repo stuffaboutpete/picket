@@ -21,7 +21,7 @@ describe('Type.Factory', function(){
 		interfaceFactory = new ClassyJS.Type.Interface.Factory();
 		classDefinition = new ClassyJS.Type.Class.Definition('class MyClass');
 		interfaceDefinition = new ClassyJS.Type.Interface.Definition('interface IMyInterface');
-		typeRegistry = new ClassyJS.Registry.Type();
+		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
 		memberRegistry = new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker());
 		namespaceManager = new ClassyJS.NamespaceManager();
 		classObject = new ClassyJS.Type.Class(
