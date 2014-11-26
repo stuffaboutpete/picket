@@ -23,20 +23,15 @@
 		var Class = function()
 		{
 			
-			/**
-			 * Check can be instantiated (here??)
-			 * 		Note that isAbstract should tell us if it's either explicit
-			 * 		or implicit abstract. We shouldn't worry about whether the
-			 * 		created instance obeys interface / abstract member rules - if
-			 * 		the class isn't abstract, its valid (I think).
-			 * Create parent and all ancestors
-			 * If this is the instantiated one, register all instances in type registry
-			 * Create dummy methods for all methods, constants and poss properties
-			 */
+			if (arguments.callee.caller.toString() == arguments.callee.toString()) {
+				var isInstantiatedObject = false;
+			} else {
+				var isInstantiatedObject = true;
+			}
 			
 			var classObject = typeRegistry.getClass(this)
 			
-			classObject.requestInstantiation();
+			if (isInstantiatedObject) classObject.requestInstantiation();
 			
 			var properties = [];
 			var methods = [];
@@ -137,7 +132,7 @@
 				})(name);
 			}
 			
-			if (this.construct) {
+			if (isInstantiatedObject && this.construct) {
 				this.construct.apply(this, Array.prototype.slice.call(arguments, 0));
 			}
 			

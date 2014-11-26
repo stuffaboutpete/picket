@@ -346,20 +346,15 @@
 		var Class = function()
 		{
 			
-			/**
-			 * Check can be instantiated (here??)
-			 * 		Note that isAbstract should tell us if it's either explicit
-			 * 		or implicit abstract. We shouldn't worry about whether the
-			 * 		created instance obeys interface / abstract member rules - if
-			 * 		the class isn't abstract, its valid (I think).
-			 * Create parent and all ancestors
-			 * If this is the instantiated one, register all instances in type registry
-			 * Create dummy methods for all methods, constants and poss properties
-			 */
+			if (arguments.callee.caller.toString() == arguments.callee.toString()) {
+				var isInstantiatedObject = false;
+			} else {
+				var isInstantiatedObject = true;
+			}
 			
 			var classObject = typeRegistry.getClass(this)
 			
-			classObject.requestInstantiation();
+			if (isInstantiatedObject) classObject.requestInstantiation();
 			
 			var properties = [];
 			var methods = [];
@@ -460,7 +455,7 @@
 				})(name);
 			}
 			
-			if (this.construct) {
+			if (isInstantiatedObject && this.construct) {
 				this.construct.apply(this, Array.prototype.slice.call(arguments, 0));
 			}
 			
@@ -1307,7 +1302,7 @@
 		return this._isAbstract;
 	};
 	
-	_.Method.prototype.call = function(target, accessInstance, arguments)
+	_.Method.prototype.call = function(target, accessInstance, args, scopeVariables)
 	{
 		if (this._isAbstract) throw new _.Method.Fatal('INTERACTION_WITH_ABSTRACT');
 		if (typeof target != 'object' && typeof target != 'function') {
@@ -1322,10 +1317,16 @@
 				'Provided type: ' + typeof accessInstance
 			);
 		}
-		if (Object.prototype.toString.call(arguments) != '[object Array]') {
+		if (Object.prototype.toString.call(args) != '[object Array]') {
 			throw new _.Method.Fatal(
 				'NON_ARRAY_ARGUMENTS_PROVIDED',
-				'Provided type: ' + typeof arguments
+				'Provided type: ' + typeof args
+			);
+		}
+		if (typeof scopeVariables != 'undefined' && typeof scopeVariables != 'object') {
+			throw new _.Method.Fatal(
+				'NON_OBJECT_SCOPE_VARIABLES',
+				'Provided type: ' + typeof scopeVariables
 			);
 		}
 		var canAccess = this._accessController.canAccess(
@@ -1334,10 +1335,18 @@
 			this._definition.getAccessTypeIdentifier()
 		);
 		if (canAccess !== true) throw new _.Method.Fatal('ACCESS_NOT_ALLOWED');
-		var areValidTypes = this._typeChecker.areValidTypes(arguments, this.getArgumentTypes());
+		var areValidTypes = this._typeChecker.areValidTypes(args, this.getArgumentTypes());
 		if (areValidTypes !== true) throw new _.Method.Fatal('INVALID_ARGUMENTS');
 		this._value.$$owner = target;
-		var returnValue = this._value.apply(target, arguments);
+		var that = this;
+		var returnValue = (function(){
+			if (scopeVariables) {
+				for (var i in scopeVariables) {
+					this[i] = scopeVariables[i];
+				}
+			}
+			return that._value.apply(target, args);
+		})();
 		delete this._value.$$owner;
 		var isValidType = this._typeChecker.isValidType(
 			returnValue,
@@ -1509,7 +1518,8 @@
 		UNEXPECTED_IMPLEMENTATION:
 			'Abstract or interface method should not provide an implementation',
 		NON_FUNCTION_IMPLEMENTATION: 'implementation must be provided as a function',
-		INTERACTION_WITH_ABSTRACT: 'This instance cannot be called as it is abstract'
+		INTERACTION_WITH_ABSTRACT: 'This instance cannot be called as it is abstract',
+		NON_OBJECT_SCOPE_VARIABLES: 'Provided scope variables must be object'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Fatal', messages);
@@ -2796,7 +2806,13 @@
 		return property.getDefaultValue(originalClassInstance, accessInstance);
 	};
 	
-	_.Member.prototype.callMethod = function(callTarget, accessInstance, name, args)
+	_.Member.prototype.callMethod = function(
+		callTarget,
+		accessInstance,
+		name,
+		args,
+		finalCallTarget
+	)
 	{
 		if (typeof callTarget != 'object' && typeof callTarget != 'function') {
 			throw new _.Member.Fatal(
@@ -2832,14 +2848,15 @@
 			if (args.length != argumentTypes.length) continue;
 			if (shouldBeStatic != methods[i].isStatic()) continue;
 			if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
-			return methods[i].call(callTarget, accessInstance, args);
+			return methods[i].call(finalCallTarget || callTarget, accessInstance, args);
 		}
 		if (this._typeRegistry.hasParent(callTarget)) {
 			return this.callMethod(
 				this._typeRegistry.getParent(callTarget),
 				accessInstance,
 				name,
-				args
+				args,
+				finalCallTarget || callTarget
 			);
 		}
 		throw new _.Member.Fatal(
