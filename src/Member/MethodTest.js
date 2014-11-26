@@ -320,7 +320,7 @@ describe('Member.Method', function(){
 		expect(method.call(methodOwnerInstance, accessInstance, [])).toBe(methodOwnerInstance);
 	});
 	
-	it('binds owner instance to this within method implementation', function(){
+	it('passes arguments to method implementation', function(){
 		var method = new ClassyJS.Member.Method(
 			definition,
 			false,
@@ -364,6 +364,34 @@ describe('Member.Method', function(){
 		);
 		expect(function(){
 			method.call(methodOwnerInstance, accessInstance, []);
+		}).toThrow(expectedFatal);
+	});
+	
+	it('makes variables available within method when provided to call', function(){
+		var methodImplementation = function(){
+			expect(example1).toBe('Value 1');
+			expect(example2).toBe('Value 2');
+		};
+		var method = new ClassyJS.Member.Method(
+			definition,
+			false,
+			methodImplementation,
+			typeChecker,
+			accessController
+		);
+		method.call(methodOwnerInstance, accessInstance, [], {
+			example1: 'Value 1',
+			example2: 'Value 2'
+		});
+	});
+	
+	it('throws error if scope variables are not object', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+			'NON_OBJECT_SCOPE_VARIABLES',
+			'Provided type: string'
+		);
+		expect(function(){
+			method.call(methodOwnerInstance, accessInstance, [], 'string');
 		}).toThrow(expectedFatal);
 	});
 	

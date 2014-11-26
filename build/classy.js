@@ -1296,7 +1296,7 @@ if (!Object.create) {
 		return this._isAbstract;
 	};
 	
-	_.Method.prototype.call = function(target, accessInstance, arguments)
+	_.Method.prototype.call = function(target, accessInstance, args, scopeVariables)
 	{
 		if (this._isAbstract) throw new _.Method.Fatal('INTERACTION_WITH_ABSTRACT');
 		if (typeof target != 'object' && typeof target != 'function') {
@@ -1311,10 +1311,16 @@ if (!Object.create) {
 				'Provided type: ' + typeof accessInstance
 			);
 		}
-		if (Object.prototype.toString.call(arguments) != '[object Array]') {
+		if (Object.prototype.toString.call(args) != '[object Array]') {
 			throw new _.Method.Fatal(
 				'NON_ARRAY_ARGUMENTS_PROVIDED',
-				'Provided type: ' + typeof arguments
+				'Provided type: ' + typeof args
+			);
+		}
+		if (typeof scopeVariables != 'undefined' && typeof scopeVariables != 'object') {
+			throw new _.Method.Fatal(
+				'NON_OBJECT_SCOPE_VARIABLES',
+				'Provided type: ' + typeof scopeVariables
 			);
 		}
 		var canAccess = this._accessController.canAccess(
@@ -1323,10 +1329,18 @@ if (!Object.create) {
 			this._definition.getAccessTypeIdentifier()
 		);
 		if (canAccess !== true) throw new _.Method.Fatal('ACCESS_NOT_ALLOWED');
-		var areValidTypes = this._typeChecker.areValidTypes(arguments, this.getArgumentTypes());
+		var areValidTypes = this._typeChecker.areValidTypes(args, this.getArgumentTypes());
 		if (areValidTypes !== true) throw new _.Method.Fatal('INVALID_ARGUMENTS');
 		this._value.$$owner = target;
-		var returnValue = this._value.apply(target, arguments);
+		var that = this;
+		var returnValue = (function(){
+			if (scopeVariables) {
+				for (var i in scopeVariables) {
+					this[i] = scopeVariables[i];
+				}
+			}
+			return that._value.apply(target, args);
+		})();
 		delete this._value.$$owner;
 		var isValidType = this._typeChecker.isValidType(
 			returnValue,
@@ -1498,7 +1512,8 @@ if (!Object.create) {
 		UNEXPECTED_IMPLEMENTATION:
 			'Abstract or interface method should not provide an implementation',
 		NON_FUNCTION_IMPLEMENTATION: 'implementation must be provided as a function',
-		INTERACTION_WITH_ABSTRACT: 'This instance cannot be called as it is abstract'
+		INTERACTION_WITH_ABSTRACT: 'This instance cannot be called as it is abstract',
+		NON_OBJECT_SCOPE_VARIABLES: 'Provided scope variables must be object'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Fatal', messages);

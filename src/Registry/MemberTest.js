@@ -1197,8 +1197,6 @@ describe('Registry.Member', function(){
 				expect(callTarget).toBe(childClassInstance);
 			});
 			registry.register(methodObject, parentClassObject);
-			childClassInstance.child = true;
-			parentClassInstance.parent = true;
 			registry.callMethod(
 				childClassInstance,
 				{},
