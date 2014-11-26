@@ -34,9 +34,15 @@
 			 * Create dummy methods for all methods, constants and poss properties
 			 */
 			
+			if (arguments.callee.caller.toString() == arguments.callee.toString()) {
+				var isInstantiatedObject = false;
+			} else {
+				var isInstantiatedObject = true;
+			}
+			
 			var classObject = typeRegistry.getClass(this)
 			
-			classObject.requestInstantiation();
+			if (isInstantiatedObject) classObject.requestInstantiation();
 			
 			var properties = [];
 			var methods = [];
