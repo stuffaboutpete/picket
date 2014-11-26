@@ -19,7 +19,8 @@
 		UNEXPECTED_IMPLEMENTATION:
 			'Abstract or interface method should not provide an implementation',
 		NON_FUNCTION_IMPLEMENTATION: 'implementation must be provided as a function',
-		INTERACTION_WITH_ABSTRACT: 'This instance cannot be called as it is abstract'
+		INTERACTION_WITH_ABSTRACT: 'This instance cannot be called as it is abstract',
+		NON_OBJECT_SCOPE_VARIABLES: 'Provided scope variables must be object'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Fatal', messages);
