@@ -340,17 +340,6 @@ if (!Object.create) {
 		var Class = function()
 		{
 			
-			/**
-			 * Check can be instantiated (here??)
-			 * 		Note that isAbstract should tell us if it's either explicit
-			 * 		or implicit abstract. We shouldn't worry about whether the
-			 * 		created instance obeys interface / abstract member rules - if
-			 * 		the class isn't abstract, its valid (I think).
-			 * Create parent and all ancestors
-			 * If this is the instantiated one, register all instances in type registry
-			 * Create dummy methods for all methods, constants and poss properties
-			 */
-			
 			if (arguments.callee.caller.toString() == arguments.callee.toString()) {
 				var isInstantiatedObject = false;
 			} else {
@@ -460,7 +449,7 @@ if (!Object.create) {
 				})(name);
 			}
 			
-			if (this.construct) {
+			if (isInstantiatedObject && this.construct) {
 				this.construct.apply(this, Array.prototype.slice.call(arguments, 0));
 			}
 			
@@ -2796,7 +2785,13 @@ if (!Object.create) {
 		return property.getDefaultValue(originalClassInstance, accessInstance);
 	};
 	
-	_.Member.prototype.callMethod = function(callTarget, accessInstance, name, args)
+	_.Member.prototype.callMethod = function(
+		callTarget,
+		accessInstance,
+		name,
+		args,
+		finalCallTarget
+	)
 	{
 		if (typeof callTarget != 'object' && typeof callTarget != 'function') {
 			throw new _.Member.Fatal(
@@ -2832,14 +2827,15 @@ if (!Object.create) {
 			if (args.length != argumentTypes.length) continue;
 			if (shouldBeStatic != methods[i].isStatic()) continue;
 			if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
-			return methods[i].call(callTarget, accessInstance, args);
+			return methods[i].call(finalCallTarget || callTarget, accessInstance, args);
 		}
 		if (this._typeRegistry.hasParent(callTarget)) {
 			return this.callMethod(
 				this._typeRegistry.getParent(callTarget),
 				accessInstance,
 				name,
-				args
+				args,
+				finalCallTarget || callTarget
 			);
 		}
 		throw new _.Member.Fatal(

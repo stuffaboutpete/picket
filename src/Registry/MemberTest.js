@@ -1182,6 +1182,30 @@ describe('Registry.Member', function(){
 			expect(methodObject2.call).not.toHaveBeenCalled();
 		});
 		
+		it('retains child as call target when calling parent method', function(){
+			methodObject = new ClassyJS.Member.Method(
+				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+				false,
+				function(){},
+				typeChecker,
+				accessController
+			);
+			spyOn(typeRegistry, 'hasParent').and.callFake(function(classInstance){
+				return (classInstance === childClassInstance) ? true : false;
+			});
+			spyOn(methodObject, 'call').and.callFake(function(callTarget){
+				expect(callTarget).toBe(childClassInstance);
+			});
+			registry.register(methodObject, parentClassObject);
+			childClassInstance.child = true;
+			parentClassInstance.parent = true;
+			registry.callMethod(
+				childClassInstance,
+				{},
+				'myMethod',
+				[]
+			);
+		});
 	});
 	
 	describe('inherited static method', function(){

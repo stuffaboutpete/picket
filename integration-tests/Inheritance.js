@@ -165,6 +165,56 @@ describe('Inheritance', function(){
 		expect(myObject.myMethod(true)).toBe('From Child');
 	});
 	
+	it('ensures only instantiated constructor is called', function(){
+		define('class My.Parent', {
+			'public construct () -> undefined': function(){
+				// We shouldn't be here so force a fail
+				expect(true).toBe(false);
+			}
+		});
+		define('class My.Child extends My.Parent', {
+			'public construct () -> undefined': function(){}
+		});
+		new My.Child();
+	});
+	
+	it('ensures parent constructor is called if not child constructor exists', function(){
+		define('class My.Parent', {
+			'public constructorCalled (boolean)': false,
+			'public construct () -> undefined': function(){
+				this.constructorCalled(true);
+			}
+		});
+		define('class My.Child extends My.Parent', {});
+		var myChild = new My.Child();
+		expect(myChild.constructorCalled()).toBe(true);
+	});
+	
+	it('ensures only instantiated method is called', function(){
+		define('class My.Parent', {
+			'public myMethod () -> undefined': function(){
+				// We shouldn't be here so force a fail
+				expect(true).toBe(false);
+			}
+		});
+		define('class My.Child extends My.Parent', {
+			'public myMethod () -> undefined': function(){}
+		});
+		var myChild = new My.Child();
+		myChild.myMethod();
+	});
+	
+	it('ensures this is bound to instantiated object in parent methods', function(){
+		define('class My.Parent', {
+			'public parentMethod (object) -> undefined': function(object){
+				expect(this).toBe(object);
+			}
+		});
+		define('class My.Child extends My.Parent');
+		var myChild = new My.Child();
+		myChild.parentMethod(myChild);
+	});
+	
 	it('makes static parent method available in child class', function(){
 		define('class My.Parent', {
 			'public static myMethod () -> string': function(){
