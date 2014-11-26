@@ -49,7 +49,7 @@ describe('Instantiation', function(){
 		define('class My.Parent', {
 			'public abstract myMethod () -> string': undefined
 		});
-		define('class My.Child', {
+		define('class My.Child extends My.Parent', {
 			'public myMethod () -> string': function(){
 				return 'From Child';
 			}
