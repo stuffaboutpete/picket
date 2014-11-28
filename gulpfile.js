@@ -82,6 +82,7 @@ gulp.task('build', function(){
 			'./src/Reflection/Member.js',
 			'./src/Reflection/Member/Method.js',
 			'./src/Reflection/Member/Method/Argument.js',
+			'./src/Reflection/Member/Property.js',
 			'./src/Main.js',
 			'./src/Main/Fatal.js'
 	])

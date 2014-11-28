@@ -28,4 +28,16 @@ describe('Reflection', function(){
 		expect(methodArguments[0].getIdentifier()).toBe('number');
 	});
 	
+	it('TEMP - allows getting class properties and their names', function(){
+		define('class My.Class', {
+			'public myPropertyOne (string)': null,
+			'public myPropertyTwo (number)': 123
+		});
+		var reflectionClass = new Reflection.Class('My.Class');
+		var reflectionProperties = reflectionClass.getProperties();
+		expect(reflectionProperties.length).toBe(2);
+		expect(reflectionProperties[0].getName()).toBe('myPropertyOne');
+		expect(reflectionProperties[1].getName()).toBe('myPropertyTwo');
+	});
+	
 });
