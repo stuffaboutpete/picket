@@ -95,6 +95,7 @@ module.exports = function(config) {
 			'Reflection/Member.js',
 			'Reflection/Member/Method.js',
 			'Reflection/Member/Method/Argument.js',
+			'Reflection/Member/Property.js',
 			'Main.js',
 			'Main/Fatal.js',
 			'../integration-tests/TypeDeclaration.js',
