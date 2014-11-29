@@ -3696,15 +3696,17 @@ if (!Object.create) {
 			_attemptFinish(_this);
 		} else {
 			var scriptLocation = _getScriptLocation(_this, className);
-			if (_this._requestedScripts.indexOf(scriptLocation) > -1) {
+			if (_this._loadedScripts.indexOf(scriptLocation) > -1) {
 				_attemptFinish(_this);
 			} else {
-				_this._includer.include(
-					scriptLocation,
-					_getScriptLoadedCallback(_this, className, scriptLocation),
-					_getScriptFailedCallback(_this, className, scriptLocation)
-				);
-				_this._requestedScripts.push(scriptLocation);
+				if (_this._requestedScripts.indexOf(scriptLocation) == -1) {
+					_this._includer.include(
+						scriptLocation,
+						_getScriptLoadedCallback(_this, className, scriptLocation),
+						_getScriptFailedCallback(_this, className, scriptLocation)
+					);
+					_this._requestedScripts.push(scriptLocation);
+				}
 				if (stack) stack.loadingScripts.push(scriptLocation);
 			}
 		}

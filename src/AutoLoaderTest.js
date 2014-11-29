@@ -473,4 +473,26 @@ describe('AutoLoader', function(){
 		expect(callback).toHaveBeenCalled();
 	});
 	
+	it('allows class to be required multiple times and run correct number of times', function(){
+		var successCallback;
+		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
+			namespaceObjectDoesNotExistError
+		);
+		spyOn(includer, 'include').and.callFake(function(script, success){
+			successCallback = success;
+		});
+		define('class My.Class', {
+			'public numberOfCalls (number)': 0,
+			'public targetMethod (string) -> undefined': function(className){
+				this.numberOfCalls('++');
+			}
+		});
+		var myObject = new My.Class();
+		autoloader.require('Example.Class', myObject, 'targetMethod');
+		autoloader.require('Example.Class', myObject, 'targetMethod');
+		expect(myObject.numberOfCalls()).toBe(0);
+		successCallback();
+		expect(myObject.numberOfCalls()).toBe(2);
+	});
+	
 });
