@@ -275,13 +275,13 @@
 		} catch (error) {
 			if (!(error instanceof _.Member.Fatal) || error.code != 'METHOD_NOT_REGISTERED') {
 				throw error;
-			} else if (this._typeRegistry.hasParent(originalCallClassInstance)) {
+			} else if (this._typeRegistry.hasParent(targetObject)) {
 				return this.bindEvent(
 					classInstance,
 					name,
-					targetObject,
+					this._typeRegistry.getParent(targetObject),
 					targetMethod,
-					this._typeRegistry.getParent(originalCallClassInstance)
+					originalCallClassInstance
 				);
 			} else {
 				throw new _.Member.Fatal(
