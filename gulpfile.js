@@ -4,7 +4,9 @@ var gulp = require('gulp'),
 	uglify = require('gulp-uglify'),
 	gzip = require('gulp-gzip'),
 	rename = require('gulp-rename'),
-	karma = require('gulp-karma');
+	karma = require('gulp-karma'),
+	bump = require('gulp-bump'),
+	args = require('yargs').argv;
 
 gulp.task('default', ['test'], function(){
 	gulp.watch(['./src/**/*.js', '!./src/**/*Test.js'], ['build']);
@@ -100,4 +102,22 @@ gulp.task('test', function(){
 		configFile: 'karma.conf.js',
 		action: 'watch'
 	})).on('error', function(error) { console.error(error); });
+});
+
+gulp.task('bump', function(){
+	var argsHolder = [];
+	if (args.major) argsHolder.push('major');
+	if (args.minor) argsHolder.push('minor');
+	if (args.patch) argsHolder.push('patch');
+	if (argsHolder.length == 0) {
+		console.log('Please provide either --major, --minor or --patch');
+		return;
+	}
+	if (argsHolder.length > 1) {
+		console.log('Please only provide one bump type');
+		return;
+	}
+	return gulp.src('./bower.json')
+		.pipe(bump({type: argsHolder[0]}))
+		.pipe(gulp.dest('./'));
 });
