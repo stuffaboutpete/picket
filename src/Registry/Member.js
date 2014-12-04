@@ -194,14 +194,14 @@
 			);
 		}
 		var shouldBeStatic = (typeof callTarget == 'function') ? true : false;
-		if (!shouldBeStatic && arguments.callee.caller != this.callMethod) {
-			return this.callMethod(
-				this._typeRegistry.getInstantiatedInstance(callTarget),
-				accessInstance,
-				name,
-				args
-			);
-		}
+		// if (!shouldBeStatic && arguments.callee.caller != this.callMethod) {
+		// 	return this.callMethod(
+		// 		this._typeRegistry.getInstantiatedInstance(callTarget),
+		// 		accessInstance,
+		// 		name,
+		// 		args
+		// 	);
+		// }
 		var classObject = _getClassObjectFromInstanceOrConstructor(this, callTarget);
 		var methods = _getAllMethodsByName(this, classObject, name);
 		for (var i = 0; i < methods.length; i++) {
@@ -209,7 +209,16 @@
 			if (args.length != argumentTypes.length) continue;
 			if (shouldBeStatic != methods[i].isStatic()) continue;
 			if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
-			return methods[i].call(finalCallTarget || callTarget, accessInstance, args);
+			callTarget = finalCallTarget || callTarget;
+			if (this._typeRegistry.hasParent(callTarget)) {
+				var scopeVariables = { parent: this._typeRegistry.getParent(callTarget) };
+			}
+			return methods[i].call(
+				finalCallTarget || callTarget,
+				accessInstance,
+				args,
+				scopeVariables
+			);
 		}
 		if (this._typeRegistry.hasParent(callTarget)) {
 			return this.callMethod(
