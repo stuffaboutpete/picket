@@ -106,17 +106,27 @@
 		if (canAccess !== true) throw new _.Method.Fatal('ACCESS_NOT_ALLOWED');
 		var areValidTypes = this._typeChecker.areValidTypes(args, this.getArgumentTypes());
 		if (areValidTypes !== true) throw new _.Method.Fatal('INVALID_ARGUMENTS');
+		if (scopeVariables) {
+			var originalScopeVariables = {};
+			for (var i in scopeVariables) {
+				if (typeof window[i] != 'undefined') {
+					originalScopeVariables[i] = window[i];
+				}
+				window[i] = scopeVariables[i];
+			}
+		}
 		this._value.$$owner = target;
-		var that = this;
-		var returnValue = (function(){
-			if (scopeVariables) {
-				for (var i in scopeVariables) {
-					this[i] = scopeVariables[i];
+		var returnValue = this._value.apply(target, args);
+		delete this._value.$$owner;
+		if (scopeVariables) {
+			for (var i in scopeVariables) {
+				if (originalScopeVariables[i]) {
+					window[i] = originalScopeVariables[i];
+				} else {
+					delete window[i];
 				}
 			}
-			return that._value.apply(target, args);
-		})();
-		delete this._value.$$owner;
+		}
 		var isValidType = this._typeChecker.isValidType(
 			returnValue,
 			this._definition.getReturnTypeIdentifier()

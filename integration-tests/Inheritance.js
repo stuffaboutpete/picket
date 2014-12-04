@@ -134,7 +134,7 @@ describe('Inheritance', function(){
 		expect(myObject.myMethod()).toBe('From Child');
 	});
 	
-	xit('allows child method to call parent method', function(){
+	it('allows child method to call parent method', function(){
 		define('class My.Parent', {
 			'public myMethod () -> string': function(){
 				return 'From Parent';
@@ -147,6 +147,26 @@ describe('Inheritance', function(){
 		});
 		var myObject = new My.Child();
 		expect(myObject.myMethod()).toBe('From Parent');
+	});
+	
+	it('allows parent method to call grandparent method', function(){
+		define('class My.GrandParent', {
+			'public myMethod () -> string': function(){
+				return 'From My.GrandParent';
+			}
+		});
+		define('class My.Parent extends My.GrandParent', {
+			'public myMethod () -> string': function(){
+				return parent.myMethod();
+			}
+		});
+		define('class My.Child extends My.Parent', {
+			'public myMethod () -> string': function(){
+				return parent.myMethod();
+			}
+		});
+		var myObject = new My.Child();
+		expect(myObject.myMethod()).toBe('From My.GrandParent');
 	});
 	
 	it('allows child method to overload parent method and both are available', function(){
@@ -178,7 +198,7 @@ describe('Inheritance', function(){
 		new My.Child();
 	});
 	
-	it('ensures parent constructor is called if not child constructor exists', function(){
+	it('ensures parent constructor is called if no child constructor exists', function(){
 		define('class My.Parent', {
 			'public constructorCalled (boolean)': false,
 			'public construct () -> undefined': function(){
