@@ -67,6 +67,36 @@ describe('Events', function(){
 		expect(function(){ new My.TargetClass(eventObject); }).toThrow(expectedFatal);
 	});
 	
+	it('can exist alongside each other within class', function(){
+		define('class My.EventClass', {
+			'public event firstEvent ()': undefined,
+			'public event secondEvent (string)': undefined,
+			'public triggerEvents () -> undefined': function(){
+				this.trigger('firstEvent', []);
+				this.trigger('secondEvent', ['string']);
+			}
+		});
+		define('class My.TargetClass', {
+			'public firstTargetMethodCalls (number)': 0,
+			'public secondTargetMethodCalls (number)': 0,
+			'public construct (My.EventClass) -> undefined': function(eventObject){
+				eventObject.bind('firstEvent', 'firstTargetMethod');
+				eventObject.bind('secondEvent', 'secondTargetMethod');
+				eventObject.triggerEvents();
+			},
+			'private firstTargetMethod () -> undefined': function(){
+				this.firstTargetMethodCalls('++');
+			},
+			'private secondTargetMethod (string) -> undefined': function(){
+				this.secondTargetMethodCalls('++');
+			}
+		});
+		var eventObject = new My.EventClass();
+		var targetObject = new My.TargetClass(eventObject);
+		expect(targetObject.firstTargetMethodCalls()).toBe(1);
+		expect(targetObject.secondTargetMethodCalls()).toBe(1);
+	});
+	
 	it('include change by default', function(){
 		define('class My.EventClass', {
 			'public myProperty (boolean)': false

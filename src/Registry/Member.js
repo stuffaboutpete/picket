@@ -303,7 +303,10 @@
 		_ensureClassInstanceIsInRegistry(this, classInstance);
 		var classInstanceData = _getClassInstanceDataFromClassInstance(this, classInstance);
 		// @todo Check method isn't already registered (possibly before this point)
-		classInstanceData.eventCallbacks.push([targetObject, methodObject]);
+		if (typeof classInstanceData.eventCallbacks[name] == 'undefined') {
+			classInstanceData.eventCallbacks[name] = [];
+		}
+		classInstanceData.eventCallbacks[name].push([targetObject, methodObject]);
 	};
 	
 	_.Member.prototype.triggerEvent = function(classInstance, name, args)
@@ -332,7 +335,7 @@
 				args
 			);
 		}
-		eventObject.trigger(classInstanceData.eventCallbacks, args);
+		eventObject.trigger(classInstanceData.eventCallbacks[name] || [], args);
 	};
 	
 	_.Member.prototype.getConstant = function(classConstructor, accessInstance, name)
@@ -382,7 +385,7 @@
 		_this._classInstanceData.push({
 			classInstance:	classInstance,
 			properties:		{},
-			eventCallbacks:	[]
+			eventCallbacks:	{}
 		});
 	};
 	
