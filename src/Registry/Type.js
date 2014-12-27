@@ -164,11 +164,15 @@
 		if (!_classObjectIsRegistered(this, classObject)) {
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
-		var interfaceNames = _getClassData(this, classObject).interfaces;
 		var interfaces = [];
-		for (var i in interfaceNames) {
-			interfaces.push(this.getInterface(interfaceNames[i]));
-		}
+		do {
+			var interfaceNames = _getClassData(this, classObject).interfaces;
+			for (var i in interfaceNames) {
+				interfaces.push(this.getInterface(interfaceNames[i]));
+			}
+			var hasParent = this.hasParent(classObject);
+			if (hasParent) classObject = this.getParent(classObject);
+		} while (hasParent);
 		return interfaces;
 	};
 	
