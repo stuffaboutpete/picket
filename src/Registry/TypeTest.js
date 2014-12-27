@@ -555,4 +555,20 @@ describe('Registry.Type', function(){
 		}).toThrow(expectedFatal);
 	});
 	
+	it('will return parent interfaces within list of interfaces', function(){
+		registry.registerClass(classObject, classConstructor);
+		registry.registerClass(parentClassObject, parentClassConstructor);
+		registry.registerClassChild('My.ParentClass', classObject);
+		registry.registerInterfaceAgainstClass('My.IInterface', classObject);
+		registry.registerInterfaceAgainstClass('My.IOtherInterface', parentClassObject);
+		spyOn(registry, 'getInterface').and.callFake(function(name){
+			if (name == 'My.IInterface') return interfaceObject;
+			if (name == 'My.IOtherInterface') return interfaceObject2;
+		});
+		expect(registry.getInterfacesFromClass(classObject)).toEqual([
+			interfaceObject,
+			interfaceObject2
+		]);
+	});
+	
 });

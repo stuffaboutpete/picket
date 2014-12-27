@@ -105,4 +105,15 @@ describe('Interfaces', function(){
 		expect(function(){ new My.Class(); }).toThrow(expectedFatal);
 	});
 	
+	it('is deemed implemented if parent class implements', function(){
+		define('interface My.IInterface', [
+			'public myMethod (object) -> array'
+		]);
+		define('class My.ParentClass implements My.IInterface', {
+			'public myMethod (object) -> array': function(){}
+		});
+		define('class My.ChildClass extends My.ParentClass');
+		expect(new My.ChildClass().conformsTo('My.IInterface')).toBe(true);
+	});
+	
 });
