@@ -186,6 +186,32 @@ describe('Member.Property', function(){
 		}).toThrow(expectedFatal);
 	});
 	
+	it('returns copy of array if provided as default value', function(){
+		var defaultArray = [];
+		var property = new ClassyJS.Member.Property(
+			new ClassyJS.Member.Property.Definition('public myProperty (array)'),
+			false,
+			defaultArray,
+			typeChecker,
+			accessController
+		);
+		expect(property.getDefaultValue(targetInstance, accessInstance)).not.toBe(defaultArray);
+		expect(property.getDefaultValue(targetInstance, accessInstance)).toEqual(defaultArray);
+	});
+	
+	it('returns array copy containing original objects if provided as default value', function(){
+		var defaultContent = {};
+		var defaultArray = [defaultContent];
+		var property = new ClassyJS.Member.Property(
+			new ClassyJS.Member.Property.Definition('public myProperty (array)'),
+			false,
+			defaultArray,
+			typeChecker,
+			accessController
+		);
+		expect(property.getDefaultValue(targetInstance, accessInstance)[0]).toBe(defaultContent);
+	});
+	
 	it('checks with access controller and type checker before allowing value to be set', function(){
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('protected');
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('string');

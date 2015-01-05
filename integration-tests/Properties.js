@@ -74,6 +74,28 @@ describe('Properties', function(){
 		expect(myObject2.myProperty()).toBe('Object 2 value');
 	});
 	
+	it('have different array instances when declared as default value', function(){
+		define('class My.Class', {
+			'public array (array)': []
+		});
+		expect(new My.Class().array()).not.toBe(new My.Class().array());
+	});
+	
+	it('have different arrays containing same objects when declared as default', function(){
+		define('class My.Class', {
+			'public array (array)': [{}]
+		});
+		expect(new My.Class().array()).not.toBe(new My.Class().array());
+		expect(new My.Class().array()[0]).toBe(new My.Class().array()[0]);
+	});
+	
+	it('have same object instances when declared as default', function(){
+		define('class My.Class', {
+			'public object (object)': {}
+		});
+		expect(new My.Class().object()).toBe(new My.Class().object());
+	});
+	
 	it('can be concatenated when strings', function(){
 		define('class My.Class', {
 			'public myProperty (string)': 'start'

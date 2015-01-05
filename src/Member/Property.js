@@ -49,6 +49,13 @@
 	_.Property.prototype.getDefaultValue = function(targetInstance, accessInstance)
 	{
 		_requestAccess(this, targetInstance, accessInstance);
+		if (Object.prototype.toString.call(this._defaultValue) == '[object Array]') {
+			var newArray = [];
+			for (var i = 0; i < this._defaultValue.length; i++) {
+				newArray.push(this._defaultValue[i]);
+			}
+			return newArray;
+		}
 		return this._defaultValue;
 	};
 	
