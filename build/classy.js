@@ -1028,6 +1028,13 @@
 	_.Property.prototype.getDefaultValue = function(targetInstance, accessInstance)
 	{
 		_requestAccess(this, targetInstance, accessInstance);
+		if (Object.prototype.toString.call(this._defaultValue) == '[object Array]') {
+			var newArray = [];
+			for (var i = 0; i < this._defaultValue.length; i++) {
+				newArray.push(this._defaultValue[i]);
+			}
+			return newArray;
+		}
 		return this._defaultValue;
 	};
 	
@@ -2793,6 +2800,7 @@
 				originalClassInstance || classInstance
 			);
 		}
+		_ensureClassInstanceIsInRegistry(this, classInstance);
 		var classInstanceData = _getClassInstanceDataFromClassInstance(this, classInstance);
 		var classObject = _getClassObjectFromInstanceOrConstructor(this, classInstance);
 		try {
@@ -2817,7 +2825,9 @@
 				classInstanceData.properties[name]
 			);
 		}
-		return property.getDefaultValue(originalClassInstance, accessInstance);
+		var defaultValue = property.getDefaultValue(originalClassInstance, accessInstance);
+		classInstanceData.properties[name] = defaultValue;
+		return defaultValue;
 	};
 	
 	_.Member.prototype.callMethod = function(
