@@ -237,6 +237,21 @@
 		throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 	};
 	
+	_.Type.prototype.isSameObject = function(instance1, instance2)
+	{
+		for (var i = 0; i < this._instances.length; i++) {
+			for (var j = 0; j < this._instances[i].length; j++) {
+				if (this._instances[i][j] !== instance1) continue;
+				for (var k = 0; k < this._instances[i].length; k++) {
+					if (j == k) continue;
+					if (this._instances[i][k] === instance2) return true;
+				}
+				return false;
+			}
+		}
+		return false;
+	};
+	
 	_.Type.prototype.getInstantiatedInstance = function(classInstance)
 	{
 		if (typeof classInstance != 'object') {

@@ -148,12 +148,21 @@
 		
 		namespace[className].prototype.get = function(name)
 		{
-			return memberRegistry.getPropertyValue(this, {}, name);
+			return memberRegistry.getPropertyValue(
+				this,
+				arguments.callee.caller.caller.$$owner,
+				name
+			);
 		};
 		
 		namespace[className].prototype.set = function(name, value)
 		{
-			memberRegistry.setPropertyValue(this, {}, name, value);
+			memberRegistry.setPropertyValue(
+				this,
+				arguments.callee.caller.caller.$$owner,
+				name,
+				value
+			);
 		};
 		
 		namespace[className].prototype.bind = function(name, targetMethod)

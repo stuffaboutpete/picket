@@ -122,7 +122,12 @@
 			this._definition.getArgumentTypeIdentifiers()
 		);
 		if (areValid !== true) throw new _.Event.Fatal('INVALID_ARGUMENTS');
-		for (var i in callbacks) callbacks[i][1].call(callbacks[i][0], callbacks[i][0], arguments);
+		for (var i in callbacks) callbacks[i][1].call(
+			callbacks[i][0],
+			callbacks[i][0],
+			callbacks[i][0],
+			arguments
+		);
 	};
 	
 })(

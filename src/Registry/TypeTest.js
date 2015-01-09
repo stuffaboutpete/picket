@@ -441,6 +441,31 @@ describe('Registry.Type', function(){
 		}).toThrow(expectedFatal);
 	});
 	
+	it('will identify parent instance as part of same object', function(){
+		var classInstance = [new classConstructor(), new parentClassConstructor()];
+		registry.registerClass(classObject, classConstructor);
+		registry.registerClass(parentClassObject, parentClassConstructor);
+		registry.registerClassChild('My.ParentClass', classObject);
+		registry.registerClassInstance(classInstance);
+		expect(registry.isSameObject(
+			classInstance[0],
+			classInstance[1]
+		)).toBe(true);
+		expect(registry.isSameObject(
+			classInstance[1],
+			classInstance[0]
+		)).toBe(true);
+	});
+	
+	it('will not identify unrelated instances as same object', function(){
+		registry.registerClass(classObject, classConstructor);
+		registry.registerClass(parentClassObject, parentClassConstructor);
+		expect(registry.isSameObject(
+			new classConstructor(),
+			new parentClassConstructor()
+		)).toBe(false);
+	});
+	
 	it('will return instantiated class instance', function(){
 		var classInstance = [
 			new classConstructor(),

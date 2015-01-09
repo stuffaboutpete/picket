@@ -12,7 +12,11 @@ describe('Member.Property', function(){
 	beforeEach(function(){
 		definition = new ClassyJS.Member.Property.Definition('public myProperty (string)');
 		typeChecker = new ClassyJS.TypeChecker();
-		accessController = new ClassyJS.Access.Controller();
+		accessController = new ClassyJS.Access.Controller(
+			new ClassyJS.Registry.Type(
+				new ClassyJS.NamespaceManager()
+			)
+		);
 		property = new ClassyJS.Member.Property(
 			definition,
 			false,
@@ -164,16 +168,6 @@ describe('Member.Property', function(){
 		}).toThrow(expectedFatal);
 	});
 	
-	it('throws error if default value is requested with non-object access instance', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
-			'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-			'Provided type: undefined'
-		);
-		expect(function(){
-			property.getDefaultValue(targetInstance);
-		}).toThrow(expectedFatal);
-	});
-	
 	it('throws error if access controller does not permit access to default value', function(){
 		var expectedFatal = new ClassyJS.Member.Property.Fatal(
 			'ACCESS_NOT_ALLOWED',
@@ -236,16 +230,6 @@ describe('Member.Property', function(){
 		}).toThrow(expectedFatal);
 	});
 	
-	it('throws error if value is set with non-object access instance', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
-			'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-			'Provided type: undefined'
-		);
-		expect(function(){
-			property.set(targetInstance, undefined, 'Value');
-		}).toThrow(expectedFatal);
-	});
-	
 	it('allows value to be set to undefined', function(){
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('protected');
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('string');
@@ -303,16 +287,6 @@ describe('Member.Property', function(){
 		);
 		expect(function(){
 			property.get(function(){}, accessInstance, 'Value');
-		}).toThrow(expectedFatal);
-	});
-	
-	it('throws error if get value is requested with non-object access instance', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
-			'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-			'Provided type: number'
-		);
-		expect(function(){
-			property.get(targetInstance, 123, 'Value');
 		}).toThrow(expectedFatal);
 	});
 	

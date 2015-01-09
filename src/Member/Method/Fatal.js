@@ -8,6 +8,8 @@
 		NULL_ARGUMENT_TYPE: 'Arguments cannot be defined as type null',
 		NON_OBJECT_OR_CONSTRUCTOR_TARGET_PROVIDED:
 			'Argument provided as property owner must be an object or constructor',
+		NON_OBJECT_OR_CONSTRUCTOR_LOCAL_TARGET_PROVIDED:
+			'Argument provided as property local owner must be an object or constructor',
 		NON_OBJECT_ACCESS_INSTANCE_PROVIDED:
 			'Instance provided as accessing property must be an object',
 		NON_ARRAY_ARGUMENTS_PROVIDED:

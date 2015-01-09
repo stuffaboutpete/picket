@@ -5,12 +5,17 @@ describe('Member.Method', function(){
 	var typeChecker;
 	var accessController;
 	var methodOwnerInstance;
+	var methodLocalOwnerInstance;
 	var accessInstance;
 	
 	beforeEach(function(){
 		definition = new ClassyJS.Member.Method.Definition('public myMethod () -> undefined');
 		typeChecker = new ClassyJS.TypeChecker();
-		accessController = new ClassyJS.Access.Controller();
+		accessController = new ClassyJS.Access.Controller(
+			new ClassyJS.Registry.Type(
+				new ClassyJS.NamespaceManager()
+			)
+		);
 		method = new ClassyJS.Member.Method(
 			definition,
 			false,
@@ -19,6 +24,7 @@ describe('Member.Method', function(){
 			accessController
 		);
 		methodOwnerInstance = {};
+		methodLocalOwnerInstance = {};
 		accessInstance = {};
 	});
 	
@@ -144,7 +150,10 @@ describe('Member.Method', function(){
 	
 	it('throws error if any argument type is undefined', function(){
 		var expectedFatal = new ClassyJS.Member.Method.Fatal('NULL_ARGUMENT_TYPE');
-		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'null', 'string']);
+		spyOn(
+			definition,
+			'getArgumentTypeIdentifiers'
+		).and.returnValue(['string', 'null', 'string']);
 		expect(function(){
 			new ClassyJS.Member.Method(
 				definition,
@@ -189,7 +198,17 @@ describe('Member.Method', function(){
 			'Provided type: undefined'
 		);
 		expect(function(){
-			method.call(undefined, accessInstance, []);
+			method.call(undefined, methodLocalOwnerInstance, accessInstance, []);
+		}).toThrow(expectedFatal);
+	});
+	
+	it('throws error if called with non-object or function local target', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+			'NON_OBJECT_OR_CONSTRUCTOR_LOCAL_TARGET_PROVIDED',
+			'Provided type: undefined'
+		);
+		expect(function(){
+			method.call(methodOwnerInstance, undefined, accessInstance, []);
 		}).toThrow(expectedFatal);
 	});
 	
@@ -199,7 +218,7 @@ describe('Member.Method', function(){
 			'Provided type: undefined'
 		);
 		expect(function(){
-			method.call(methodOwnerInstance, undefined, []);
+			method.call(methodOwnerInstance, methodLocalOwnerInstance, undefined, []);
 		}).toThrow(expectedFatal);
 	});
 	
@@ -209,14 +228,14 @@ describe('Member.Method', function(){
 			'Provided type: undefined'
 		);
 		expect(function(){
-			method.call(methodOwnerInstance, accessInstance);
+			method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance);
 		}).toThrow(expectedFatal);
 	});
 	
 	it('checks with access controller on call', function(){
 		spyOn(accessController, 'canAccess').and.returnValue(true);
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('public');
-		method.call(methodOwnerInstance, accessInstance, []);
+		method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance, []);
 		expect(accessController.canAccess).toHaveBeenCalledWith(
 			methodOwnerInstance,
 			accessInstance,
@@ -230,7 +249,7 @@ describe('Member.Method', function(){
 		spyOn(accessController, 'canAccess').and.returnValue(false);
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('public');
 		expect(function(){
-			method.call(methodOwnerInstance, accessInstance, []);
+			method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance, []);
 		}).toThrow(expectedFatal);
 	});
 	
@@ -238,7 +257,12 @@ describe('Member.Method', function(){
 		spyOn(accessController, 'canAccess').and.returnValue(true);
 		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'number']);
 		spyOn(typeChecker, 'areValidTypes').and.returnValue(true);
-		method.call(methodOwnerInstance, accessInstance, ['Example', 123]);
+		method.call(
+			methodOwnerInstance,
+			methodLocalOwnerInstance,
+			accessInstance,
+			['Example', 123]
+		);
 		expect(typeChecker.areValidTypes).toHaveBeenCalledWith(
 			['Example', 123],
 			['string', 'number']
@@ -251,7 +275,7 @@ describe('Member.Method', function(){
 		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue([]);
 		spyOn(typeChecker, 'areValidTypes').and.returnValue(false);
 		expect(function(){
-			method.call(methodOwnerInstance, accessInstance, []);
+			method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance, []);
 		}).toThrow(expectedFatal);
 	});
 	
@@ -267,7 +291,12 @@ describe('Member.Method', function(){
 		spyOn(typeChecker, 'areValidTypes').and.returnValue(true);
 		spyOn(typeChecker, 'isValidType').and.returnValue(true);
 		spyOn(definition, 'getReturnTypeIdentifier').and.returnValue('string');
-		method.call(methodOwnerInstance, accessInstance, ['Example', 123]);
+		method.call(
+			methodOwnerInstance,
+			methodLocalOwnerInstance,
+			accessInstance,
+			['Example', 123]
+		);
 		expect(typeChecker.isValidType).toHaveBeenCalledWith('Return', 'string');
 	});
 	
@@ -288,7 +317,7 @@ describe('Member.Method', function(){
 		spyOn(typeChecker, 'isValidType').and.returnValue(false);
 		spyOn(definition, 'getReturnTypeIdentifier').and.returnValue('number');
 		expect(function(){
-			method.call(methodOwnerInstance, accessInstance, []);
+			method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance, []);
 		}).toThrow(expectedFatal);
 	});
 	
@@ -303,7 +332,12 @@ describe('Member.Method', function(){
 		spyOn(accessController, 'canAccess').and.returnValue(true);
 		spyOn(typeChecker, 'areValidTypes').and.returnValue(true);
 		spyOn(typeChecker, 'isValidType').and.returnValue(true);
-		expect(method.call(methodOwnerInstance, accessInstance, [])).toBe('Return');
+		expect(method.call(
+			methodOwnerInstance,
+			methodLocalOwnerInstance,
+			accessInstance,
+			[]
+		)).toBe('Return');
 	});
 	
 	it('binds owner instance to this within method implementation', function(){
@@ -317,7 +351,12 @@ describe('Member.Method', function(){
 		spyOn(accessController, 'canAccess').and.returnValue(true);
 		spyOn(typeChecker, 'areValidTypes').and.returnValue(true);
 		spyOn(typeChecker, 'isValidType').and.returnValue(true);
-		expect(method.call(methodOwnerInstance, accessInstance, [])).toBe(methodOwnerInstance);
+		expect(method.call(
+			methodOwnerInstance,
+			methodLocalOwnerInstance,
+			accessInstance,
+			[]
+		)).toBe(methodOwnerInstance);
 	});
 	
 	it('passes arguments to method implementation', function(){
@@ -333,6 +372,7 @@ describe('Member.Method', function(){
 		spyOn(typeChecker, 'isValidType').and.returnValue(true);
 		expect(method.call(
 			methodOwnerInstance,
+			methodLocalOwnerInstance,
 			accessInstance,
 			['One', 'Two', 'Three']
 		)).toEqual(['One', 'Two', 'Three']);
@@ -349,7 +389,7 @@ describe('Member.Method', function(){
 			accessController
 		);
 		expect(function(){
-			method.call(methodOwnerInstance, accessInstance, []);
+			method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance, []);
 		}).toThrow(expectedFatal);
 	});
 	
@@ -363,7 +403,7 @@ describe('Member.Method', function(){
 			accessController
 		);
 		expect(function(){
-			method.call(methodOwnerInstance, accessInstance, []);
+			method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance, []);
 		}).toThrow(expectedFatal);
 	});
 	
@@ -379,7 +419,7 @@ describe('Member.Method', function(){
 			typeChecker,
 			accessController
 		);
-		method.call(methodOwnerInstance, accessInstance, [], {
+		method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance, [], {
 			example1: 'Value 1',
 			example2: 'Value 2'
 		});
@@ -391,7 +431,13 @@ describe('Member.Method', function(){
 			'Provided type: string'
 		);
 		expect(function(){
-			method.call(methodOwnerInstance, accessInstance, [], 'string');
+			method.call(
+				methodOwnerInstance,
+				methodLocalOwnerInstance,
+				accessInstance,
+				[],
+				'string'
+			);
 		}).toThrow(expectedFatal);
 	});
 	

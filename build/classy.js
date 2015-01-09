@@ -190,33 +190,33 @@
 	window.ClassyJS.TypeChecker = window.ClassyJS.TypeChecker || {}
 );
 
-;(function(ClassyJS, _){
+// ;(function(ClassyJS, _){
 	
-	_.Type = function(level)
-	{
-		if (typeof level != 'string') {
-			throw new _.Type.Fatal('NON_STRING_IDENTIFIER');
-		}
-		if (['public', 'protected', 'private'].indexOf(level) == -1) {
-			throw new _.Type.Fatal('INVALID_IDENTIFIER');
-		}
-		this._level = level;
-	};
+// 	_.Type = function(level)
+// 	{
+// 		if (typeof level != 'string') {
+// 			throw new _.Type.Fatal('NON_STRING_IDENTIFIER');
+// 		}
+// 		if (['public', 'protected', 'private'].indexOf(level) == -1) {
+// 			throw new _.Type.Fatal('INVALID_IDENTIFIER');
+// 		}
+// 		this._level = level;
+// 	};
 	
-	_.Type.prototype.childAllowed = function()
-	{
-		return (this._level != 'private');
-	};
+// 	_.Type.prototype.childAllowed = function()
+// 	{
+// 		return (this._level != 'private');
+// 	};
 	
-	_.Type.prototype.allAllowed = function()
-	{
-		return (this._level == 'public');
-	};
+// 	_.Type.prototype.allAllowed = function()
+// 	{
+// 		return (this._level == 'public');
+// 	};
 	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Access = window.ClassyJS.Access || {}
-);
+// })(
+// 	window.ClassyJS = window.ClassyJS || {},
+// 	window.ClassyJS.Access = window.ClassyJS.Access || {}
+// );
 
 ;(function(ClassyJS, Access, _){
 	
@@ -236,13 +236,76 @@
 
 ;(function(ClassyJS, _){
 	
-	_.Controller = function(){};
+	_.Controller = function(typeRegistry)
+	{
+		if (!(typeRegistry instanceof ClassyJS.Registry.Type)) {
+			throw new _.Controller.Fatal(
+				'NO_TYPE_REGISTRY_PROVIDED',
+				'Provided type: ' + typeof typeRegistry
+			);
+		}
+		this._typeRegistry = typeRegistry;
+	};
 	
-	_.Controller.prototype.canAccess = function(){ return true; };
+	_.Controller.prototype.canAccess = function(target, accessObject, identifier)
+	{
+		if (typeof target != 'object' && typeof target != 'function') {
+			throw new _.Controller.Fatal(
+				'TARGET_NOT_INSTANCE_OR_CONSTRUCTOR',
+				'Provided type: ' + typeof target
+			);
+		}
+		if (typeof accessObject != 'object' && typeof accessObject != 'function' && accessObject !== undefined) {
+			throw new _.Controller.Fatal(
+				'ACCESS_OBJECT_NOT_INSTANCE_OR_CONSTRUCTOR_OR_UNDEFINED',
+				'Provided type: ' + typeof accessObject
+			);
+		}
+		if (typeof identifier != 'string') {
+			throw new _.Controller.Fatal(
+				'ACCESS_IDENTIFIER_NOT_STRING',
+				'Provided type: ' + typeof identifier
+			);
+		}
+		if (['public', 'private', 'protected'].indexOf(identifier) < 0) {
+			throw new _.Controller.Fatal(
+				'ACCESS_IDENTIFIER_NOT_VALID_STRING',
+				'Provided identifier: ' + identifier
+			);
+		}
+		if (identifier == 'public') return true;
+		if (!accessObject) return false;
+		if (target === accessObject) return true;
+		if (identifier == 'private') return false;
+		return this._typeRegistry.isSameObject(target, accessObject);
+	};
 	
 })(
 	window.ClassyJS = window.ClassyJS || {},
 	window.ClassyJS.Access = window.ClassyJS.Access || {}
+);
+
+;(function(ClassyJS, Access, _){
+	
+	var messages = {
+		NO_TYPE_REGISTRY_PROVIDED:
+			'An instance of ClassyJS.Registry.Type must be provided to the constructor',
+		TARGET_NOT_INSTANCE_OR_CONSTRUCTOR:
+			'Provided target object should either be an object instance or constructor function',
+		ACCESS_OBJECT_NOT_INSTANCE_OR_CONSTRUCTOR_OR_UNDEFINED:
+			'Provided access object must be a class instance or constructor or undefined',
+		ACCESS_IDENTIFIER_NOT_STRING: 'Provided access identifier must be a string',
+		ACCESS_IDENTIFIER_NOT_VALID_STRING:
+			'Provided access identifier must be one of the ' +
+			'strings \'public\', \'private\' or \'protected\''
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Access.Controller.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Access = window.ClassyJS.Access || {},
+	window.ClassyJS.Access.Controller = window.ClassyJS.Access.Controller || {}
 );
 
 (function(ClassyJS, _){
@@ -471,12 +534,21 @@
 		
 		namespace[className].prototype.get = function(name)
 		{
-			return memberRegistry.getPropertyValue(this, {}, name);
+			return memberRegistry.getPropertyValue(
+				this,
+				arguments.callee.caller.caller.$$owner,
+				name
+			);
 		};
 		
 		namespace[className].prototype.set = function(name, value)
 		{
-			memberRegistry.setPropertyValue(this, {}, name, value);
+			memberRegistry.setPropertyValue(
+				this,
+				arguments.callee.caller.caller.$$owner,
+				name,
+				value
+			);
 		};
 		
 		namespace[className].prototype.bind = function(name, targetMethod)
@@ -1065,12 +1137,6 @@
 				'Provided type: ' + typeof targetInstance
 			);
 		}
-		if (typeof accessInstance != 'object') {
-			throw new _.Property.Fatal(
-				'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-				'Provided type: ' + typeof accessInstance
-			);
-		}
 		var accessType = _this._definition.getAccessTypeIdentifier();
 		var canAccess = _this._accessController.canAccess(
 			targetInstance,
@@ -1309,13 +1375,19 @@
 		return this._isAbstract;
 	};
 	
-	_.Method.prototype.call = function(target, accessInstance, args, scopeVariables)
+	_.Method.prototype.call = function(target, localTarget, accessInstance, args, scopeVariables)
 	{
 		if (this._isAbstract) throw new _.Method.Fatal('INTERACTION_WITH_ABSTRACT');
 		if (typeof target != 'object' && typeof target != 'function') {
 			throw new _.Method.Fatal(
 				'NON_OBJECT_OR_CONSTRUCTOR_TARGET_PROVIDED',
 				'Provided type: ' + typeof target
+			);
+		}
+		if (typeof localTarget != 'object' && typeof localTarget != 'function') {
+			throw new _.Method.Fatal(
+				'NON_OBJECT_OR_CONSTRUCTOR_LOCAL_TARGET_PROVIDED',
+				'Provided type: ' + typeof localTarget
 			);
 		}
 		if (typeof accessInstance != 'object') {
@@ -1354,8 +1426,10 @@
 			}
 		}
 		this._value.$$owner = target;
+		this._value.$$localOwner = localTarget;
 		var returnValue = this._value.apply(target, args);
 		delete this._value.$$owner;
+		delete this._value.$$localOwner;
 		if (scopeVariables) {
 			for (var i in scopeVariables) {
 				if (originalScopeVariables[i]) {
@@ -1524,6 +1598,8 @@
 		NULL_ARGUMENT_TYPE: 'Arguments cannot be defined as type null',
 		NON_OBJECT_OR_CONSTRUCTOR_TARGET_PROVIDED:
 			'Argument provided as property owner must be an object or constructor',
+		NON_OBJECT_OR_CONSTRUCTOR_LOCAL_TARGET_PROVIDED:
+			'Argument provided as property local owner must be an object or constructor',
 		NON_OBJECT_ACCESS_INSTANCE_PROVIDED:
 			'Instance provided as accessing property must be an object',
 		NON_ARRAY_ARGUMENTS_PROVIDED:
@@ -1671,7 +1747,12 @@
 			this._definition.getArgumentTypeIdentifiers()
 		);
 		if (areValid !== true) throw new _.Event.Fatal('INVALID_ARGUMENTS');
-		for (var i in callbacks) callbacks[i][1].call(callbacks[i][0], callbacks[i][0], arguments);
+		for (var i in callbacks) callbacks[i][1].call(
+			callbacks[i][0],
+			callbacks[i][0],
+			callbacks[i][0],
+			arguments
+		);
 	};
 	
 })(
@@ -2577,6 +2658,21 @@
 		throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 	};
 	
+	_.Type.prototype.isSameObject = function(instance1, instance2)
+	{
+		for (var i = 0; i < this._instances.length; i++) {
+			for (var j = 0; j < this._instances[i].length; j++) {
+				if (this._instances[i][j] !== instance1) continue;
+				for (var k = 0; k < this._instances[i].length; k++) {
+					if (j == k) continue;
+					if (this._instances[i][k] === instance2) return true;
+				}
+				return false;
+			}
+		}
+		return false;
+	};
+	
 	_.Type.prototype.getInstantiatedInstance = function(classInstance)
 	{
 		if (typeof classInstance != 'object') {
@@ -2857,14 +2953,6 @@
 			);
 		}
 		var shouldBeStatic = (typeof callTarget == 'function') ? true : false;
-		// if (!shouldBeStatic && arguments.callee.caller != this.callMethod) {
-		// 	return this.callMethod(
-		// 		this._typeRegistry.getInstantiatedInstance(callTarget),
-		// 		accessInstance,
-		// 		name,
-		// 		args
-		// 	);
-		// }
 		var classObject = _getClassObjectFromInstanceOrConstructor(this, callTarget);
 		var methods = _getAllMethodsByName(this, classObject, name);
 		for (var i = 0; i < methods.length; i++) {
@@ -2872,12 +2960,14 @@
 			if (args.length != argumentTypes.length) continue;
 			if (shouldBeStatic != methods[i].isStatic()) continue;
 			if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
-			callTarget = finalCallTarget || callTarget;
-			if (this._typeRegistry.hasParent(callTarget)) {
-				var scopeVariables = { parent: this._typeRegistry.getParent(callTarget) };
+			if (this._typeRegistry.hasParent(finalCallTarget || callTarget)) {
+				var scopeVariables = {
+					parent: this._typeRegistry.getParent(finalCallTarget || callTarget)
+				};
 			}
 			return methods[i].call(
 				finalCallTarget || callTarget,
+				callTarget,
 				accessInstance,
 				args,
 				scopeVariables
@@ -3587,7 +3677,9 @@
 	_.Instantiator.prototype.getAccessController = function()
 	{
 		if (!this._accessController) {
-			this._accessController = new ClassyJS.Access.Controller();
+			this._accessController = new ClassyJS.Access.Controller(
+				this.getTypeRegistry()
+			);
 		}
 		return this._accessController;
 	};

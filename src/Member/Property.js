@@ -86,12 +86,6 @@
 				'Provided type: ' + typeof targetInstance
 			);
 		}
-		if (typeof accessInstance != 'object') {
-			throw new _.Property.Fatal(
-				'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-				'Provided type: ' + typeof accessInstance
-			);
-		}
 		var accessType = _this._definition.getAccessTypeIdentifier();
 		var canAccess = _this._accessController.canAccess(
 			targetInstance,

@@ -219,7 +219,9 @@
 	_.Instantiator.prototype.getAccessController = function()
 	{
 		if (!this._accessController) {
-			this._accessController = new ClassyJS.Access.Controller();
+			this._accessController = new ClassyJS.Access.Controller(
+				this.getTypeRegistry()
+			);
 		}
 		return this._accessController;
 	};
