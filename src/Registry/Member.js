@@ -197,14 +197,6 @@
 			);
 		}
 		var shouldBeStatic = (typeof callTarget == 'function') ? true : false;
-		// if (!shouldBeStatic && arguments.callee.caller != this.callMethod) {
-		// 	return this.callMethod(
-		// 		this._typeRegistry.getInstantiatedInstance(callTarget),
-		// 		accessInstance,
-		// 		name,
-		// 		args
-		// 	);
-		// }
 		var classObject = _getClassObjectFromInstanceOrConstructor(this, callTarget);
 		var methods = _getAllMethodsByName(this, classObject, name);
 		for (var i = 0; i < methods.length; i++) {
