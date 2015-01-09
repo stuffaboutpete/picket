@@ -212,12 +212,14 @@
 			if (args.length != argumentTypes.length) continue;
 			if (shouldBeStatic != methods[i].isStatic()) continue;
 			if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
-			callTarget = finalCallTarget || callTarget;
-			if (this._typeRegistry.hasParent(callTarget)) {
-				var scopeVariables = { parent: this._typeRegistry.getParent(callTarget) };
+			if (this._typeRegistry.hasParent(finalCallTarget || callTarget)) {
+				var scopeVariables = {
+					parent: this._typeRegistry.getParent(finalCallTarget || callTarget)
+				};
 			}
 			return methods[i].call(
 				finalCallTarget || callTarget,
+				callTarget,
 				accessInstance,
 				args,
 				scopeVariables

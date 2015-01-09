@@ -71,13 +71,19 @@
 		return this._isAbstract;
 	};
 	
-	_.Method.prototype.call = function(target, accessInstance, args, scopeVariables)
+	_.Method.prototype.call = function(target, localTarget, accessInstance, args, scopeVariables)
 	{
 		if (this._isAbstract) throw new _.Method.Fatal('INTERACTION_WITH_ABSTRACT');
 		if (typeof target != 'object' && typeof target != 'function') {
 			throw new _.Method.Fatal(
 				'NON_OBJECT_OR_CONSTRUCTOR_TARGET_PROVIDED',
 				'Provided type: ' + typeof target
+			);
+		}
+		if (typeof localTarget != 'object' && typeof localTarget != 'function') {
+			throw new _.Method.Fatal(
+				'NON_OBJECT_OR_CONSTRUCTOR_LOCAL_TARGET_PROVIDED',
+				'Provided type: ' + typeof localTarget
 			);
 		}
 		if (typeof accessInstance != 'object') {
@@ -116,8 +122,10 @@
 			}
 		}
 		this._value.$$owner = target;
+		this._value.$$localOwner = localTarget;
 		var returnValue = this._value.apply(target, args);
 		delete this._value.$$owner;
+		delete this._value.$$localOwner;
 		if (scopeVariables) {
 			for (var i in scopeVariables) {
 				if (originalScopeVariables[i]) {

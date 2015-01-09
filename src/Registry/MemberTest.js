@@ -22,7 +22,7 @@ describe('Registry.Member', function(){
 	beforeEach(function(){
 		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
 		typeChecker = new ClassyJS.TypeChecker();
-		accessController = new ClassyJS.Access.Controller();
+		accessController = new ClassyJS.Access.Controller(typeRegistry);
 		registry = new ClassyJS.Registry.Member(typeRegistry, typeChecker);
 		classObject = new ClassyJS.Type.Class(
 			new ClassyJS.Type.Class.Definition('class MyClass'),
@@ -530,6 +530,7 @@ describe('Registry.Member', function(){
 			registry.callMethod(classInstance, accessInstance, 'myMethod', ['arg1', 'arg2']);
 			expect(methodObject.call).toHaveBeenCalledWith(
 				classInstance,
+				classInstance,
 				accessInstance,
 				['arg1', 'arg2'],
 				undefined
@@ -640,6 +641,7 @@ describe('Registry.Member', function(){
 			spyOn(methodObject, 'call');
 			registry.callMethod(classConstructor, accessInstance, 'myMethod', [1, 2, 3]);
 			expect(methodObject.call).toHaveBeenCalledWith(
+				classConstructor,
 				classConstructor,
 				accessInstance,
 				[1, 2, 3],
@@ -1182,6 +1184,7 @@ describe('Registry.Member', function(){
 			)).toBe('Method 1 return value');
 			expect(methodObject.call).toHaveBeenCalledWith(
 				parentClassInstance,
+				childClassInstance, // ???????
 				accessInstance,
 				[],
 				{ parent: grandParentClassInstance }
@@ -1233,6 +1236,7 @@ describe('Registry.Member', function(){
 			);
 			expect(methodObject.call).toHaveBeenCalledWith(
 				childClassInstance,
+				parentClassInstance,
 				accessInstance,
 				[],
 				{ parent: parentClassInstance }
@@ -1361,6 +1365,7 @@ describe('Registry.Member', function(){
 			)).toBe('Method 2 return value');
 			expect(methodObject.call).not.toHaveBeenCalled();
 			expect(methodObject2.call).toHaveBeenCalledWith(
+				parentClassConstructor,
 				parentClassConstructor,
 				accessInstance,
 				[],

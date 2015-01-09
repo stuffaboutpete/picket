@@ -10,7 +10,11 @@ describe('Member.Constant', function(){
 	beforeEach(function(){
 		definition = new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT');
 		typeChecker = new ClassyJS.TypeChecker();
-		accessController = new ClassyJS.Access.Controller();
+		accessController = new ClassyJS.Access.Controller(
+			new ClassyJS.Registry.Type(
+				new ClassyJS.NamespaceManager()
+			)
+		);
 		constant = new ClassyJS.Member.Constant(
 			definition,
 			false,

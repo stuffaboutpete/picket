@@ -33,7 +33,11 @@ describe('Member.Factory', function(){
 		eventDefinition = new ClassyJS.Member.Event.Definition('public event myEvent()');
 		constantDefinition = new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT');
 		typeChecker = new ClassyJS.TypeChecker();
-		accessController = new ClassyJS.Access.Controller();
+		accessController = new ClassyJS.Access.Controller(
+			new ClassyJS.Registry.Type(
+				new ClassyJS.NamespaceManager()
+			)
+		);
 		factory = new ClassyJS.Member.Factory(
 			definitionFactory,
 			propertyFactory,

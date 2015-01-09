@@ -24,6 +24,7 @@ gulp.task('build', function(){
 			'./src/Access/Type.js',
 			'./src/Access/Type/Fatal.js',
 			'./src/Access/Controller.js',
+			'./src/Access/Controller/Fatal.js',
 			'./src/Type/Class.js',
 			'./src/Type/Class/Constructor.js',
 			'./src/Type/Class/Constructor/Fatal.js',

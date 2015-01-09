@@ -14,7 +14,11 @@ describe('Member.Event', function(){
 	beforeEach(function(){
 		definition = new ClassyJS.Member.Event.Definition('public event myEvent ()');
 		typeChecker = new ClassyJS.TypeChecker();
-		accessController = new ClassyJS.Access.Controller();
+		accessController = new ClassyJS.Access.Controller(
+			new ClassyJS.Registry.Type(
+				new ClassyJS.NamespaceManager()
+			)
+		);
 		eventObject = new ClassyJS.Member.Event(
 			definition,
 			false,
@@ -325,6 +329,7 @@ describe('Member.Event', function(){
 		expect(methodObject.call).toHaveBeenCalledWith(
 			eventBinderInstance,
 			eventBinderInstance,
+			eventBinderInstance,
 			arguments
 		);
 	});
@@ -345,9 +350,11 @@ describe('Member.Event', function(){
 		expect(methodObject.call).toHaveBeenCalledWith(
 			eventBinderInstance,
 			eventBinderInstance,
+			eventBinderInstance,
 			arguments
 		);
 		expect(methodObject2.call).toHaveBeenCalledWith(
+			eventBinderInstance2,
 			eventBinderInstance2,
 			eventBinderInstance2,
 			arguments
