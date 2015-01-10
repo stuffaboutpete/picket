@@ -1054,7 +1054,7 @@ describe('Registry.Member', function(){
 				'myProperty'
 			)).toBe('Value');
 			expect(propertyObject.set).toHaveBeenCalledWith(
-				parentClassInstance,
+				childClassInstance,
 				accessInstance,
 				'Value'
 			);

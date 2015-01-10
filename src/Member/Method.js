@@ -86,12 +86,6 @@
 				'Provided type: ' + typeof localTarget
 			);
 		}
-		if (typeof accessInstance != 'object') {
-			throw new _.Method.Fatal(
-				'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-				'Provided type: ' + typeof accessInstance
-			);
-		}
 		if (Object.prototype.toString.call(args) != '[object Array]') {
 			throw new _.Method.Fatal(
 				'NON_ARRAY_ARGUMENTS_PROVIDED',
@@ -105,7 +99,7 @@
 			);
 		}
 		var canAccess = this._accessController.canAccess(
-			target,
+			localTarget,
 			accessInstance,
 			this._definition.getAccessTypeIdentifier()
 		);

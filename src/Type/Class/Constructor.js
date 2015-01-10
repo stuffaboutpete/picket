@@ -38,7 +38,7 @@
 			
 			_appendMemberNames(properties, methods, classObject);
 			
-			if (typeRegistry.hasParent(classObject)) {
+			if (isInstantiatedObject && typeRegistry.hasParent(classObject)) {
 				
 				var parentConstructors = [];
 				var childObject = classObject;
@@ -124,7 +124,7 @@
 					return function(){
 						return memberRegistry.callMethod(
 							this,
-							{},
+							arguments.callee.caller.$$localOwner,
 							name,
 							Array.prototype.slice.call(arguments, 0)
 						);
@@ -150,7 +150,7 @@
 		{
 			return memberRegistry.getPropertyValue(
 				this,
-				arguments.callee.caller.caller.$$owner,
+				arguments.callee.caller.caller.$$localOwner,
 				name
 			);
 		};
@@ -159,7 +159,7 @@
 		{
 			memberRegistry.setPropertyValue(
 				this,
-				arguments.callee.caller.caller.$$owner,
+				arguments.callee.caller.caller.$$localOwner,
 				name,
 				value
 			);
