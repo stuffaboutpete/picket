@@ -190,50 +190,6 @@
 	window.ClassyJS.TypeChecker = window.ClassyJS.TypeChecker || {}
 );
 
-// ;(function(ClassyJS, _){
-	
-// 	_.Type = function(level)
-// 	{
-// 		if (typeof level != 'string') {
-// 			throw new _.Type.Fatal('NON_STRING_IDENTIFIER');
-// 		}
-// 		if (['public', 'protected', 'private'].indexOf(level) == -1) {
-// 			throw new _.Type.Fatal('INVALID_IDENTIFIER');
-// 		}
-// 		this._level = level;
-// 	};
-	
-// 	_.Type.prototype.childAllowed = function()
-// 	{
-// 		return (this._level != 'private');
-// 	};
-	
-// 	_.Type.prototype.allAllowed = function()
-// 	{
-// 		return (this._level == 'public');
-// 	};
-	
-// })(
-// 	window.ClassyJS = window.ClassyJS || {},
-// 	window.ClassyJS.Access = window.ClassyJS.Access || {}
-// );
-
-;(function(ClassyJS, Access, _){
-	
-	var messages = {
-		NON_STRING_IDENTIFIER:	'Provided identifier must be a string',
-		INVALID_IDENTIFIER:		'Provided identifier must be one of ' +
-			'\'public\', \'protected\' or \'private\''
-	};
-	
-	_.Fatal = ClassyJS.Fatal.getFatal('Access.Type.Fatal', messages);
-	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Access = window.ClassyJS.Access || {},
-	window.ClassyJS.Access.Type = window.ClassyJS.Access.Type || {}
-);
-
 ;(function(ClassyJS, _){
 	
 	_.Controller = function(typeRegistry)
@@ -424,7 +380,7 @@
 			
 			_appendMemberNames(properties, methods, classObject);
 			
-			if (typeRegistry.hasParent(classObject)) {
+			if (isInstantiatedObject && typeRegistry.hasParent(classObject)) {
 				
 				var parentConstructors = [];
 				var childObject = classObject;
@@ -510,7 +466,7 @@
 					return function(){
 						return memberRegistry.callMethod(
 							this,
-							{},
+							arguments.callee.caller.$$localOwner,
 							name,
 							Array.prototype.slice.call(arguments, 0)
 						);
@@ -536,7 +492,7 @@
 		{
 			return memberRegistry.getPropertyValue(
 				this,
-				arguments.callee.caller.caller.$$owner,
+				arguments.callee.caller.caller.$$localOwner,
 				name
 			);
 		};
@@ -545,7 +501,7 @@
 		{
 			memberRegistry.setPropertyValue(
 				this,
-				arguments.callee.caller.caller.$$owner,
+				arguments.callee.caller.caller.$$localOwner,
 				name,
 				value
 			);
@@ -1390,12 +1346,6 @@
 				'Provided type: ' + typeof localTarget
 			);
 		}
-		if (typeof accessInstance != 'object') {
-			throw new _.Method.Fatal(
-				'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-				'Provided type: ' + typeof accessInstance
-			);
-		}
 		if (Object.prototype.toString.call(args) != '[object Array]') {
 			throw new _.Method.Fatal(
 				'NON_ARRAY_ARGUMENTS_PROVIDED',
@@ -1409,7 +1359,7 @@
 			);
 		}
 		var canAccess = this._accessController.canAccess(
-			target,
+			localTarget,
 			accessInstance,
 			this._definition.getAccessTypeIdentifier()
 		);
@@ -1600,8 +1550,6 @@
 			'Argument provided as property owner must be an object or constructor',
 		NON_OBJECT_OR_CONSTRUCTOR_LOCAL_TARGET_PROVIDED:
 			'Argument provided as property local owner must be an object or constructor',
-		NON_OBJECT_ACCESS_INSTANCE_PROVIDED:
-			'Instance provided as accessing property must be an object',
 		NON_ARRAY_ARGUMENTS_PROVIDED:
 			'Provided arguments must be within array',
 		ACCESS_NOT_ALLOWED:
@@ -2875,7 +2823,7 @@
 				originalClassInstance || classInstance
 			);
 		}
-		value = property.set(originalClassInstance, accessInstance, value);
+		value = property.set(classInstance, accessInstance, value);
 		_ensureClassInstanceIsInRegistry(this, classInstance);
 		var classInstanceData = _getClassInstanceDataFromClassInstance(this, classInstance);
 		classInstanceData.properties[name] = value;
@@ -2916,12 +2864,12 @@
 		}
 		if (classInstanceData && classInstanceData.properties.hasOwnProperty(name)) {
 			return property.get(
-				originalClassInstance,
+				classInstance,
 				accessInstance,
 				classInstanceData.properties[name]
 			);
 		}
-		var defaultValue = property.getDefaultValue(originalClassInstance, accessInstance);
+		var defaultValue = property.getDefaultValue(classInstance, accessInstance);
 		classInstanceData.properties[name] = defaultValue;
 		return defaultValue;
 	};

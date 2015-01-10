@@ -119,7 +119,7 @@
 				originalClassInstance || classInstance
 			);
 		}
-		value = property.set(originalClassInstance, accessInstance, value);
+		value = property.set(classInstance, accessInstance, value);
 		_ensureClassInstanceIsInRegistry(this, classInstance);
 		var classInstanceData = _getClassInstanceDataFromClassInstance(this, classInstance);
 		classInstanceData.properties[name] = value;
@@ -160,12 +160,12 @@
 		}
 		if (classInstanceData && classInstanceData.properties.hasOwnProperty(name)) {
 			return property.get(
-				originalClassInstance,
+				classInstance,
 				accessInstance,
 				classInstanceData.properties[name]
 			);
 		}
-		var defaultValue = property.getDefaultValue(originalClassInstance, accessInstance);
+		var defaultValue = property.getDefaultValue(classInstance, accessInstance);
 		classInstanceData.properties[name] = defaultValue;
 		return defaultValue;
 	};

@@ -212,16 +212,6 @@ describe('Member.Method', function(){
 		}).toThrow(expectedFatal);
 	});
 	
-	it('throws error if called with non-object access instance', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
-			'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-			'Provided type: undefined'
-		);
-		expect(function(){
-			method.call(methodOwnerInstance, methodLocalOwnerInstance, undefined, []);
-		}).toThrow(expectedFatal);
-	});
-	
 	it('throws error if called with non-array arguments', function(){
 		var expectedFatal = new ClassyJS.Member.Method.Fatal(
 			'NON_ARRAY_ARGUMENTS_PROVIDED',
