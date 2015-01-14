@@ -19,7 +19,9 @@
 				'Provided type: ' + typeof target
 			);
 		}
-		if (typeof accessObject != 'object' && typeof accessObject != 'function' && accessObject !== undefined) {
+		if (typeof accessObject != 'object'
+		&&	typeof accessObject != 'function'
+		&&	accessObject !== undefined) {
 			throw new _.Controller.Fatal(
 				'ACCESS_OBJECT_NOT_INSTANCE_OR_CONSTRUCTOR_OR_UNDEFINED',
 				'Provided type: ' + typeof accessObject
@@ -36,6 +38,10 @@
 				'ACCESS_IDENTIFIER_NOT_VALID_STRING',
 				'Provided identifier: ' + identifier
 			);
+		}
+		// @todo The following line is untested
+		if (typeof target == 'function' && typeof accessObject == 'object') {
+			accessObject = accessObject.constructor;
 		}
 		if (identifier == 'public') return true;
 		if (!accessObject) return false;

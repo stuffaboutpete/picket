@@ -17,7 +17,7 @@ describe('Registry.Type', function(){
 		grandParentClassConstructor = function(){};
 		namespaceManager = new ClassyJS.NamespaceManager();
 		classObject = new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition('class MyClass'),
+			new ClassyJS.Type.Class.Definition('class My.Class'),
 			new ClassyJS.Registry.Type(namespaceManager),
 			new ClassyJS.Registry.Member(
 				new ClassyJS.Registry.Type(namespaceManager),
@@ -26,7 +26,7 @@ describe('Registry.Type', function(){
 			new ClassyJS.NamespaceManager()
 		);
 		parentClassObject = new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition('class MyClass'),
+			new ClassyJS.Type.Class.Definition('class My.ParentClass'),
 			new ClassyJS.Registry.Type(namespaceManager),
 			new ClassyJS.Registry.Member(
 				new ClassyJS.Registry.Type(namespaceManager),
@@ -463,6 +463,33 @@ describe('Registry.Type', function(){
 		expect(registry.isSameObject(
 			new classConstructor(),
 			new parentClassConstructor()
+		)).toBe(false);
+	});
+	
+	it('will identify parent constructor as part of same object', function(){
+		registry.registerClass(classObject, classConstructor);
+		registry.registerClass(parentClassObject, parentClassConstructor);
+		registry.registerClassChild('My.ParentClass', classObject);
+		expect(registry.isSameObject(
+			classConstructor,
+			parentClassConstructor
+		)).toBe(true);
+		expect(registry.isSameObject(
+			parentClassConstructor,
+			classConstructor
+		)).toBe(true);
+	});
+	
+	it('will not identify unrelated constructors as same object', function(){
+		registry.registerClass(classObject, classConstructor);
+		registry.registerClass(parentClassObject, parentClassConstructor);
+		expect(registry.isSameObject(
+			classConstructor,
+			parentClassConstructor
+		)).toBe(false);
+		expect(registry.isSameObject(
+			parentClassConstructor,
+			classConstructor
 		)).toBe(false);
 	});
 	

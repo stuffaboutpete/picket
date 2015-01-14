@@ -237,19 +237,39 @@
 		throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 	};
 	
-	_.Type.prototype.isSameObject = function(instance1, instance2)
+	_.Type.prototype.isSameObject = function(object1, object2)
 	{
-		for (var i = 0; i < this._instances.length; i++) {
-			for (var j = 0; j < this._instances[i].length; j++) {
-				if (this._instances[i][j] !== instance1) continue;
-				for (var k = 0; k < this._instances[i].length; k++) {
-					if (j == k) continue;
-					if (this._instances[i][k] === instance2) return true;
+		// @todo If not both instances and not both constructors, throw
+		if (typeof object1 == 'object') {
+			for (var i = 0; i < this._instances.length; i++) {
+				for (var j = 0; j < this._instances[i].length; j++) {
+					if (this._instances[i][j] !== object1) continue;
+					for (var k = 0; k < this._instances[i].length; k++) {
+						if (j == k) continue;
+						if (this._instances[i][k] === object2) return true;
+					}
+					return false;
 				}
-				return false;
 			}
+			return false;
+		} else {
+			for (var i = 0; i < this._classes.length; i++) {
+				if (!this._classes[i].parentClassName) continue;
+				if (this._classes[i].constructor === object1) {
+					var childObject = object1;
+					var parentObject = object2;
+				} else if (this._classes[i].constructor === object2) {
+					var childObject = object2;
+					var parentObject = object1;
+				}
+				if (!childObject) continue;
+				var parentClassData = _getClassData(this, this._namespaceManager.getNamespaceObject(
+					this._classes[i].parentClassName
+				));
+				if (parentClassData.constructor === parentObject) return true;
+			}
+			return false;
 		}
-		return false;
 	};
 	
 	_.Type.prototype.getInstantiatedInstance = function(classInstance)

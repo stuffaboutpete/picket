@@ -232,14 +232,6 @@ describe('Member.Constant', function(){
 		expect(function(){ constant.get(undefined, accessInstance); }).toThrow(expectedFatal);
 	});
 	
-	it('throws error if value is requested with non-object access instance', function(){
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
-			'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-			'Provided type: undefined'
-		);
-		expect(function(){ constant.get(constantOwnerConstructor); }).toThrow(expectedFatal);
-	});
-	
 	it('throws error if access controller does not allow access to value', function(){
 		var expectedFatal = new ClassyJS.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
 		spyOn(accessController, 'canAccess').and.returnValue(false);
