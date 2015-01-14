@@ -6,6 +6,7 @@ describe('Access control', function(){
 	var privateMethodFatal;
 	var protectedConstantFatal;
 	var privateConstantFatal;
+	var protectedEventFatal;
 	
 	beforeEach(function(){
 		delete window.My;
@@ -21,6 +22,10 @@ describe('Access control', function(){
 		privateMethodFatal = new ClassyJS.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
 		protectedConstantFatal = new ClassyJS.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
 		privateConstantFatal = new ClassyJS.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
+		protectedEventFatal = new ClassyJS.Member.Event.Fatal(
+			'ACCESS_NOT_ALLOWED',
+			'Access type: protected'
+		);
 	});
 	
 	it('allows object to get all own properties', function(){
@@ -498,6 +503,139 @@ describe('Access control', function(){
 		var myObject = new My.ChildClass();
 		expect(function(){ myObject.getValueViaParent(); }).toThrow(privateConstantFatal);
 		expect(function(){ myObject.getValueViaChild(); }).toThrow(privateConstantFatal);
+	});
+	
+	it('allows class instance to bind to and trigger own events', function(){
+		define('class My.Class', {
+			'public event publicEvent ()': undefined,
+			'protected event protectedEvent ()': undefined,
+			'public eventsHandled (number)': 0,
+			'public bindAndTrigger () -> undefined': function(){
+				this.bind('publicEvent', 'targetMethod');
+				this.bind('protectedEvent', 'targetMethod');
+				this.trigger('publicEvent', []);
+				this.trigger('protectedEvent', []);
+			},
+			'private targetMethod () -> undefined': function(){
+				this.eventsHandled('++');
+			}
+		});
+		var myObject = new My.Class();
+		myObject.bindAndTrigger();
+		expect(myObject.eventsHandled()).toBe(2);
+	});
+	
+	it('allows external class to bind to public event', function(){
+		define('class My.Class', {
+			'public event publicEvent ()': undefined,
+			'public triggerEvent () -> undefined': function(){
+				this.trigger('publicEvent', []);
+			}
+		});
+		define('class My.BindClass', {
+			'public eventHandled (boolean)': false,
+			'public construct (My.Class) -> undefined': function(myObject){
+				myObject.bind('publicEvent', 'targetMethod');
+			},
+			'private targetMethod () -> undefined': function(){
+				this.eventHandled(true);
+			}
+		});
+		var myObject = new My.Class();
+		var binder = new My.BindClass(myObject);
+		myObject.triggerEvent();
+		expect(binder.eventHandled()).toBe(true);
+	});
+	
+	// @todo
+	xit('denies external class from triggering public event', function(){
+		define('class My.Class', {
+			'public event publicEvent ()': undefined,
+			'public construct () -> undefined': function(){
+				this.bind('publicEvent', 'targetMethod');
+			},
+			'private targetMethod () -> undefined': function(){}
+		});
+		var myObject = new My.Class();
+		myObject.trigger('publicEvent', []);
+		expect(function(){ myObject.trigger('publicEvent', []); }).toThrow(expectedFatal);
+	});
+	
+	it('denies external class from binding to protected event', function(){
+		define('class My.Class', {
+			'protected event protectedEvent ()': undefined
+		});
+		define('class My.BindClass', {
+			'public bindEvent (My.Class) -> undefined': function(myObject){
+				myObject.bind('protectedEvent', 'targetMethod');
+			},
+			'private targetMethod () -> undefined': function(){}
+		});
+		var myObject = new My.Class();
+		var binder = new My.BindClass();
+		expect(function(){ binder.bindEvent(myObject); }).toThrow(protectedEventFatal);
+	});
+	
+	it('allows parent and child classes access to bind to protected event', function(){
+		define('class My.ParentClass', {
+			'public parentEventHandled (boolean)': false,
+			'public construct () -> undefined': function(){
+				this.bind('protectedEvent', 'parentTargetMethod');
+			},
+			'private parentTargetMethod () -> undefined': function(){
+				this.parentEventHandled(true);
+			}
+		});
+		define('class My.Class extends My.ParentClass', {
+			'protected event protectedEvent ()': undefined,
+			'public construct () -> undefined': function(){
+				parent.construct();
+			},
+			'public triggerEvent () -> undefined': function(){
+				this.trigger('protectedEvent', []);
+			}
+		});
+		define('class My.ChildClass extends My.Class', {
+			'public childEventHandled (boolean)': false,
+			'public construct () -> undefined': function(){
+				this.bind('protectedEvent', 'childTargetMethod');
+				parent.construct();
+			},
+			'private childTargetMethod () -> undefined': function(){
+				this.childEventHandled(true);
+			}
+		});
+		var myObject = new My.ChildClass();
+		myObject.triggerEvent();
+		expect(myObject.parentEventHandled()).toBe(true);
+		expect(myObject.childEventHandled()).toBe(true);
+	});
+	
+	it('allows parent and child classes to trigger protected event', function(){
+		define('class My.ParentClass', {
+			'public triggerEventFromParent () -> undefined': function(){
+				this.trigger('protectedEvent', []);
+			}
+		});
+		define('class My.Class extends My.ParentClass', {
+			'protected event protectedEvent ()': undefined,
+			'public eventsHandled (number)': 0,
+			'public construct () -> undefined': function(){
+				this.bind('protectedEvent', 'targetMethod');
+			},
+			'public targetMethod () -> undefined': function(){
+				this.eventsHandled('++');
+			}
+		});
+		define('class My.ChildClass extends My.Class', {
+			'public triggerEventFromChild () -> undefined': function(){
+				this.trigger('protectedEvent', []);
+			}
+		});
+		var myObject = new My.ChildClass();
+		myObject.triggerEventFromParent();
+		myObject.triggerEventFromChild();
+		expect(myObject.eventsHandled()).toBe(2);
 	});
 	
 });
