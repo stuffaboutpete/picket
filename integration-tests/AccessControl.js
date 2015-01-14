@@ -399,6 +399,24 @@ describe('Access control', function(){
 		expect(function(){ myObject.callMethodViaChild(); }).toThrow(privateMethodFatal);
 	});
 	
+	it('allows function to be proxied as containing method', function(){
+		define('class My.Class', {
+			'public privateMethodCalled (boolean)': false,
+			'public callPrivateMethod () -> string': function(){
+				return this.proxyMethod(function(){
+					return this.privateMethod();
+				})();
+			},
+			'private privateMethod () -> string': function(){
+				this.privateMethodCalled(true);
+				return 'From private method';
+			}
+		});
+		var myObject = new My.Class();
+		expect(myObject.callPrivateMethod()).toBe('From private method');
+		expect(myObject.privateMethodCalled()).toBe(true);
+	});
+	
 	it('allows class instance to access all own constants', function(){
 		define('class My.Class', {
 			'public constant PUBLIC_CONSTANT (string)': 'public',

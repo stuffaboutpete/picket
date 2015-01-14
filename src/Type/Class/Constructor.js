@@ -182,6 +182,18 @@
 			return false;
 		};
 		
+		namespace[className].prototype.proxyMethod = function(proxyFunction)
+		{
+			var parentMethod = arguments.callee.caller;
+			return (function(proxyFunction, $$owner, $$localOwner){
+				return function(){
+					proxyFunction.$$owner = arguments.callee.caller.$$owner;
+					proxyFunction.$$localOwner = arguments.callee.caller.$$localOwner;
+					return proxyFunction.apply(arguments.callee.caller.$$owner, arguments);
+				}
+			})(proxyFunction, parentMethod.$$owner, parentMethod.$$localOwner);
+		};
+		
 		var _appendMemberNames = function(properties, methods, classObject)
 		{
 			var members = memberRegistry.getMembers(classObject);
