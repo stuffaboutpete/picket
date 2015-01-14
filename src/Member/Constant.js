@@ -59,12 +59,6 @@
 				'Provided type: ' + typeof targetConstructor
 			);
 		}
-		if (typeof accessInstance != 'object') {
-			throw new _.Constant.Fatal(
-				'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
-				'Provided type: ' + typeof accessInstance
-			);
-		}
 		var canAccess = this._accessController.canAccess(
 			targetConstructor,
 			accessInstance,

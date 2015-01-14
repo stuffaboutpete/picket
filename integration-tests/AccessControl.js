@@ -4,6 +4,8 @@ describe('Access control', function(){
 	var privatePropertyFatal;
 	var protectedMethodFatal;
 	var privateMethodFatal;
+	var protectedConstantFatal;
+	var privateConstantFatal;
 	
 	beforeEach(function(){
 		delete window.My;
@@ -17,6 +19,8 @@ describe('Access control', function(){
 		);
 		protectedMethodFatal = new ClassyJS.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
 		privateMethodFatal = new ClassyJS.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
+		protectedConstantFatal = new ClassyJS.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
+		privateConstantFatal = new ClassyJS.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
 	});
 	
 	it('allows object to get all own properties', function(){
@@ -388,6 +392,113 @@ describe('Access control', function(){
 		var myObject = new My.ChildClass();
 		expect(function(){ myObject.callMethodViaParent(); }).toThrow(privateMethodFatal);
 		expect(function(){ myObject.callMethodViaChild(); }).toThrow(privateMethodFatal);
+	});
+	
+	it('allows class instance to access all own constants', function(){
+		define('class My.Class', {
+			'public constant PUBLIC_CONSTANT (string)': 'public',
+			'private constant PRIVATE_CONSTANT (string)': 'private',
+			'protected constant PROTECTED_CONSTANT (string)': 'protected',
+			'public getValues () -> [string]': function(){
+				return [
+					My.Class.PUBLIC_CONSTANT(),
+					My.Class.PRIVATE_CONSTANT(),
+					My.Class.PROTECTED_CONSTANT()
+				];
+			}
+		});
+		var myObject = new My.Class();
+		expect(myObject.getValues()[0]).toBe('public');
+		expect(myObject.getValues()[1]).toBe('private');
+		expect(myObject.getValues()[2]).toBe('protected');
+	});
+	
+	it('allows external class instance to access public constants', function(){
+		define('class My.Class', {
+			'public constant PUBLIC_CONSTANT (string)': 'public'
+		});
+		define('class My.AccessingClass', {
+			'public getValue () -> string': function(){
+				return My.Class.PUBLIC_CONSTANT();
+			}
+		});
+		var myAccessingObject = new My.AccessingClass();
+		expect(myAccessingObject.getValue()).toBe('public');
+	});
+	
+	it('allows non-class to access public constants', function(){
+		define('class My.Class', {
+			'public constant PUBLIC_CONSTANT (string)': 'public'
+		});
+		expect(My.Class.PUBLIC_CONSTANT()).toBe('public');
+	});
+	
+	it('denies external class instance access to private and protected constants', function(){
+		define('class My.Class', {
+			'private constant PRIVATE_CONSTANT (string)': 'private',
+			'protected constant PROTECTED_CONSTANT (string)': 'protected'
+		});
+		define('class My.AccessingClass', {
+			'public getPrivateValue () -> string': function(){
+				return My.Class.PRIVATE_CONSTANT();
+			},
+			'public getProtectedValue () -> string': function(){
+				return My.Class.PROTECTED_CONSTANT();
+			}
+		});
+		var myAccessingObject = new My.AccessingClass();
+		expect(function(){ myAccessingObject.getPrivateValue(); }).toThrow(privateConstantFatal);
+		expect(function(){
+			myAccessingObject.getProtectedValue();
+		}).toThrow(protectedConstantFatal);
+	});
+	
+	it('denies non-object access to private and protected constants', function(){
+		define('class My.Class', {
+			'private constant PRIVATE_CONSTANT (string)': 'private',
+			'protected constant PROTECTED_CONSTANT (string)': 'protected'
+		});
+		expect(function(){ My.Class.PRIVATE_CONSTANT(); }).toThrow(privateConstantFatal);
+		expect(function(){ My.Class.PROTECTED_CONSTANT(); }).toThrow(protectedConstantFatal);
+	});
+	
+	it('allows parent and child classes access to protected constants', function(){
+		define('class My.ParentClass', {
+			'public getValueViaParent () -> string': function(){
+				return My.Class.PROTECTED_CONSTANT();
+			}
+		});
+		define('class My.Class extends My.ParentClass', {
+			'protected constant PROTECTED_CONSTANT (string)': 'protected'
+		});
+		define('class My.ChildClass extends My.Class', {
+			'public getValueViaChild () -> string': function(){
+				return My.Class.PROTECTED_CONSTANT();
+			}
+		});
+		var myObject = new My.ChildClass();
+		expect(myObject.getValueViaParent()).toBe('protected');
+		expect(myObject.getValueViaChild()).toBe('protected');
+	});
+	
+	it('denies parent and child classes access to private constants', function(){
+		define('class My.ParentClass', {
+			'public getValueViaParent () -> string': function(){
+				debugger;
+				return My.Class.PRIVATE_CONSTANT();
+			}
+		});
+		define('class My.Class extends My.ParentClass', {
+			'private constant PRIVATE_CONSTANT (string)': 'private'
+		});
+		define('class My.ChildClass extends My.Class', {
+			'public getValueViaChild () -> string': function(){
+				return My.Class.PRIVATE_CONSTANT();
+			}
+		});
+		var myObject = new My.ChildClass();
+		expect(function(){ myObject.getValueViaParent(); }).toThrow(privateConstantFatal);
+		expect(function(){ myObject.getValueViaChild(); }).toThrow(privateConstantFatal);
 	});
 	
 });

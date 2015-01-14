@@ -176,7 +176,7 @@
 					return function(){
 						return instantiator.getMemberRegistry().getConstant(
 							constructor,
-							{},
+							arguments.callee.caller.$$localOwner,
 							name
 						);
 					};
