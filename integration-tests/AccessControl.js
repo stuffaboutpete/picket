@@ -369,7 +369,7 @@ describe('Access control', function(){
 		expect(myObject.callMethodViaChild()).toBe('protected');
 	});
 	
-	it('denies parent and child classes to call private method', function(){
+	it('denies parent and child classes calling private method', function(){
 		define('class My.ParentClass', {
 			'public callMethodViaParent () -> string': function(){
 				return this.privateMethod();
