@@ -484,7 +484,6 @@ describe('Access control', function(){
 	it('denies parent and child classes access to private constants', function(){
 		define('class My.ParentClass', {
 			'public getValueViaParent () -> string': function(){
-				debugger;
 				return My.Class.PRIVATE_CONSTANT();
 			}
 		});
