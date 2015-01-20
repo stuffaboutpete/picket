@@ -568,6 +568,42 @@ describe('Registry.Member', function(){
 			)).toBe('Type: number');
 		});
 		
+		it('can be called when it has optional argument', function(){
+			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string', 'string']);
+			spyOn(methodObject, 'argumentIsOptional').and.callFake(function(index){
+				return index === 1;
+			});
+			spyOn(methodObject, 'getDefaultArgumentValue').and.returnValue(null);
+			spyOn(methodObject, 'call');
+			registry.callMethod(classInstance, accessInstance, 'myMethod', ['arg1']);
+			expect(methodObject.call).toHaveBeenCalledWith(
+				classInstance,
+				classInstance,
+				accessInstance,
+				['arg1', null],
+				undefined
+			);
+		});
+		
+		it('replaces missing optional argument with default value if available', function(){
+			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string', 'string']);
+			spyOn(methodObject, 'argumentIsOptional').and.callFake(function(index){
+				return index === 1;
+			});
+			spyOn(methodObject, 'getDefaultArgumentValue').and.returnValue('default value');
+			spyOn(methodObject, 'call');
+			registry.callMethod(classInstance, accessInstance, 'myMethod', ['arg1']);
+			expect(methodObject.call).toHaveBeenCalledWith(
+				classInstance,
+				classInstance,
+				accessInstance,
+				['arg1', 'default value'],
+				undefined
+			);
+			expect(methodObject.getDefaultArgumentValue.calls.count()).toBe(1);
+			expect(methodObject.getDefaultArgumentValue).toHaveBeenCalledWith(1);
+		});
+		
 		it('will not call static method against class instance', function(){
 			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
 				'METHOD_NOT_REGISTERED',

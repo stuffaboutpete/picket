@@ -1349,6 +1349,18 @@
 		return this._isAbstract;
 	};
 	
+	// @todo This method not tested
+	_.Method.prototype.argumentIsOptional = function(index)
+	{
+		return this._definition.argumentIsOptional(index);
+	};
+	
+	// @todo This method not tested
+	_.Method.prototype.getDefaultArgumentValue = function(index)
+	{
+		return this._definition.getDefaultArgumentValue(index);
+	};
+	
 	_.Method.prototype.call = function(target, localTarget, accessInstance, args, scopeVariables)
 	{
 		if (this._isAbstract) throw new _.Method.Fatal('INTERACTION_WITH_ABSTRACT');
@@ -1383,7 +1395,6 @@
 		);
 		if (canAccess !== true) throw new _.Method.Fatal('ACCESS_NOT_ALLOWED');
 		var areValidTypes = this._typeChecker.areValidTypes(args, this.getArgumentTypes());
-		if (areValidTypes !== true) throw new _.Method.Fatal('INVALID_ARGUMENTS');
 		if (scopeVariables) {
 			var originalScopeVariables = {};
 			for (var i in scopeVariables) {
@@ -1440,7 +1451,7 @@
 			'^(?:\\s+)?(?:(static|abstract)(?:\\s+))?(?:(static|abstract)(?:\\s+))?' +
 			'(public|protected|private)\\s+(?:(static|abstract)(?:\\s+))?' +
 			'(?:(static|abstract)(?:\\s+))?([a-z][A-Za-z0-9.]*)(?:\\s+)?' +
-			'\\(([A-Za-z0-9,:.\\s\\[\\]]*)\\)\\s+->\\s+([A-Za-z0-9.[\\]]+)(?:\\s+)?$'
+			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=]*)\\)\\s+->\\s+([A-Za-z0-9.[\\]]+)(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -1462,8 +1473,80 @@
 		this._isAbstract = staticAbstracts.indexOf('abstract') > -1 ? true : false;
 		if (signatureMatch[7] == '') {
 			this._argumentTypeIdentifiers = [];
+			this._argumentDefaultValues = [];
 		} else {
-			this._argumentTypeIdentifiers = signatureMatch[7].replace(/\s+/g, '').split(',');
+			var arguments = signatureMatch[7].replace(/\s+/g, '').split(',');
+			this._argumentTypeIdentifiers = [];
+			this._argumentDefaultValues = [];
+			var optionalArgumentRegex = new RegExp(
+				'^(?:[A-Za-z0-9.\\[\\]]*(\\?)|(string|number|boolean|object|' +
+				'array|\\[[A-Za-z0-9.]+\\])\\s*=\\s*([A-Za-z0-9.{}\\[\\]]+))$'
+			);
+			var foundOptionalArgument = false;
+			for (var i = 0; i < arguments.length; i++) {
+				var optionalArgumentMatch = optionalArgumentRegex.exec(arguments[i]);
+				if (optionalArgumentMatch === null) {
+					if (foundOptionalArgument) {
+						throw new _.Definition.Fatal(
+							'INVALID_ARGUMENT_ORDER',
+							'Provided signature: ' + signature
+						);
+					}
+					this._argumentTypeIdentifiers.push(arguments[i]);
+					this._argumentDefaultValues.push(undefined);
+				} else if (optionalArgumentMatch[1]) {
+					foundOptionalArgument = true;
+					this._argumentTypeIdentifiers.push(
+						arguments[i].substr(0, arguments[i].length-1)
+					);
+					this._argumentDefaultValues.push(null);
+				} else if (optionalArgumentMatch[2] && optionalArgumentMatch[3]) {
+					foundOptionalArgument = true;
+					var type = optionalArgumentMatch[2];
+					var value = optionalArgumentMatch[3];
+					if (type == 'string') {
+						this._argumentTypeIdentifiers.push(type);
+						this._argumentDefaultValues.push(value);
+					} else if (type == 'number') {
+						if (parseFloat(value) + '' !== value) {
+							var throwInvalidArgumentDefault = true;
+						}
+						this._argumentTypeIdentifiers.push(type);
+						this._argumentDefaultValues.push(parseFloat(value));
+					} else if (type == 'boolean') {
+						this._argumentTypeIdentifiers.push(type);
+						if (value == 'true') {
+							this._argumentDefaultValues.push(true);
+						} else if (value == 'false') {
+							this._argumentDefaultValues.push(false);
+						} else {
+							var throwInvalidArgumentDefault = true;
+						}
+					} else if (type == 'array' || type.match(/^\[[A-Za-z0-9.]+\]$/)) {
+						if (value == '[]') {
+							this._argumentTypeIdentifiers.push(type);
+							this._argumentDefaultValues.push([]);
+						} else {
+							var throwInvalidArgumentDefault = true;
+						}
+					} else if (type == 'object') {
+						if (value == '{}') {
+							this._argumentTypeIdentifiers.push(type);
+							this._argumentDefaultValues.push({});
+						} else {
+							var throwInvalidArgumentDefault = true;
+						}
+					} else {
+						var throwInvalidArgumentDefault = true;
+					}
+					if (throwInvalidArgumentDefault) {
+						throw new _.Definition.Fatal(
+							'INVALID_ARGUMENT_DEFAULT',
+							'Argument type: ' + type + '; Provided value: ' + value
+						);
+					}
+				}
+			}
 		}
 	};
 	
@@ -1497,6 +1580,16 @@
 		return this._returnTypeIdentifier;
 	};
 	
+	_.Definition.prototype.argumentIsOptional = function(index)
+	{
+		return this._argumentDefaultValues[index] !== undefined;
+	};
+	
+	_.Definition.prototype.getDefaultArgumentValue = function(index)
+	{
+		return this._argumentDefaultValues[index];
+	};
+	
 })(
 	window.ClassyJS = window.ClassyJS || {},
 	window.ClassyJS.Member = window.ClassyJS.Member || {},
@@ -1507,7 +1600,11 @@
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
-		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood' 
+		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood',
+		INVALID_ARGUMENT_ORDER:
+			'Optional method arguments must be defined after non-optional arguments',
+		INVALID_ARGUMENT_DEFAULT:
+			'The provided default value for an optional argument is not valid'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Definition.Fatal', messages);
@@ -2935,11 +3032,28 @@
 		var shouldBeStatic = (typeof callTarget == 'function') ? true : false;
 		var classObject = _getClassObjectFromInstanceOrConstructor(this, callTarget);
 		var methods = _getAllMethodsByName(this, classObject, name);
+		toInspectMethods:
 		for (var i = 0; i < methods.length; i++) {
 			var argumentTypes = methods[i].getArgumentTypes();
-			if (args.length != argumentTypes.length) continue;
 			if (shouldBeStatic != methods[i].isStatic()) continue;
-			if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
+			if (args.length > argumentTypes.length) continue;
+			if (args.length < argumentTypes.length) {
+				if (!this._typeChecker.areValidTypes(args, argumentTypes.slice(0, args.length))) {
+					continue toInspectMethods;
+				}
+				for (var j = args.length; j < argumentTypes.length; j++) {
+					if (!methods[i].argumentIsOptional(j)) continue toInspectMethods;
+					var defaultValue = methods[i].getDefaultArgumentValue(j);
+					if (defaultValue !== null) {
+						if (!this._typeChecker.isValidType(defaultValue, argumentTypes[j])) {
+							continue toInspectMethods;
+						}
+					}
+					args.push(defaultValue);
+				}
+			} else {
+				if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
+			}
 			if (this._typeRegistry.hasParent(finalCallTarget || callTarget)) {
 				var scopeVariables = {
 					parent: this._typeRegistry.getParent(finalCallTarget || callTarget)

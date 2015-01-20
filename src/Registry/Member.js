@@ -199,11 +199,28 @@
 		var shouldBeStatic = (typeof callTarget == 'function') ? true : false;
 		var classObject = _getClassObjectFromInstanceOrConstructor(this, callTarget);
 		var methods = _getAllMethodsByName(this, classObject, name);
+		toInspectMethods:
 		for (var i = 0; i < methods.length; i++) {
 			var argumentTypes = methods[i].getArgumentTypes();
-			if (args.length != argumentTypes.length) continue;
 			if (shouldBeStatic != methods[i].isStatic()) continue;
-			if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
+			if (args.length > argumentTypes.length) continue;
+			if (args.length < argumentTypes.length) {
+				if (!this._typeChecker.areValidTypes(args, argumentTypes.slice(0, args.length))) {
+					continue toInspectMethods;
+				}
+				for (var j = args.length; j < argumentTypes.length; j++) {
+					if (!methods[i].argumentIsOptional(j)) continue toInspectMethods;
+					var defaultValue = methods[i].getDefaultArgumentValue(j);
+					if (defaultValue !== null) {
+						if (!this._typeChecker.isValidType(defaultValue, argumentTypes[j])) {
+							continue toInspectMethods;
+						}
+					}
+					args.push(defaultValue);
+				}
+			} else {
+				if (!this._typeChecker.areValidTypes(args, argumentTypes)) continue;
+			}
 			if (this._typeRegistry.hasParent(finalCallTarget || callTarget)) {
 				var scopeVariables = {
 					parent: this._typeRegistry.getParent(finalCallTarget || callTarget)

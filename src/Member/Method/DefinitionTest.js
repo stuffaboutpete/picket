@@ -110,6 +110,170 @@ describe('Member.Method.Definition', function(){
 		]);
 	});
 	
+	it('can identify optional single argument from signature', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (string?) -> undefined'
+		);
+		expect(propertyDefinition.argumentIsOptional(0)).toBe(true);
+	});
+	
+	it('can identify non-optional single argument from signature', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (string) -> undefined'
+		);
+		expect(propertyDefinition.argumentIsOptional(0)).toBe(false);
+	});
+	
+	it('can identify multiple optional arguments', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (string, number?, array?) -> undefined'
+		);
+		expect(propertyDefinition.argumentIsOptional(0)).toBe(false);
+		expect(propertyDefinition.argumentIsOptional(1)).toBe(true);
+		expect(propertyDefinition.argumentIsOptional(2)).toBe(true);
+	});
+	
+	it('throws error if optional argument appears before non-optional argument', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+			'INVALID_ARGUMENT_ORDER',
+			'Provided signature: protected myMethod (string?, number) -> undefined'
+		);
+		expect(function(){
+			new ClassyJS.Member.Method.Definition(
+				'protected myMethod (string?, number) -> undefined'
+			);
+		}).toThrow(expectedFatal);
+	});
+	
+	it('identifies argument with default value as optional', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (number = 30) -> undefined'
+		);
+		expect(propertyDefinition.argumentIsOptional(0)).toBe(true);
+	});
+	
+	it('returns default string value for argument', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (string = example) -> undefined'
+		);
+		expect(propertyDefinition.getDefaultArgumentValue(0)).toBe('example');
+		expect(typeof propertyDefinition.getDefaultArgumentValue(0)).toBe('string');
+	});
+	
+	// @todo Identify illegal string args by defining what characters can be included
+	
+	it('returns default integer value for argument', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (number = 30) -> undefined'
+		);
+		expect(propertyDefinition.getDefaultArgumentValue(0)).toBe(30);
+		expect(typeof propertyDefinition.getDefaultArgumentValue(0)).toBe('number');
+	});
+	
+	it('returns default float value for argument', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (number = 3.2) -> undefined'
+		);
+		expect(propertyDefinition.getDefaultArgumentValue(0)).toBe(3.2);
+		expect(typeof propertyDefinition.getDefaultArgumentValue(0)).toBe('number');
+	});
+	
+	it('throws error when invalid number is provided as default for argument', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+			'INVALID_ARGUMENT_DEFAULT',
+			'Argument type: number; Provided value: example'
+		);
+		expect(function(){
+			new ClassyJS.Member.Method.Definition(
+				'protected myMethod (number = example) -> undefined'
+			);
+		}).toThrow(expectedFatal);
+	});
+	
+	it('returns default boolean value for argument', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (boolean = true) -> undefined'
+		);
+		expect(propertyDefinition.getDefaultArgumentValue(0)).toBe(true);
+		expect(typeof propertyDefinition.getDefaultArgumentValue(0)).toBe('boolean');
+	});
+	
+	it('throws error when invalid boolean is provided as default for argument', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+			'INVALID_ARGUMENT_DEFAULT',
+			'Argument type: boolean; Provided value: example'
+		);
+		expect(function(){
+			new ClassyJS.Member.Method.Definition(
+				'protected myMethod (boolean = example) -> undefined'
+			);
+		}).toThrow(expectedFatal);
+	});
+	
+	it('returns empty array value for optional array argument', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (array = []) -> undefined'
+		);
+		var defaultValue = propertyDefinition.getDefaultArgumentValue(0);
+		expect(defaultValue).toEqual([]);
+		expect(Object.prototype.toString.call(defaultValue)).toBe('[object Array]');
+		expect(defaultValue.length).toBe(0);
+	});
+	
+	it('throws error when invalid array is provided as default for argument', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+			'INVALID_ARGUMENT_DEFAULT',
+			'Argument type: array; Provided value: example'
+		);
+		expect(function(){
+			new ClassyJS.Member.Method.Definition(
+				'protected myMethod (array = example) -> undefined'
+			);
+		}).toThrow(expectedFatal);
+	});
+	
+	it('returns empty array value for optional typed array argument', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod ([string] = []) -> undefined'
+		);
+		var defaultValue = propertyDefinition.getDefaultArgumentValue(0);
+		expect(defaultValue).toEqual([]);
+		expect(Object.prototype.toString.call(defaultValue)).toBe('[object Array]');
+		expect(defaultValue.length).toBe(0);
+	});
+	
+	it('throws error when invalid typed array is provided as default for argument', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+			'INVALID_ARGUMENT_DEFAULT',
+			'Argument type: [string]; Provided value: example'
+		);
+		expect(function(){
+			new ClassyJS.Member.Method.Definition(
+				'protected myMethod ([string] = example) -> undefined'
+			);
+		}).toThrow(expectedFatal);
+	});
+	
+	it('returns empty object value for optional object argument', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod (object = {}) -> undefined'
+		);
+		var defaultValue = propertyDefinition.getDefaultArgumentValue(0);
+		expect(defaultValue).toEqual({});
+	});
+	
+	it('throws error when invalid object is provided as default for argument', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+			'INVALID_ARGUMENT_DEFAULT',
+			'Argument type: object; Provided value: example'
+		);
+		expect(function(){
+			new ClassyJS.Member.Method.Definition(
+				'protected myMethod (object = example) -> undefined'
+			);
+		}).toThrow(expectedFatal);
+	});
+	
 	it('can return return argument type identifier from signature', function(){
 		var propertyDefinition = new ClassyJS.Member.Method.Definition(
 			'protected myMethod () -> string'
