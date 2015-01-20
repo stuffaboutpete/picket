@@ -71,6 +71,18 @@
 		return this._isAbstract;
 	};
 	
+	// @todo This method not tested
+	_.Method.prototype.argumentIsOptional = function(index)
+	{
+		return this._definition.argumentIsOptional(index);
+	};
+	
+	// @todo This method not tested
+	_.Method.prototype.getDefaultArgumentValue = function(index)
+	{
+		return this._definition.getDefaultArgumentValue(index);
+	};
+	
 	_.Method.prototype.call = function(target, localTarget, accessInstance, args, scopeVariables)
 	{
 		if (this._isAbstract) throw new _.Method.Fatal('INTERACTION_WITH_ABSTRACT');
@@ -105,7 +117,6 @@
 		);
 		if (canAccess !== true) throw new _.Method.Fatal('ACCESS_NOT_ALLOWED');
 		var areValidTypes = this._typeChecker.areValidTypes(args, this.getArgumentTypes());
-		if (areValidTypes !== true) throw new _.Method.Fatal('INVALID_ARGUMENTS');
 		if (scopeVariables) {
 			var originalScopeVariables = {};
 			for (var i in scopeVariables) {

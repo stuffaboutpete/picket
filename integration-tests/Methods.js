@@ -163,4 +163,71 @@ describe('Methods', function(){
 		expect(My.Class.myMethod()).toBe(My.Class);
 	});
 	
+	it('can be specified with optional argument', function(){
+		define('class My.Class', {
+			'public myMethod (string?) -> boolean': function(string){
+				return string ? true : false;
+			}
+		});
+		var myObject = new My.Class();
+		expect(myObject.myMethod('string')).toBe(true);
+		expect(myObject.myMethod()).toBe(false);
+	});
+	
+	it('are supplied with null if optional argument is not provided', function(){
+		define('class My.Class', {
+			'public myMethod (string?) -> null': function(string){
+				return string;
+			}
+		});
+		var myObject = new My.Class();
+		expect(myObject.myMethod()).toBe(null);
+	});
+	
+	it('throws error if optional argument is specified before non-optional argument', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+			'INVALID_ARGUMENT_ORDER',
+			'Provided signature: public myMethod (string?, number) -> undefined'
+		);
+		expect(function(){
+			define('class My.Class', {
+				'public myMethod (string?, number) -> undefined': function(){}
+			});
+		}).toThrow(expectedFatal);
+	});
+	
+	it('allows optional argument to have a default value', function(){
+		define('class My.Class', {
+			'public myStringMethod (string = example) -> string': function(argument){
+				return argument;
+			},
+			'public myIntegerMethod (number = 30) -> number': function(argument){
+				return argument;
+			},
+			'public myFloatMethod (number = 3.2) -> number': function(argument){
+				return argument;
+			},
+			'public myBooleanMethod (boolean = true) -> boolean': function(argument){
+				return argument;
+			},
+			'public myArrayMethod (array = []) -> array': function(argument){
+				return argument;
+			},
+			'public myTypedArrayMethod ([string] = []) -> array': function(argument){
+				return argument;
+			},
+			'public myObjectMethod (object = {}) -> object': function(argument){
+				return argument;
+			},
+		});
+		var myObject = new My.Class();
+		expect(myObject.myStringMethod()).toBe('example');
+		expect(myObject.myIntegerMethod()).toBe(30);
+		expect(myObject.myFloatMethod()).toBe(3.2);
+		expect(myObject.myBooleanMethod()).toBe(true);
+		expect(myObject.myArrayMethod()).toEqual([]);
+		expect(myObject.myTypedArrayMethod()).toEqual([]);
+		expect(myObject.myObjectMethod()).toEqual({});
+	});
+	
 });

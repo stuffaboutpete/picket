@@ -259,16 +259,6 @@ describe('Member.Method', function(){
 		);
 	});
 	
-	it('throws error if type checker indicates arguments are not valid', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('INVALID_ARGUMENTS');
-		spyOn(accessController, 'canAccess').and.returnValue(true);
-		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue([]);
-		spyOn(typeChecker, 'areValidTypes').and.returnValue(false);
-		expect(function(){
-			method.call(methodOwnerInstance, methodLocalOwnerInstance, accessInstance, []);
-		}).toThrow(expectedFatal);
-	});
-	
 	it('checks return argument from method implementation', function(){
 		var method = new ClassyJS.Member.Method(
 			definition,
