@@ -5,6 +5,7 @@
 		INSTANTIATOR_NOT_PROVIDED:
 			'Instance of ClassyJS.AutoLoader.Instantiator must be provided',
 		NAMESPACE_MANAGER_NOT_PROVIDED: 'Instance of ClassyJS.NamespaceManager must be provided',
+		MEMBER_REGISTRY_NOT_PROVIDED: 'Instance of ClassyJS.Registry.Member must be provided',
 		ALREADY_RUNNING: 'Cannot start a new loading session whilst one is already running',
 		NOT_RUNNING: 'Cannot continue a loading session whilst not running',
 		SCRIPT_NOT_LOADED: 'A required script could not be loaded',

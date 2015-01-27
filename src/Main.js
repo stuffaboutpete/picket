@@ -212,6 +212,7 @@
 		instantiator.getAutoLoader().require(
 			className,
 			arguments.callee.caller.$$owner,
+			arguments.callee.caller.$$localOwner,
 			targetMethod
 		);
 	};

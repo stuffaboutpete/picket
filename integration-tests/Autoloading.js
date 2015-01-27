@@ -47,6 +47,21 @@ describe('Autoloading', function(){
 		new My.Class();
 	});
 	
+	it('allows class to call own private method after require', function(done){
+		define('class My.Class', {
+			'public construct () -> undefined': function(){
+				expect(typeof AutoLoad.ClassTgc8cH).toBe('undefined');
+				require('AutoLoad.ClassTgc8cH', 'targetMethod');
+			},
+			'private targetMethod (string) -> undefined': function(className){
+				expect(className).toBe('AutoLoad.ClassTgc8cH');
+				expect(typeof AutoLoad.ClassTgc8cH).toBe('function');
+				done();
+			}
+		});
+		new My.Class();
+	});
+	
 	it('allows parent class to be loaded and relationship is intact', function(done){
 		define('class My.AutoloadComplete', {
 			'public static complete (AutoLoad.ClassS9yhHw) -> undefined': function(child){

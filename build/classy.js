@@ -3784,7 +3784,8 @@
 			this._autoLoader = new ClassyJS.AutoLoader(
 				this.getIncluder(),
 				this.getAutoLoadInstantiator(),
-				this.getNamespaceManager()
+				this.getNamespaceManager(),
+				this.getMemberRegistry()
 			);
 		}
 		return this._autoLoader;
@@ -3810,7 +3811,7 @@
 
 (function(_){
 	
-	_.AutoLoader = function(includer, instantiator, namespaceManager)
+	_.AutoLoader = function(includer, instantiator, namespaceManager, memberRegistry)
 	{
 		if (!(includer instanceof ClassyJS.AutoLoader.Includer.Script)) {
 			throw new _.AutoLoader.Fatal(
@@ -3830,9 +3831,16 @@
 				'Provided type: ' + typeof namespaceManager
 			);
 		}
+		if (!(memberRegistry instanceof ClassyJS.Registry.Member)) {
+			throw new _.AutoLoader.Fatal(
+				'MEMBER_REGISTRY_NOT_PROVIDED',
+				'Provided type: ' + typeof memberRegistry
+			);
+		}
 		this._includer = includer;
 		this._instantiator = instantiator;
 		this._namespaceManager = namespaceManager;
+		this._memberRegistry = memberRegistry;
 		this._stacks = [];
 		this._continueBuffer = [];
 		this._classMaps = [];
@@ -3870,13 +3878,14 @@
 		}
 	};
 	
-	_.AutoLoader.prototype.require = function(className, targetObject, methodName)
+	_.AutoLoader.prototype.require = function(className, targetObject, accessObject, methodName)
 	{
 		// @todo Check className and methodName are strings
 		// @todo Check targetObject is object and has method
 		var stack = {
 			className:        className,
 			targetInstance:   targetObject,
+			accessObject:     accessObject,
 			targetMethodName: methodName,
 			loadingScripts:   []
 		};
@@ -3972,9 +3981,11 @@
 				if (stack.methodName) instance[stack.methodName].call(instance);
 			} else {
 				// @todo Check method is (string) -> undefined
-				stack.targetInstance[stack.targetMethodName].call(
+				_this._memberRegistry.callMethod(
 					stack.targetInstance,
-					stack.className
+					stack.accessObject,
+					stack.targetMethodName,
+					[stack.className]
 				);
 			}
 		}
@@ -4064,6 +4075,7 @@
 		INSTANTIATOR_NOT_PROVIDED:
 			'Instance of ClassyJS.AutoLoader.Instantiator must be provided',
 		NAMESPACE_MANAGER_NOT_PROVIDED: 'Instance of ClassyJS.NamespaceManager must be provided',
+		MEMBER_REGISTRY_NOT_PROVIDED: 'Instance of ClassyJS.Registry.Member must be provided',
 		ALREADY_RUNNING: 'Cannot start a new loading session whilst one is already running',
 		NOT_RUNNING: 'Cannot continue a loading session whilst not running',
 		SCRIPT_NOT_LOADED: 'A required script could not be loaded',
@@ -4485,6 +4497,7 @@
 		instantiator.getAutoLoader().require(
 			className,
 			arguments.callee.caller.$$owner,
+			arguments.callee.caller.$$localOwner,
 			targetMethod
 		);
 	};
