@@ -71,6 +71,7 @@
 	{
 		// @todo Check className and methodName are strings
 		// @todo Check targetObject is object and has method
+		// @todo Check access object is object
 		var stack = {
 			className:        className,
 			targetInstance:   targetObject,
