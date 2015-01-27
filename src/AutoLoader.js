@@ -1,6 +1,6 @@
 (function(_){
 	
-	_.AutoLoader = function(includer, instantiator, namespaceManager)
+	_.AutoLoader = function(includer, instantiator, namespaceManager, memberRegistry)
 	{
 		if (!(includer instanceof ClassyJS.AutoLoader.Includer.Script)) {
 			throw new _.AutoLoader.Fatal(
@@ -20,9 +20,16 @@
 				'Provided type: ' + typeof namespaceManager
 			);
 		}
+		if (!(memberRegistry instanceof ClassyJS.Registry.Member)) {
+			throw new _.AutoLoader.Fatal(
+				'MEMBER_REGISTRY_NOT_PROVIDED',
+				'Provided type: ' + typeof memberRegistry
+			);
+		}
 		this._includer = includer;
 		this._instantiator = instantiator;
 		this._namespaceManager = namespaceManager;
+		this._memberRegistry = memberRegistry;
 		this._stacks = [];
 		this._continueBuffer = [];
 		this._classMaps = [];
@@ -60,13 +67,14 @@
 		}
 	};
 	
-	_.AutoLoader.prototype.require = function(className, targetObject, methodName)
+	_.AutoLoader.prototype.require = function(className, targetObject, accessObject, methodName)
 	{
 		// @todo Check className and methodName are strings
 		// @todo Check targetObject is object and has method
 		var stack = {
 			className:        className,
 			targetInstance:   targetObject,
+			accessObject:     accessObject,
 			targetMethodName: methodName,
 			loadingScripts:   []
 		};
@@ -162,9 +170,11 @@
 				if (stack.methodName) instance[stack.methodName].call(instance);
 			} else {
 				// @todo Check method is (string) -> undefined
-				stack.targetInstance[stack.targetMethodName].call(
+				_this._memberRegistry.callMethod(
 					stack.targetInstance,
-					stack.className
+					stack.accessObject,
+					stack.targetMethodName,
+					[stack.className]
 				);
 			}
 		}

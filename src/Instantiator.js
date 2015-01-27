@@ -232,7 +232,8 @@
 			this._autoLoader = new ClassyJS.AutoLoader(
 				this.getIncluder(),
 				this.getAutoLoadInstantiator(),
-				this.getNamespaceManager()
+				this.getNamespaceManager(),
+				this.getMemberRegistry()
 			);
 		}
 		return this._autoLoader;

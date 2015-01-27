@@ -11,6 +11,7 @@ describe('AutoLoader', function(){
 	var includer;
 	var instantiator;
 	var namespaceManager;
+	var memberRegistry;
 	var namespaceObjectDoesNotExistError;
 	
 	beforeEach(function(){
@@ -18,10 +19,15 @@ describe('AutoLoader', function(){
 		includer = new ClassyJS.AutoLoader.Includer.Script();
 		instantiator = new ClassyJS.AutoLoader.Instantiator();
 		namespaceManager = new ClassyJS.NamespaceManager();
+		memberRegistry = new ClassyJS.Registry.Member(
+			new ClassyJS.Registry.Type(namespaceManager),
+			new ClassyJS.TypeChecker()
+		);
 		autoloader = new ClassyJS.AutoLoader(
 			includer,
 			instantiator,
-			namespaceManager
+			namespaceManager,
+			memberRegistry
 		);
 		namespaceObjectDoesNotExistError = new ClassyJS.NamespaceManager.Fatal(
 			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
@@ -32,7 +38,8 @@ describe('AutoLoader', function(){
 		var loader = new ClassyJS.AutoLoader(
 			includer,
 			instantiator,
-			namespaceManager
+			namespaceManager,
+			memberRegistry
 		);
 		expect(loader instanceof ClassyJS.AutoLoader).toBe(true);
 	});
@@ -46,7 +53,8 @@ describe('AutoLoader', function(){
 			new ClassyJS.AutoLoader(
 				undefined,
 				instantiator,
-				namespaceManager
+				namespaceManager,
+				memberRegistry
 			);
 		}).toThrow(expectedFatal);
 	});
@@ -60,7 +68,8 @@ describe('AutoLoader', function(){
 			new ClassyJS.AutoLoader(
 				includer,
 				undefined,
-				namespaceManager
+				namespaceManager,
+				memberRegistry
 			);
 		}).toThrow(expectedFatal);
 	});
@@ -74,6 +83,22 @@ describe('AutoLoader', function(){
 			new ClassyJS.AutoLoader(
 				includer,
 				instantiator,
+				{},
+				memberRegistry
+			);
+		}).toThrow(expectedFatal);
+	});
+	
+	it('throws error if member registry is not provided', function(){
+		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
+			'MEMBER_REGISTRY_NOT_PROVIDED',
+			'Provided type: object'
+		);
+		expect(function(){
+			new ClassyJS.AutoLoader(
+				includer,
+				instantiator,
+				namespaceManager,
 				{}
 			);
 		}).toThrow(expectedFatal);
@@ -389,13 +414,16 @@ describe('AutoLoader', function(){
 		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(name){
 			return function(){};
 		});
-		define('class My.Class', {
-			'public targetMethod (string) -> undefined': function(className){}
-		});
-		var myObject = new My.Class();
-		spyOn(myObject, 'targetMethod');
-		autoloader.require('Example.Class', myObject, 'targetMethod');
-		expect(myObject.targetMethod).toHaveBeenCalledWith('Example.Class');
+		var targetObject = {};
+		var accessObject = {};
+		spyOn(memberRegistry, 'callMethod');
+		autoloader.require('Example.Class', targetObject, accessObject, 'targetMethod');
+		expect(memberRegistry.callMethod).toHaveBeenCalledWith(
+			targetObject,
+			accessObject,
+			'targetMethod',
+			['Example.Class']
+		);
 		expect(namespaceManager.getNamespaceObject).toHaveBeenCalledWith('Example.Class');
 	});
 	
@@ -412,21 +440,24 @@ describe('AutoLoader', function(){
 		spyOn(includer, 'include').and.callFake(function(script, success, error){
 			successCallbacks[script] = success;
 		});
-		define('class My.Class', {
-			'public targetMethod (string) -> undefined': function(className){}
-		});
-		var myObject = new My.Class();
-		spyOn(myObject, 'targetMethod');
-		autoloader.require('Example.Class', myObject, 'targetMethod');
+		spyOn(memberRegistry, 'callMethod');
+		var targetObject = {};
+		var accessObject = {};
+		autoloader.require('Example.Class', targetObject, accessObject, 'targetMethod');
 		autoloader.continue('Other.Class');
 		autoloader.continue('Third.Class');
 		namespaceObjectExists = true;
-		expect(myObject.targetMethod).not.toHaveBeenCalled();
+		expect(memberRegistry.callMethod).not.toHaveBeenCalled();
 		successCallbacks['/Example/Class.js']();
 		successCallbacks['/Other/Class.js']();
-		expect(myObject.targetMethod).not.toHaveBeenCalled();
+		expect(memberRegistry.callMethod).not.toHaveBeenCalled();
 		successCallbacks['/Third/Class.js']();
-		expect(myObject.targetMethod).toHaveBeenCalledWith('Example.Class');
+		expect(memberRegistry.callMethod).toHaveBeenCalledWith(
+			targetObject,
+			accessObject,
+			'targetMethod',
+			['Example.Class']
+		);
 	});
 	
 	it('does not load same script twice', function(){
@@ -481,18 +512,14 @@ describe('AutoLoader', function(){
 		spyOn(includer, 'include').and.callFake(function(script, success){
 			successCallback = success;
 		});
-		define('class My.Class', {
-			'public numberOfCalls (number)': 0,
-			'public targetMethod (string) -> undefined': function(className){
-				this.numberOfCalls('++');
-			}
-		});
-		var myObject = new My.Class();
-		autoloader.require('Example.Class', myObject, 'targetMethod');
-		autoloader.require('Example.Class', myObject, 'targetMethod');
-		expect(myObject.numberOfCalls()).toBe(0);
+		var targetObject = {};
+		var accessObject = {};
+		spyOn(memberRegistry, 'callMethod');
+		autoloader.require('Example.Class', targetObject, accessObject, 'targetMethod');
+		autoloader.require('Example.Class', targetObject, accessObject, 'targetMethod');
+		expect(memberRegistry.callMethod.calls.count()).toBe(0);
 		successCallback();
-		expect(myObject.numberOfCalls()).toBe(2);
+		expect(memberRegistry.callMethod.calls.count()).toBe(2);
 	});
 	
 });
