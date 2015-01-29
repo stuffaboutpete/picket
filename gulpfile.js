@@ -87,7 +87,10 @@ gulp.task('build', function(){
 			'./src/Reflection/Member/Method/Argument.js',
 			'./src/Reflection/Member/Property.js',
 			'./src/Main.js',
-			'./src/Main/Fatal.js'
+			'./src/Main/Fatal.js',
+			'./src/Mocker.js',
+			'./src/Mocker/Fatal.js',
+			'./src/Mocker/ReflectionClassFactory.js'
 	])
 		.pipe(concat('classy.js'))
 		.pipe(gulp.dest('./build/'))
