@@ -38,11 +38,20 @@
 	
 	var _getMembers = function(_this)
 	{
-		return _.Type._memberRegistry.getMembers(
-			_.Type._typeRegistry.getClass(
-				_.Type._namespaceManager.getNamespaceObject(_this._name)
-			)
-		);
+		try {
+			return _.Type._memberRegistry.getMembers(
+				_.Type._typeRegistry.getClass(
+					_.Type._namespaceManager.getNamespaceObject(_this._name)
+				)
+			);
+		} catch (error) {
+			if (error instanceof ClassyJS.Registry.Type.Fatal
+			&&  error.code == 'CLASS_NOT_REGISTERED') {
+				return [];
+			} else {
+				throw error;
+			}
+		}
 	};
 	
 })(window.Reflection = window.Reflection || {});

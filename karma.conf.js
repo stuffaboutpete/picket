@@ -99,6 +99,10 @@ module.exports = function(config) {
 			'Reflection/Member/Property.js',
 			'Main.js',
 			'Main/Fatal.js',
+			'Mocker.js',
+			'MockerTest.js',
+			'Mocker/Fatal.js',
+			'Mocker/ReflectionClassFactory.js',
 			'../integration-tests/TypeDeclaration.js',
 			'../integration-tests/Instantiation.js',
 			'../integration-tests/Properties.js',
@@ -110,6 +114,7 @@ module.exports = function(config) {
 			'../integration-tests/Interfaces.js',
 			'../integration-tests/Autoloading.js',
 			'../integration-tests/Reflection.js',
+			'../integration-tests/Mocks.js',
 			{
 				pattern: '../integration-tests/Autoloading/**/*.js',
 				watched: true,
