@@ -535,9 +535,9 @@
 			var parentMethod = arguments.callee.caller;
 			return (function(proxyFunction, $$owner, $$localOwner){
 				return function(){
-					proxyFunction.$$owner = arguments.callee.caller.$$owner;
-					proxyFunction.$$localOwner = arguments.callee.caller.$$localOwner;
-					return proxyFunction.apply(arguments.callee.caller.$$owner, arguments);
+					proxyFunction.$$owner = $$owner;
+					proxyFunction.$$localOwner = $$localOwner;
+					return proxyFunction.apply($$owner, arguments);
 				}
 			})(proxyFunction, parentMethod.$$owner, parentMethod.$$localOwner);
 		};
