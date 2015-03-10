@@ -122,6 +122,13 @@
 		if (typeof type != 'string') {
 			throw new _.TypeChecker.Fatal('NON_STRING_TYPE_IDENTIFIER');
 		}
+		if (type.match(/\|(?![^\[]*\])/)) {
+			var types = type.split(/\|(?![^\[]*\])/);
+			for (var i = 0; i < types.length; i++) {
+				if (this.isValidType(value, types[i]) === true) return true;
+			}
+			return false;
+		}
 		if (Object.prototype.toString.call(value) == '[object Array]') {
 			var match = type.match(/^\[(.+)\]$/);
 			if (match) {
@@ -416,52 +423,43 @@
 				this[name] = (function(name, property){
 					return function(value){
 						// @todo All this magic stuff should probably be elsewhere
-						var objectChanged = false;
 						var type = property.getTypeIdentifier();
 						if (type == 'string' && arguments.length == 2) {
 							if (value === '+=') {
-								var returnValue = this.set(name, this.get(name) + arguments[1]);
-								objectChanged = true;
+								return this.set(name, this.get(name) + arguments[1]);
 							} else if (value === '=+') {
-								var returnValue = this.set(name, arguments[1] + this.get(name));
-								objectChanged = true;
+								return this.set(name, arguments[1] + this.get(name));
 							}
 						} else if (type == 'number' && typeof value == 'string') {
 							var match = value.match(/^(\+|-)((?:\+|-)|[0-9]+)$/);
 							if (match) {
 								if (match[1] == '+' && match[2] == '+') {
-									var returnValue = this.set(name, this.get(name) + 1);
+									return this.set(name, this.get(name) + 1);
 								} else if (match[1] == '-' && match[2] == '-') {
-									var returnValue = this.set(name, this.get(name) - 1);
+									return this.set(name, this.get(name) - 1);
 								} else {
 									value = this.get(name);
 									value = (match[1] == '+')
 										? value + parseInt(match[2])
 										: value - parseInt(match[2]);
-									var returnValue = this.set(name, value);
+									return this.set(name, value);
 								}
-								objectChanged = true;
 							}
 						} else if (typeof value == 'string'
 						&& (type == 'array' || type.match(/^\[(.+)\]$/))) {
 							var match = value.match(/push|pop|shift|unshift/);
 							if (match) {
-								var returnValue = this.get(name)[match[0]].call(
+								return this.get(name)[match[0]].call(
 									this.get(name),
 									arguments[1]
 								);
-								objectChanged = true;
 							}
 						}
-						if (!objectChanged) {
-							if (typeof value != 'undefined') {
-								var returnValue = this.set(name, value);
-							} else {
-								return this.get(name);
-							}
+						if (typeof value != 'undefined') {
+							return this.set(name, value);
+						} else {
+							return this.get(name);
 						}
-						this.trigger('change', [name, this]);
-						return returnValue;
 					};
 				})(name, properties[i]);
 			}
@@ -1158,7 +1156,7 @@
 		}
 		var signatureRegex = new RegExp(
 			'^(?:\\s+)?(public|protected|private)\\s+([A-Za-z][A-Za-z0-9.]*)\\s+' +
-			'\\((?:\\s+)?([A-Za-z\\[][A-Za-z0-9.\\]]*)(?:\\s+)?\\)(?:\\s+)?$'
+			'\\((?:\\s+)?([A-Za-z\\[][A-Za-z0-9.\\]|]*)(?:\\s+)?\\)(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -1451,7 +1449,7 @@
 			'^(?:\\s+)?(?:(static|abstract)(?:\\s+))?(?:(static|abstract)(?:\\s+))?' +
 			'(public|protected|private)\\s+(?:(static|abstract)(?:\\s+))?' +
 			'(?:(static|abstract)(?:\\s+))?([a-z][A-Za-z0-9.]*)(?:\\s+)?' +
-			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=]*)\\)\\s+->\\s+([A-Za-z0-9.[\\]]+)(?:\\s+)?$'
+			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=|]*)\\)\\s+->\\s+([A-Za-z0-9.[\\]|]+)(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -1835,7 +1833,7 @@
 		}
 		var signatureRegex = new RegExp(
 			'^(?:\\s+)?(public|protected)\\s+event\\s+([a-z][A-Za-z0-9]*)(?:\\s+)?' +
-			'\\(([A-Za-z0-9,.\\s\\[\\]]*)\\)(?:\\s+)?$'
+			'\\(([A-Za-z0-9,.\\s\\[\\]|]*)\\)(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -1850,7 +1848,7 @@
 		if (signatureMatch[3] == '') return;
 		var argumentTypeIdentifiers = signatureMatch[3].replace(/\s+/g, '').split(',');
 		for (var i in argumentTypeIdentifiers) {
-			if (!argumentTypeIdentifiers[i].match(/^[A-Za-z0-9.\[\]]+$/)) {
+			if (!argumentTypeIdentifiers[i].match(/^[A-Za-z0-9.\[\]|]+$/)) {
 				throw new _.Definition.Fatal(
 					'SIGNATURE_NOT_RECOGNISED',
 					'Provided signature: ' + signature
@@ -4410,8 +4408,6 @@
 			
 		}
 		
-		var changeEventFound = false;
-		
 		for (var i in members) {
 			
 			if (Object.prototype.toString.call(members) == '[object Array]') {
@@ -4430,22 +4426,8 @@
 				
 				constants.push(member.getName());
 				
-			} else if (member instanceof ClassyJS.Member.Event) {
-				
-				if (member.getName() == 'change') {
-					changeEventFound = true;
-				}
-				
 			}
 			
-		}
-		
-		if (!changeEventFound) {
-			var member = instantiator.getMemberFactory().build(
-				'public event change (string, object)',
-				false
-			);
-			instantiator.getMemberRegistry().register(member, typeObject);
 		}
 		
 		if (typeObject instanceof ClassyJS.Type.Class) {
