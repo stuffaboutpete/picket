@@ -7,6 +7,13 @@
 		if (typeof type != 'string') {
 			throw new _.TypeChecker.Fatal('NON_STRING_TYPE_IDENTIFIER');
 		}
+		if (type.match(/\|(?![^\[]*\])/)) {
+			var types = type.split(/\|(?![^\[]*\])/);
+			for (var i = 0; i < types.length; i++) {
+				if (this.isValidType(value, types[i]) === true) return true;
+			}
+			return false;
+		}
 		if (Object.prototype.toString.call(value) == '[object Array]') {
 			var match = type.match(/^\[(.+)\]$/);
 			if (match) {
