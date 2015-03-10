@@ -255,6 +255,25 @@ describe('TypeChecker', function(){
 		expect(checker.isValidType({}, 'mixed')).toBe(true);
 	});
 	
+	it('will verify multi-typed argument', function(){
+		expect(checker.isValidType('string', 'string|number')).toBe(true);
+		expect(checker.isValidType(123, 'string|number')).toBe(true);
+		expect(checker.isValidType({}, 'string|number|object')).toBe(true);
+		expect(checker.isValidType(new My.Example(), 'My.Example|boolean')).toBe(true);
+		expect(checker.isValidType(true, 'My.Example|boolean')).toBe(true);
+		expect(checker.isValidType(['1', '2', '3'], '[string]|[number]')).toBe(true);
+		expect(checker.isValidType([1, 2, 3], '[string]|[number]')).toBe(true);
+		expect(checker.isValidType([1, '2', 3], '[string|number]')).toBe(true);
+	});
+	
+	it('will reject invalid multi-typed argument', function(){
+		expect(checker.isValidType(true, 'string|number')).toBe(false);
+		expect(checker.isValidType({}, 'boolean|number')).toBe(false);
+		expect(checker.isValidType({}, 'My.Example|string')).toBe(false);
+		expect(checker.isValidType([1, '2', 3], '[string]|[number]')).toBe(false);
+		expect(checker.isValidType([1, '2', true], '[string|number]')).toBe(false);
+	});
+	
 	it('can accept multiple variables to type check in one call', function(){
 		expect(checker.areValidTypes(
 			['example', 123, { key: 'value' }, ['one', 'two']],
