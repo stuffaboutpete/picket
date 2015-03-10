@@ -126,11 +126,13 @@
 				window[i] = scopeVariables[i];
 			}
 		}
+		var currentOwner = this._value.$$owner;
+		var currentLocalOwner = this._value.$$localOwner;
 		this._value.$$owner = target;
 		this._value.$$localOwner = localTarget;
 		var returnValue = this._value.apply(target, args);
-		delete this._value.$$owner;
-		delete this._value.$$localOwner;
+		this._value.$$owner = currentOwner;
+		this._value.$$localOwner = currentLocalOwner;
 		if (scopeVariables) {
 			for (var i in scopeVariables) {
 				if (originalScopeVariables[i]) {
