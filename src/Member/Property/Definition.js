@@ -10,7 +10,7 @@
 		}
 		var signatureRegex = new RegExp(
 			'^(?:\\s+)?(public|protected|private)\\s+([A-Za-z][A-Za-z0-9.]*)\\s+' +
-			'\\((?:\\s+)?([A-Za-z\\[][A-Za-z0-9.\\]]*)(?:\\s+)?\\)(?:\\s+)?$'
+			'\\((?:\\s+)?([A-Za-z\\[][A-Za-z0-9.\\]|]*)(?:\\s+)?\\)(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {

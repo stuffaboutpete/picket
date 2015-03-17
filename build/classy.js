@@ -1,3 +1,16 @@
+if (!Object.create) {
+	Object.create = (function(){
+		function F(){}
+		return function(o){
+			if (arguments.length != 1) {
+				throw new Error('Object.create implementation only accepts one parameter.');
+			}
+			F.prototype = o;
+			return new F()
+		}
+	})()
+}
+
 (function(_){
 	
 	_.Inheritance = function(){};
@@ -121,6 +134,13 @@
 	{
 		if (typeof type != 'string') {
 			throw new _.TypeChecker.Fatal('NON_STRING_TYPE_IDENTIFIER');
+		}
+		if (type.match(/\|(?![^\[]*\])/)) {
+			var types = type.split(/\|(?![^\[]*\])/);
+			for (var i = 0; i < types.length; i++) {
+				if (this.isValidType(value, types[i]) === true) return true;
+			}
+			return false;
 		}
 		if (Object.prototype.toString.call(value) == '[object Array]') {
 			var match = type.match(/^\[(.+)\]$/);
@@ -416,52 +436,43 @@
 				this[name] = (function(name, property){
 					return function(value){
 						// @todo All this magic stuff should probably be elsewhere
-						var objectChanged = false;
 						var type = property.getTypeIdentifier();
 						if (type == 'string' && arguments.length == 2) {
 							if (value === '+=') {
-								var returnValue = this.set(name, this.get(name) + arguments[1]);
-								objectChanged = true;
+								return this.set(name, this.get(name) + arguments[1]);
 							} else if (value === '=+') {
-								var returnValue = this.set(name, arguments[1] + this.get(name));
-								objectChanged = true;
+								return this.set(name, arguments[1] + this.get(name));
 							}
 						} else if (type == 'number' && typeof value == 'string') {
 							var match = value.match(/^(\+|-)((?:\+|-)|[0-9]+)$/);
 							if (match) {
 								if (match[1] == '+' && match[2] == '+') {
-									var returnValue = this.set(name, this.get(name) + 1);
+									return this.set(name, this.get(name) + 1);
 								} else if (match[1] == '-' && match[2] == '-') {
-									var returnValue = this.set(name, this.get(name) - 1);
+									return this.set(name, this.get(name) - 1);
 								} else {
 									value = this.get(name);
 									value = (match[1] == '+')
 										? value + parseInt(match[2])
 										: value - parseInt(match[2]);
-									var returnValue = this.set(name, value);
+									return this.set(name, value);
 								}
-								objectChanged = true;
 							}
 						} else if (typeof value == 'string'
 						&& (type == 'array' || type.match(/^\[(.+)\]$/))) {
 							var match = value.match(/push|pop|shift|unshift/);
 							if (match) {
-								var returnValue = this.get(name)[match[0]].call(
+								return this.get(name)[match[0]].call(
 									this.get(name),
 									arguments[1]
 								);
-								objectChanged = true;
 							}
 						}
-						if (!objectChanged) {
-							if (typeof value != 'undefined') {
-								var returnValue = this.set(name, value);
-							} else {
-								return this.get(name);
-							}
+						if (typeof value != 'undefined') {
+							return this.set(name, value);
+						} else {
+							return this.get(name);
 						}
-						this.trigger('change', [name, this]);
-						return returnValue;
 					};
 				})(name, properties[i]);
 			}
@@ -535,9 +546,9 @@
 			var parentMethod = arguments.callee.caller;
 			return (function(proxyFunction, $$owner, $$localOwner){
 				return function(){
-					proxyFunction.$$owner = arguments.callee.caller.$$owner;
-					proxyFunction.$$localOwner = arguments.callee.caller.$$localOwner;
-					return proxyFunction.apply(arguments.callee.caller.$$owner, arguments);
+					proxyFunction.$$owner = $$owner;
+					proxyFunction.$$localOwner = $$localOwner;
+					return proxyFunction.apply($$owner, arguments);
 				}
 			})(proxyFunction, parentMethod.$$owner, parentMethod.$$localOwner);
 		};
@@ -1158,7 +1169,7 @@
 		}
 		var signatureRegex = new RegExp(
 			'^(?:\\s+)?(public|protected|private)\\s+([A-Za-z][A-Za-z0-9.]*)\\s+' +
-			'\\((?:\\s+)?([A-Za-z\\[][A-Za-z0-9.\\]]*)(?:\\s+)?\\)(?:\\s+)?$'
+			'\\((?:\\s+)?([A-Za-z\\[][A-Za-z0-9.\\]|]*)(?:\\s+)?\\)(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -1404,11 +1415,13 @@
 				window[i] = scopeVariables[i];
 			}
 		}
+		var currentOwner = this._value.$$owner;
+		var currentLocalOwner = this._value.$$localOwner;
 		this._value.$$owner = target;
 		this._value.$$localOwner = localTarget;
 		var returnValue = this._value.apply(target, args);
-		delete this._value.$$owner;
-		delete this._value.$$localOwner;
+		this._value.$$owner = currentOwner;
+		this._value.$$localOwner = currentLocalOwner;
 		if (scopeVariables) {
 			for (var i in scopeVariables) {
 				if (originalScopeVariables[i]) {
@@ -1451,7 +1464,7 @@
 			'^(?:\\s+)?(?:(static|abstract)(?:\\s+))?(?:(static|abstract)(?:\\s+))?' +
 			'(public|protected|private)\\s+(?:(static|abstract)(?:\\s+))?' +
 			'(?:(static|abstract)(?:\\s+))?([a-z][A-Za-z0-9.]*)(?:\\s+)?' +
-			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=]*)\\)\\s+->\\s+([A-Za-z0-9.[\\]]+)(?:\\s+)?$'
+			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=|]*)\\)\\s+->\\s+([A-Za-z0-9.[\\]|]+)(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -1835,7 +1848,7 @@
 		}
 		var signatureRegex = new RegExp(
 			'^(?:\\s+)?(public|protected)\\s+event\\s+([a-z][A-Za-z0-9]*)(?:\\s+)?' +
-			'\\(([A-Za-z0-9,.\\s\\[\\]]*)\\)(?:\\s+)?$'
+			'\\(([A-Za-z0-9,.\\s\\[\\]|]*)\\)(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -1850,7 +1863,7 @@
 		if (signatureMatch[3] == '') return;
 		var argumentTypeIdentifiers = signatureMatch[3].replace(/\s+/g, '').split(',');
 		for (var i in argumentTypeIdentifiers) {
-			if (!argumentTypeIdentifiers[i].match(/^[A-Za-z0-9.\[\]]+$/)) {
+			if (!argumentTypeIdentifiers[i].match(/^[A-Za-z0-9.\[\]|]+$/)) {
 				throw new _.Definition.Fatal(
 					'SIGNATURE_NOT_RECOGNISED',
 					'Provided signature: ' + signature
@@ -4136,9 +4149,10 @@
 
 (function(_){
 	
-	_.Type = function(name)
+	_.Type = function(name, type)
 	{
 		this._name = name;
+		this._type = type;
 	};
 	
 	_.Type.acceptClassDependencies = function(namespaceManager, typeRegistry, memberRegistry)
@@ -4175,11 +4189,17 @@
 	var _getMembers = function(_this)
 	{
 		try {
-			return _.Type._memberRegistry.getMembers(
-				_.Type._typeRegistry.getClass(
-					_.Type._namespaceManager.getNamespaceObject(_this._name)
-				)
-			);
+			if (_this._type == 'interface') {
+				return _.Type._memberRegistry.getMembers(
+					_.Type._typeRegistry.getInterface(_this._name)
+				);
+			} else {
+				return _.Type._memberRegistry.getMembers(
+					_.Type._typeRegistry.getClass(
+						_.Type._namespaceManager.getNamespaceObject(_this._name)
+					)
+				);
+			}
 		} catch (error) {
 			if (error instanceof ClassyJS.Registry.Type.Fatal
 			&&  error.code == 'CLASS_NOT_REGISTERED') {
@@ -4192,15 +4212,97 @@
 	
 })(window.Reflection = window.Reflection || {});
 
+;(function(ClassyJS, _){
+	
+	var messages = {
+		NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER:
+			'Object returned from namespace manager was not a function as expected'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Type.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Type = window.ClassyJS.Reflection.Type || {}
+);
+
 (function(ClassyJS, Reflection, _){
 	
 	_.Class = function(className)
 	{
-		return _.call(this, className);
+		return _.call(this, className, 'class');
 	};
 	
 	ClassyJS.Inheritance.makeChild(_.Class, _);
+	
+	_.Class.prototype.getMock = function()
+	{
+		
+		// Get the real constructor function
+		// for the class and ensure it is a function
+		var constructor = _._namespaceManager.getNamespaceObject(this._name);
+		if (typeof constructor != 'function') {
+			throw new _.Mocker.Fatal(
+				'NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER',
+				'Returned type: ' + typeof constructor + '; Provided identifier: ' + this._name
+			);
+		}
+		
+		// Create a proxy class, assigning
+		// the target class's prototype to it
+		var Mock = function(){};
+		Mock.prototype = constructor.prototype;
+		
+		// Create an instance of the proxy
+		var mock = new Mock();
+		
+		var methods = this.getMethods();
+		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
+		
+		// Return the finished mock
+		return mock;
+		
+	};
+	
 	Reflection.Class = _.Class;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.Reflection = window.Reflection || {},
+	window.Reflection.Type = window.Reflection.Type || {}
+);
+
+(function(ClassyJS, Reflection, _){
+	
+	_.Interface = function(interfaceName)
+	{
+		return _.call(this, interfaceName, 'interface');
+	};
+	
+	ClassyJS.Inheritance.makeChild(_.Interface, _);
+	
+	_.Interface.prototype.getMock = function()
+	{
+		
+		var Mock = function(){};
+		
+		Mock.prototype.conformsTo = (function(name){
+			return function(interfaceName){
+				return (interfaceName === name);
+			}
+		})(this._name);
+		
+		var mock = new Mock();
+		
+		var methods = this.getMethods();
+		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
+		
+		return mock;
+		
+	}
+	
+	Reflection.Interface = _.Interface;
 	
 })(
 	window.ClassyJS = window.ClassyJS || {},
@@ -4410,8 +4512,6 @@
 			
 		}
 		
-		var changeEventFound = false;
-		
 		for (var i in members) {
 			
 			if (Object.prototype.toString.call(members) == '[object Array]') {
@@ -4430,22 +4530,8 @@
 				
 				constants.push(member.getName());
 				
-			} else if (member instanceof ClassyJS.Member.Event) {
-				
-				if (member.getName() == 'change') {
-					changeEventFound = true;
-				}
-				
 			}
 			
-		}
-		
-		if (!changeEventFound) {
-			var member = instantiator.getMemberFactory().build(
-				'public event change (string, object)',
-				false
-			);
-			instantiator.getMemberRegistry().register(member, typeObject);
 		}
 		
 		if (typeObject instanceof ClassyJS.Type.Class) {
@@ -4583,106 +4669,3 @@
 	window.ClassyJS = window.ClassyJS || {},
 	window.ClassyJS.Main = window.ClassyJS.Main || {}
 );
-
-(function(_){
-	
-	_.Mocker = function(namespaceManager, reflectionClassFactory)
-	{
-		
-		// Ensure we have been given
-		// a namespace manager
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
-			throw new _.Mocker.Fatal(
-				'NON_NAMESPACE_MANAGER_PROVIDED',
-				'Provided type: ' + typeof namespaceManager
-			);
-		}
-		
-		// Ensure we have been given a factory
-		// for creating reflection classes
-		if (!(reflectionClassFactory instanceof ClassyJS.Mocker.ReflectionClassFactory)) {
-			throw new _.Mocker.Fatal(
-				'NON_REFLECTION_CLASS_FACTORY_PROVIDED',
-				'Provided type: ' + typeof reflectionClassFactory
-			);
-		}
-		
-		// Save both dependencies
-		this._namespaceManager = namespaceManager;
-		this._reflectionClassFactory = reflectionClassFactory;
-		
-	};
-	
-	_.Mocker.prototype.getMock = function(className)
-	{
-		
-		// Ensure we are given a string class name
-		if (typeof className != 'string') {
-			throw new _.Mocker.Fatal(
-				'NON_STRING_CLASS_NAME_PROVIDED',
-				'Provided type: ' + typeof className
-			);
-		}
-		
-		// Get the real constructor function
-		// for the class and ensure it is a function
-		var constructor = this._namespaceManager.getNamespaceObject(className);
-		if (typeof constructor != 'function') {
-			throw new _.Mocker.Fatal(
-				'NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER',
-				'Returned type: ' + typeof constructor + '; Provided identifier: ' + className
-			);
-		}
-		
-		// Create a proxy class, assigning
-		// the target class's prototype to it
-		var Mock = function(){};
-		Mock.prototype = constructor.prototype;
-		
-		// Create an instance of the proxy
-		var mock = new Mock();
-		
-		// Ensure that any methods on the
-		// original class exist on the mock,
-		// by using the reflection API
-		var reflectionClass = this._reflectionClassFactory.build(className);
-		var methods = reflectionClass.getMethods();
-		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
-		
-		// Return the finished mock
-		return mock;
-		
-	};
-	
-})(window.ClassyJS = window.ClassyJS || {});
-
-;(function(ClassyJS, _){
-	
-	var messages = {
-		NON_NAMESPACE_MANAGER_PROVIDED:
-			'Instance of ClassyJS.NamespaceManager must be provided to the constructor',
-		NON_REFLECTION_CLASS_FACTORY_PROVIDED:
-			'Instance of ClassyJS.Mocker.ReflectionClassFactory ' +
-			'must be provided to the constructor',
-		NON_STRING_CLASS_NAME_PROVIDED: 'Class name provided must be a string',
-		NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER:
-			'Object returned from namespace manager was not a function as expected'
-	};
-	
-	_.Fatal = ClassyJS.Fatal.getFatal('Mocker.Fatal', messages);
-	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Mocker = window.ClassyJS.Mocker || {}
-);
-
-(function(ClassyJS, _){
-	
-	_.ReflectionClassFactory = function(){};
-	
-	_.ReflectionClassFactory.prototype.build = function(className)
-	{
-		return new Reflection.Class(className);
-	};
-	
-})(window.ClassyJS = window.ClassyJS || {}, window.ClassyJS.Mocker = window.ClassyJS.Mocker || {});

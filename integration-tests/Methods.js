@@ -230,4 +230,22 @@ describe('Methods', function(){
 		expect(myObject.myObjectMethod()).toEqual({});
 	});
 	
+	it('can call themselves whilst retaining access to private functionality', function(){
+		// Note this is to fix a bug where
+		// completing a method call to self
+		// removed a method's 'identity'
+		// (its reference to what object owns
+		// it) and affects its ability to
+		// access private/protected members
+		define('class My.Class', {
+			'private myProperty (string)': 'Example',
+			'public myMethod (boolean = true) -> undefined': function(callSelf){
+				if (callSelf) this.myMethod(false);
+				this.myProperty();
+			}
+		});
+		var myObject = new My.Class();
+		myObject.myMethod();
+	});
+	
 });

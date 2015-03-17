@@ -1,8 +1,9 @@
 (function(_){
 	
-	_.Type = function(name)
+	_.Type = function(name, type)
 	{
 		this._name = name;
+		this._type = type;
 	};
 	
 	_.Type.acceptClassDependencies = function(namespaceManager, typeRegistry, memberRegistry)
@@ -39,11 +40,17 @@
 	var _getMembers = function(_this)
 	{
 		try {
-			return _.Type._memberRegistry.getMembers(
-				_.Type._typeRegistry.getClass(
-					_.Type._namespaceManager.getNamespaceObject(_this._name)
-				)
-			);
+			if (_this._type == 'interface') {
+				return _.Type._memberRegistry.getMembers(
+					_.Type._typeRegistry.getInterface(_this._name)
+				);
+			} else {
+				return _.Type._memberRegistry.getMembers(
+					_.Type._typeRegistry.getClass(
+						_.Type._namespaceManager.getNamespaceObject(_this._name)
+					)
+				);
+			}
 		} catch (error) {
 			if (error instanceof ClassyJS.Registry.Type.Fatal
 			&&  error.code == 'CLASS_NOT_REGISTERED') {

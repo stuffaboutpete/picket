@@ -115,8 +115,6 @@
 			
 		}
 		
-		var changeEventFound = false;
-		
 		for (var i in members) {
 			
 			if (Object.prototype.toString.call(members) == '[object Array]') {
@@ -135,22 +133,8 @@
 				
 				constants.push(member.getName());
 				
-			} else if (member instanceof ClassyJS.Member.Event) {
-				
-				if (member.getName() == 'change') {
-					changeEventFound = true;
-				}
-				
 			}
 			
-		}
-		
-		if (!changeEventFound) {
-			var member = instantiator.getMemberFactory().build(
-				'public event change (string, object)',
-				false
-			);
-			instantiator.getMemberRegistry().register(member, typeObject);
 		}
 		
 		if (typeObject instanceof ClassyJS.Type.Class) {
