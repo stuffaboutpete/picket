@@ -40,4 +40,51 @@ describe('Reflection', function(){
 		expect(reflectionProperties[1].getName()).toBe('myPropertyTwo');
 	});
 	
+	describe('mocks', function(){
+		
+		it('can mock classy class', function(){
+			define('class My.Class');
+			var mock = new Reflection.Class('My.Class').getMock();
+			expect(mock instanceof My.Class).toBe(true);
+		});
+		
+		it('do not call class constructor', function(){
+			define('class My.Class', {
+				'public construct () -> undefined': function(){
+					// Force a fail
+					expect(true).toBe(false);
+				}
+			});
+			var mock = new Reflection.Class('My.Class').getMock();
+		});
+		
+		it('contain class methods when mocked', function(){
+			define('class My.Class', {
+				'public myMethod () -> undefined': function(){}
+			});
+			var mock = new Reflection.Class('My.Class').getMock();
+			expect(typeof mock.myMethod).toBe('function');
+		});
+		
+		it('can mock non-classy objects', function(){
+			var mock = new Reflection.Class('Date').getMock();
+			expect(mock instanceof Date).toBe(true);
+		});
+		
+		it('can mock interface', function(){
+			define('interface My.IInterface');
+			var mock = new Reflection.Interface('My.IInterface').getMock();
+			expect(mock.conformsTo('My.IInterface')).toBe(true);
+		});
+		
+		it('contains interface methods when mocked', function(){
+			define('interface My.IInterface', [
+				'public myMethod () -> undefined'
+			]);
+			var mock = new Reflection.Interface('My.IInterface').getMock();
+			expect(typeof mock.myMethod).toBe('function');
+		});
+		
+	});
+	
 });

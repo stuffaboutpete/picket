@@ -1,3 +1,16 @@
+if (!Object.create) {
+	Object.create = (function(){
+		function F(){}
+		return function(o){
+			if (arguments.length != 1) {
+				throw new Error('Object.create implementation only accepts one parameter.');
+			}
+			F.prototype = o;
+			return new F()
+		}
+	})()
+}
+
 (function(_){
 	
 	_.Inheritance = function(){};
@@ -4136,9 +4149,10 @@
 
 (function(_){
 	
-	_.Type = function(name)
+	_.Type = function(name, type)
 	{
 		this._name = name;
+		this._type = type;
 	};
 	
 	_.Type.acceptClassDependencies = function(namespaceManager, typeRegistry, memberRegistry)
@@ -4175,11 +4189,17 @@
 	var _getMembers = function(_this)
 	{
 		try {
-			return _.Type._memberRegistry.getMembers(
-				_.Type._typeRegistry.getClass(
-					_.Type._namespaceManager.getNamespaceObject(_this._name)
-				)
-			);
+			if (_this._type == 'interface') {
+				return _.Type._memberRegistry.getMembers(
+					_.Type._typeRegistry.getInterface(_this._name)
+				);
+			} else {
+				return _.Type._memberRegistry.getMembers(
+					_.Type._typeRegistry.getClass(
+						_.Type._namespaceManager.getNamespaceObject(_this._name)
+					)
+				);
+			}
 		} catch (error) {
 			if (error instanceof ClassyJS.Registry.Type.Fatal
 			&&  error.code == 'CLASS_NOT_REGISTERED') {
@@ -4192,15 +4212,97 @@
 	
 })(window.Reflection = window.Reflection || {});
 
+;(function(ClassyJS, _){
+	
+	var messages = {
+		NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER:
+			'Object returned from namespace manager was not a function as expected'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Type.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Type = window.ClassyJS.Reflection.Type || {}
+);
+
 (function(ClassyJS, Reflection, _){
 	
 	_.Class = function(className)
 	{
-		return _.call(this, className);
+		return _.call(this, className, 'class');
 	};
 	
 	ClassyJS.Inheritance.makeChild(_.Class, _);
+	
+	_.Class.prototype.getMock = function()
+	{
+		
+		// Get the real constructor function
+		// for the class and ensure it is a function
+		var constructor = _._namespaceManager.getNamespaceObject(this._name);
+		if (typeof constructor != 'function') {
+			throw new _.Mocker.Fatal(
+				'NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER',
+				'Returned type: ' + typeof constructor + '; Provided identifier: ' + this._name
+			);
+		}
+		
+		// Create a proxy class, assigning
+		// the target class's prototype to it
+		var Mock = function(){};
+		Mock.prototype = constructor.prototype;
+		
+		// Create an instance of the proxy
+		var mock = new Mock();
+		
+		var methods = this.getMethods();
+		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
+		
+		// Return the finished mock
+		return mock;
+		
+	};
+	
 	Reflection.Class = _.Class;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.Reflection = window.Reflection || {},
+	window.Reflection.Type = window.Reflection.Type || {}
+);
+
+(function(ClassyJS, Reflection, _){
+	
+	_.Interface = function(interfaceName)
+	{
+		return _.call(this, interfaceName, 'interface');
+	};
+	
+	ClassyJS.Inheritance.makeChild(_.Interface, _);
+	
+	_.Interface.prototype.getMock = function()
+	{
+		
+		var Mock = function(){};
+		
+		Mock.prototype.conformsTo = (function(name){
+			return function(interfaceName){
+				return (interfaceName === name);
+			}
+		})(this._name);
+		
+		var mock = new Mock();
+		
+		var methods = this.getMethods();
+		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
+		
+		return mock;
+		
+	}
+	
+	Reflection.Interface = _.Interface;
 	
 })(
 	window.ClassyJS = window.ClassyJS || {},
@@ -4567,106 +4669,3 @@
 	window.ClassyJS = window.ClassyJS || {},
 	window.ClassyJS.Main = window.ClassyJS.Main || {}
 );
-
-(function(_){
-	
-	_.Mocker = function(namespaceManager, reflectionClassFactory)
-	{
-		
-		// Ensure we have been given
-		// a namespace manager
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
-			throw new _.Mocker.Fatal(
-				'NON_NAMESPACE_MANAGER_PROVIDED',
-				'Provided type: ' + typeof namespaceManager
-			);
-		}
-		
-		// Ensure we have been given a factory
-		// for creating reflection classes
-		if (!(reflectionClassFactory instanceof ClassyJS.Mocker.ReflectionClassFactory)) {
-			throw new _.Mocker.Fatal(
-				'NON_REFLECTION_CLASS_FACTORY_PROVIDED',
-				'Provided type: ' + typeof reflectionClassFactory
-			);
-		}
-		
-		// Save both dependencies
-		this._namespaceManager = namespaceManager;
-		this._reflectionClassFactory = reflectionClassFactory;
-		
-	};
-	
-	_.Mocker.prototype.getMock = function(className)
-	{
-		
-		// Ensure we are given a string class name
-		if (typeof className != 'string') {
-			throw new _.Mocker.Fatal(
-				'NON_STRING_CLASS_NAME_PROVIDED',
-				'Provided type: ' + typeof className
-			);
-		}
-		
-		// Get the real constructor function
-		// for the class and ensure it is a function
-		var constructor = this._namespaceManager.getNamespaceObject(className);
-		if (typeof constructor != 'function') {
-			throw new _.Mocker.Fatal(
-				'NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER',
-				'Returned type: ' + typeof constructor + '; Provided identifier: ' + className
-			);
-		}
-		
-		// Create a proxy class, assigning
-		// the target class's prototype to it
-		var Mock = function(){};
-		Mock.prototype = constructor.prototype;
-		
-		// Create an instance of the proxy
-		var mock = new Mock();
-		
-		// Ensure that any methods on the
-		// original class exist on the mock,
-		// by using the reflection API
-		var reflectionClass = this._reflectionClassFactory.build(className);
-		var methods = reflectionClass.getMethods();
-		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
-		
-		// Return the finished mock
-		return mock;
-		
-	};
-	
-})(window.ClassyJS = window.ClassyJS || {});
-
-;(function(ClassyJS, _){
-	
-	var messages = {
-		NON_NAMESPACE_MANAGER_PROVIDED:
-			'Instance of ClassyJS.NamespaceManager must be provided to the constructor',
-		NON_REFLECTION_CLASS_FACTORY_PROVIDED:
-			'Instance of ClassyJS.Mocker.ReflectionClassFactory ' +
-			'must be provided to the constructor',
-		NON_STRING_CLASS_NAME_PROVIDED: 'Class name provided must be a string',
-		NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER:
-			'Object returned from namespace manager was not a function as expected'
-	};
-	
-	_.Fatal = ClassyJS.Fatal.getFatal('Mocker.Fatal', messages);
-	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Mocker = window.ClassyJS.Mocker || {}
-);
-
-(function(ClassyJS, _){
-	
-	_.ReflectionClassFactory = function(){};
-	
-	_.ReflectionClassFactory.prototype.build = function(className)
-	{
-		return new Reflection.Class(className);
-	};
-	
-})(window.ClassyJS = window.ClassyJS || {}, window.ClassyJS.Mocker = window.ClassyJS.Mocker || {});
