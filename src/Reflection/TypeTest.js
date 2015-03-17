@@ -1,5 +1,6 @@
-describe('Mocker', function(){
+xdescribe('Reflection.Type', function(){
 	
+	// @todo This was the test file for the mocker before it was moved into reflection
 	// @todo Also should be able to mock interfaces and they should pass conformTo tests
 	
 	var namespaceManager;
