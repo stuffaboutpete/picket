@@ -101,10 +101,24 @@ gulp.task('build', function(){
 });
 
 gulp.task('test', function(){
-	return gulp.src(['**/*invalid']).pipe(karma({
-		configFile: 'karma.conf.js',
-		action: 'watch'
-	})).on('error', function(error) { console.error(error); });
+	var argsHolder = [];
+	if (args['build']) argsHolder.push('build');
+	if (args['build-min']) argsHolder.push('build-min');
+	if (argsHolder.length > 1) {
+		console.log('Please only provide one test type');
+		return;
+	}
+	if (argsHolder.length) {
+		return gulp.src(['**/*invalid']).pipe(karma({
+			configFile: 'tests/configs/' + argsHolder[0] + '.js',
+			action: 'run'
+		}));
+	} else {
+		return gulp.src(['**/*invalid']).pipe(karma({
+			configFile: 'tests/configs/dev.js',
+			action: (process.env.CI) ? 'run' : 'watch'
+		})).on('error', function(error) { console.error(error); });
+	}
 });
 
 gulp.task('bump', function(){

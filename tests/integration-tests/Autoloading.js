@@ -2,7 +2,7 @@ describe('Autoloading', function(){
 	
 	start.addAutoLoadPattern(
 		'AutoLoad',
-		'/absolute/classyjs/integration-tests/Autoloading'
+		'/absolute/classyjs/tests/integration-tests/Autoloading'
 	);
 	
 	beforeEach(function(){

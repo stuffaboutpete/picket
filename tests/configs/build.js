@@ -1,0 +1,51 @@
+module.exports = function(config) {
+	config.set({
+		basePath: '../../src',
+		files: [
+			'../build/classy.js',
+			'NamespaceManagerTest.js',
+			'TypeCheckerTest.js',
+			'Access/TypeTest.js',
+			'Access/ControllerTest.js',
+			'Type/ClassTest.js',
+			'Type/Class/DefinitionTest.js',
+			'Type/InterfaceTest.js',
+			'Type/Interface/DefinitionTest.js',
+			'Type/FactoryTest.js',
+			'Type/DefinitionFactoryTest.js',
+			'Member/PropertyTest.js',
+			'Member/Property/DefinitionTest.js',
+			'Member/MethodTest.js',
+			'Member/Method/DefinitionTest.js',
+			'Member/EventTest.js',
+			'Member/Event/DefinitionTest.js',
+			'Member/ConstantTest.js',
+			'Member/Constant/DefinitionTest.js',
+			'Member/FactoryTest.js',
+			'Member/DefinitionFactoryTest.js',
+			'Registry/TypeTest.js',
+			'Registry/MemberTest.js',
+			'AutoLoaderTest.js',
+			'Reflection/TypeTest.js',
+			'../tests/integration-tests/TypeDeclaration.js',
+			'../tests/integration-tests/Instantiation.js',
+			'../tests/integration-tests/Properties.js',
+			'../tests/integration-tests/Methods.js',
+			'../tests/integration-tests/Events.js',
+			'../tests/integration-tests/Constants.js',
+			'../tests/integration-tests/Inheritance.js',
+			'../tests/integration-tests/AccessControl.js',
+			'../tests/integration-tests/Interfaces.js',
+			'../tests/integration-tests/Autoloading.js',
+			'../tests/integration-tests/Reflection.js',
+			{
+				pattern: '../tests/integration-tests/Autoloading/**/*.js',
+				watched: true,
+				included: false,
+				served: true
+			}
+		],
+		frameworks: ['jasmine'],
+		browsers: ['PhantomJS']
+	});
+};
