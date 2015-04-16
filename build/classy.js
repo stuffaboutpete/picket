@@ -3867,9 +3867,9 @@ if (!Object.create) {
 		return (this._stacks.length > 0) ? true : false;
 	};
 	
-	_.AutoLoader.prototype.start = function(className, methodName)
+	_.AutoLoader.prototype.start = function(className, classMap)
 	{
-		// @todo Check methodName is string
+		// @todo Ensure classMap is object containing only strings
 		if (typeof className != 'string') {
 			throw new _.AutoLoader.Fatal(
 				'NON_STRING_CLASS_NAME',
@@ -3878,11 +3878,11 @@ if (!Object.create) {
 		}
 		var stack = {
 			className:        className,
-			methodName:       methodName,
 			classConstructor: undefined,
 			loadingScripts:   []
 		};
 		this._stacks.push(stack);
+		_addClassAutoloadPatterns(this, classMap);
 		if (_classExists(this, className)) {
 			stack.classConstructor = _getClassConstructor(this, className);
 			_attemptFinish(this);
@@ -3930,13 +3930,16 @@ if (!Object.create) {
 		_load(this, className);
 	};
 	
-	_.AutoLoader.prototype.addClassAutoloadPattern = function(pattern, target)
+	var _addClassAutoloadPatterns = function(_this, map)
 	{
-		this._classMaps.push({
-			pattern: pattern,
-			target:  target
-		});
-		this._classMaps.sort(function(a, b){
+		for (var pattern in map) {
+			if (!map.hasOwnProperty(pattern)) continue;
+			_this._classMaps.push({
+				pattern: pattern,
+				target:  map[pattern]
+			});
+		}
+		_this._classMaps.sort(function(a, b){
 			return b.pattern.length - a.pattern.length;
 		});
 	};
@@ -3992,7 +3995,6 @@ if (!Object.create) {
 			_this._stacks.splice(index, 1);
 			if (typeof stack.classConstructor != 'undefined') {
 				var instance = _this._instantiator.instantiate(stack.classConstructor);
-				if (stack.methodName) instance[stack.methodName].call(instance);
 			} else {
 				// @todo Check method is (string) -> undefined
 				_this._memberRegistry.callMethod(
@@ -4581,11 +4583,6 @@ if (!Object.create) {
 	window.start = function(className, methodName)
 	{
 		instantiator.getAutoLoader().start(className, methodName);
-	};
-	
-	window.start.addAutoLoadPattern = function(pattern, target)
-	{
-		instantiator.getAutoLoader().addClassAutoloadPattern(pattern, target);
 	};
 	
 	window.require = function(className, targetMethod)
