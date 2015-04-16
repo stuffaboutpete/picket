@@ -128,15 +128,6 @@ describe('AutoLoader', function(){
 		expect(instantiator.instantiate).toHaveBeenCalledWith(constructor);
 	});
 	
-	it('calls provided object method if start class exists', function(){
-		var targetObject = { startMethod: function(){} };
-		spyOn(namespaceManager, 'getNamespaceObject').and.returnValue(function(){});
-		spyOn(instantiator, 'instantiate').and.returnValue(targetObject);
-		spyOn(targetObject, 'startMethod');
-		autoloader.start('Example.Class', 'startMethod');
-		expect(targetObject.startMethod).toHaveBeenCalledWith();
-	});
-	
 	it('indicates not running before and after starting a pre-loaded class', function(){
 		spyOn(namespaceManager, 'getNamespaceObject').and.returnValue(function(){});
 		spyOn(instantiator, 'instantiate').and.returnValue({});
@@ -172,11 +163,10 @@ describe('AutoLoader', function(){
 		});
 		spyOn(instantiator, 'instantiate').and.returnValue(targetObject);
 		spyOn(targetObject, 'startMethod');
-		autoloader.start('Example.Class', 'startMethod');
+		autoloader.start('Example.Class');
 		namespaceObjectExists = true;
 		successCallback();
 		expect(instantiator.instantiate).toHaveBeenCalledWith(constructor);
-		expect(targetObject.startMethod).toHaveBeenCalledWith();
 	});
 	
 	it('indicates running whilst loading a file', function(){
@@ -276,35 +266,38 @@ describe('AutoLoader', function(){
 		expect(function(){ errorCallback(); }).toThrow(expectedFatal);
 	});
 	
-	it('allows class loading pattern to be registered', function(){
+	it('allows class loading pattern to be provided', function(){
 		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
 			namespaceObjectDoesNotExistError
 		);
 		spyOn(includer, 'include');
-		autoloader.addClassAutoloadPattern('Example', 'subfolder');
-		autoloader.start('Example.Class');
+		autoloader.start('Example.Class', {
+			'Example': 'subfolder'
+		});
 		expect(includer.include.calls.argsFor(0)[0]).toBe('/subfolder/Class.js');
 	});
 	
-	it('allows multiple class loading patterns to be registered', function(){
+	it('allows multiple class loading patterns to be provided', function(){
 		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
 			namespaceObjectDoesNotExistError
 		);
 		spyOn(includer, 'include');
-		autoloader.addClassAutoloadPattern('Example', 'subfolder');
-		autoloader.addClassAutoloadPattern('Other', 'otherSubfolder');
-		autoloader.addClassAutoloadPattern('Third', 'thirdSubfolder');
-		autoloader.start('Other.Class');
+		autoloader.start('Other.Class', {
+			'Example': 'subfolder',
+			'Other':   'otherSubfolder',
+			'Third':   'thirdSubfolder'
+		});
 		expect(includer.include.calls.argsFor(0)[0]).toBe('/otherSubfolder/Class.js');
 	});
 	
-	it('allows nested class loading patterns to be registered', function(){
+	it('allows nested class loading patterns to be provided', function(){
 		spyOn(namespaceManager, 'getNamespaceObject').and.throwError(
 			namespaceObjectDoesNotExistError
 		);
 		spyOn(includer, 'include');
-		autoloader.addClassAutoloadPattern('Example.My', 'my');
-		autoloader.start('Example.My.Class');
+		autoloader.start('Example.My.Class', {
+			'Example.My': 'my'
+		});
 		expect(includer.include.calls.argsFor(0)[0]).toBe('/my/Class.js');
 	});
 	
@@ -313,10 +306,11 @@ describe('AutoLoader', function(){
 			namespaceObjectDoesNotExistError
 		);
 		spyOn(includer, 'include');
-		autoloader.addClassAutoloadPattern('My', 'subfolder');
-		autoloader.addClassAutoloadPattern('My.Test.Something', 'otherSubfolder');
-		autoloader.addClassAutoloadPattern('My.Test', 'thirdSubfolder');
-		autoloader.start('My.Test.Something.Class');
+		autoloader.start('My.Test.Something.Class', {
+			'My':                'subfolder',
+			'My.Test.Something': 'otherSubfolder',
+			'My.Test':           'thirdSubfolder'
+		});
 		expect(includer.include.calls.argsFor(0)[0]).toBe('/otherSubfolder/Class.js');
 	});
 	
@@ -325,8 +319,9 @@ describe('AutoLoader', function(){
 			namespaceObjectDoesNotExistError
 		);
 		spyOn(includer, 'include');
-		autoloader.addClassAutoloadPattern('DomainTest', 'http://some.other.domain');
-		autoloader.start('DomainTest.Class');
+		autoloader.start('DomainTest.Class', {
+			'DomainTest': 'http://some.other.domain'
+		});
 		expect(includer.include.calls.argsFor(0)[0]).toBe('http://some.other.domain/Class.js');
 	});
 	
@@ -335,8 +330,9 @@ describe('AutoLoader', function(){
 			namespaceObjectDoesNotExistError
 		);
 		spyOn(includer, 'include');
-		autoloader.addClassAutoloadPattern('SubDomainTest', 'http://some.other.domain/subfolder');
-		autoloader.start('SubDomainTest.Class');
+		autoloader.start('SubDomainTest.Class', {
+			'SubDomainTest': 'http://some.other.domain/subfolder'
+		});
 		expect(includer.include.calls.argsFor(0)[0]).toBe(
 			'http://some.other.domain/subfolder/Class.js'
 		);

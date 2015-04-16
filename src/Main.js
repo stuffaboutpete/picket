@@ -186,11 +186,6 @@
 		instantiator.getAutoLoader().start(className, methodName);
 	};
 	
-	window.start.addAutoLoadPattern = function(pattern, target)
-	{
-		instantiator.getAutoLoader().addClassAutoloadPattern(pattern, target);
-	};
-	
 	window.require = function(className, targetMethod)
 	{
 		instantiator.getAutoLoader().require(

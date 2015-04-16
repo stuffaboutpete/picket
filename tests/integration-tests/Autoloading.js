@@ -1,12 +1,10 @@
 describe('Autoloading', function(){
 	
-	start.addAutoLoadPattern(
-		'AutoLoad',
-		'/base/tests/integration-tests/Autoloading'
-	);
+	var classMap;
 	
 	beforeEach(function(){
 		delete window.My;
+		classMap = { 'AutoLoad': '/base/tests/integration-tests/Autoloading' };
 	});
 	
 	it('can include external class file', function(done){
@@ -16,7 +14,7 @@ describe('Autoloading', function(){
 				done();
 			}
 		});
-		start('AutoLoad.Classg7H6th');
+		start('AutoLoad.Classg7H6th', classMap);
 	});
 	
 	it('will process all downstream dependencies before instantiating target class', function(done){
@@ -29,7 +27,7 @@ describe('Autoloading', function(){
 				done();
 			}
 		});
-		start('AutoLoad.ClassU6gh0h');
+		start('AutoLoad.ClassU6gh0h', classMap);
 	});
 	
 	it('allows inline class loading', function(done){
@@ -71,7 +69,7 @@ describe('Autoloading', function(){
 				done();
 			}
 		});
-		start('AutoLoad.ClassS9yhHw');
+		start('AutoLoad.ClassS9yhHw', classMap);
 	});
 	
 });
