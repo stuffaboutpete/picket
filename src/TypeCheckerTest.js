@@ -180,54 +180,54 @@ describe('TypeChecker', function(){
 	});
 	
 	it('will verify valid array of other types', function(){
-		expect(checker.isValidType(['one', 'two'], '[string]')).toBe(true);
-		expect(checker.isValidType([1, 2, 3], '[number]')).toBe(true);
-		expect(checker.isValidType([true, false], '[boolean]')).toBe(true);
-		expect(checker.isValidType([undefined], '[undefined]')).toBe(true);
-		expect(checker.isValidType([null, null], '[null]')).toBe(true);
-		expect(checker.isValidType([[1, 2], [3, 4]], '[array]')).toBe(true);
-		expect(checker.isValidType([function(){}, function(){}], '[function]')).toBe(true);
-		expect(checker.isValidType([{}], '[object]')).toBe(true);
+		expect(checker.isValidType(['one', 'two'], 'string[]')).toBe(true);
+		expect(checker.isValidType([1, 2, 3], 'number[]')).toBe(true);
+		expect(checker.isValidType([true, false], 'boolean[]')).toBe(true);
+		expect(checker.isValidType([undefined], 'undefined[]')).toBe(true);
+		expect(checker.isValidType([null, null], 'null[]')).toBe(true);
+		expect(checker.isValidType([[1, 2], [3, 4]], 'array[]')).toBe(true);
+		expect(checker.isValidType([function(){}, function(){}], 'function[]')).toBe(true);
+		expect(checker.isValidType([{}], 'object[]')).toBe(true);
 		expect(checker.isValidType(
 			[document.getElementsByTagName('*')[0]],
-			'[HTMLElement]'
+			'HTMLElement[]'
 		)).toBe(true);
 		expect(checker.isValidType(
 			[new My.Example(), new My.Example()],
-			'[My.Example]'
+			'My.Example[]'
 		)).toBe(true);
 	});
 	
 	it('will reject invalid array of other types', function(){
-		expect(checker.isValidType([1, 'two'], '[string]')).toBe(false);
-		expect(checker.isValidType([1, 'two'], '[number]')).toBe(false);
-		expect(checker.isValidType([1], '[boolean]')).toBe(false);
-		expect(checker.isValidType([null], '[undefined]')).toBe(false);
-		expect(checker.isValidType([undefined], '[null]')).toBe(false);
-		expect(checker.isValidType([{}, []], '[array]')).toBe(false);
-		expect(checker.isValidType([new RegExp()], '[function]')).toBe(false);
-		expect(checker.isValidType([[1, 2], [3, 4]], '[object]')).toBe(false);
+		expect(checker.isValidType([1, 'two'], 'string[]')).toBe(false);
+		expect(checker.isValidType([1, 'two'], 'number[]')).toBe(false);
+		expect(checker.isValidType([1], 'boolean[]')).toBe(false);
+		expect(checker.isValidType([null], 'undefined[]')).toBe(false);
+		expect(checker.isValidType([undefined], 'null[]')).toBe(false);
+		expect(checker.isValidType([{}, []], 'array[]')).toBe(false);
+		expect(checker.isValidType([new RegExp()], 'function[]')).toBe(false);
+		expect(checker.isValidType([[1, 2], [3, 4]], 'object[]')).toBe(false);
 		expect(checker.isValidType(
 			[1, document.getElementsByTagName('*')[0]],
-			'[HTMLElement]'
+			'HTMLElement[]'
 		)).toBe(false);
-		expect(checker.isValidType([My.Example, My.Example], '[My.Example]')).toBe(false);
+		expect(checker.isValidType([My.Example, My.Example], 'My.Example[]')).toBe(false);
 		expect(checker.isValidType(
 			[new My.Example(), new My.Example.Nested()],
-			'[My.Example]'
+			'My.Example[]'
 		)).toBe(false);
 	});
 	
 	it('will verify empty arrays of specific types', function(){
-		expect(checker.isValidType([], '[string]')).toBe(true);
-		expect(checker.isValidType([], '[number]')).toBe(true);
-		expect(checker.isValidType([], '[boolean]')).toBe(true);
-		expect(checker.isValidType([], '[undefined]')).toBe(true);
-		expect(checker.isValidType([], '[null]')).toBe(true);
-		expect(checker.isValidType([], '[array]')).toBe(true);
-		expect(checker.isValidType([], '[function]')).toBe(true);
-		expect(checker.isValidType([], '[object]')).toBe(true);
-		expect(checker.isValidType([], '[HTMLElement]')).toBe(true);
+		expect(checker.isValidType([], 'string[]')).toBe(true);
+		expect(checker.isValidType([], 'number[]')).toBe(true);
+		expect(checker.isValidType([], 'boolean[]')).toBe(true);
+		expect(checker.isValidType([], 'undefined[]')).toBe(true);
+		expect(checker.isValidType([], 'null[]')).toBe(true);
+		expect(checker.isValidType([], 'array[]')).toBe(true);
+		expect(checker.isValidType([], 'function[]')).toBe(true);
+		expect(checker.isValidType([], 'object[]')).toBe(true);
+		expect(checker.isValidType([], 'HTMLElement[]')).toBe(true);
 	});
 	
 	it('will verify valid instance of interface', function(){
@@ -260,30 +260,28 @@ describe('TypeChecker', function(){
 		expect(checker.isValidType({}, 'string|number|object')).toBe(true);
 		expect(checker.isValidType(new My.Example(), 'My.Example|boolean')).toBe(true);
 		expect(checker.isValidType(true, 'My.Example|boolean')).toBe(true);
-		expect(checker.isValidType(['1', '2', '3'], '[string]|[number]')).toBe(true);
-		expect(checker.isValidType([1, 2, 3], '[string]|[number]')).toBe(true);
-		expect(checker.isValidType([1, '2', 3], '[string|number]')).toBe(true);
+		expect(checker.isValidType(['1', '2', '3'], 'string[]|number[]')).toBe(true);
+		expect(checker.isValidType([1, 2, 3], 'string[]|number[]')).toBe(true);
 	});
 	
 	it('will reject invalid multi-typed argument', function(){
 		expect(checker.isValidType(true, 'string|number')).toBe(false);
 		expect(checker.isValidType({}, 'boolean|number')).toBe(false);
 		expect(checker.isValidType({}, 'My.Example|string')).toBe(false);
-		expect(checker.isValidType([1, '2', 3], '[string]|[number]')).toBe(false);
-		expect(checker.isValidType([1, '2', true], '[string|number]')).toBe(false);
+		expect(checker.isValidType([1, '2', 3], 'string[]|number[]')).toBe(false);
 	});
 	
 	it('can accept multiple variables to type check in one call', function(){
 		expect(checker.areValidTypes(
 			['example', 123, { key: 'value' }, ['one', 'two']],
-			['string', 'number', 'object', '[string]']
+			['string', 'number', 'object', 'string[]']
 		)).toBe(true);
 	});
 	
 	it('will reject multiple variables if at least one is invalid', function(){
 		expect(checker.areValidTypes(
 			['example', 123, { key: 'value' }, ['one', 2]],
-			['string', 'number', 'object', '[string]']
+			['string', 'number', 'object', 'string[]']
 		)).toBe(false);
 	});
 	

@@ -15,7 +15,7 @@
 			return false;
 		}
 		if (Object.prototype.toString.call(value) == '[object Array]') {
-			var match = type.match(/^\[(.+)\]$/);
+			var match = type.match(/^(.+)\[\]$/);
 			if (match) {
 				for (var i in value) if (!this.isValidType(value[i], match[1])) return false;
 				return true;

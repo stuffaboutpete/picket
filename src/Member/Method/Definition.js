@@ -41,7 +41,7 @@
 			this._argumentDefaultValues = [];
 			var optionalArgumentRegex = new RegExp(
 				'^(?:[A-Za-z0-9.\\[\\]]*(\\?)|(string|number|boolean|object|' +
-				'array|\\[[A-Za-z0-9.]+\\])\\s*=\\s*([A-Za-z0-9.{}\\[\\]]+))$'
+				'array|[A-Za-z0-9.]+\\[\\])\\s*=\\s*([A-Za-z0-9.{}\\[\\]]+))$'
 			);
 			var foundOptionalArgument = false;
 			for (var i = 0; i < arguments.length; i++) {
@@ -83,7 +83,7 @@
 						} else {
 							var throwInvalidArgumentDefault = true;
 						}
-					} else if (type == 'array' || type.match(/^\[[A-Za-z0-9.]+\]$/)) {
+					} else if (type == 'array' || type.match(/^[A-Za-z0-9.]+\[\]$/)) {
 						if (value == '[]') {
 							this._argumentTypeIdentifiers.push(type);
 							this._argumentDefaultValues.push([]);

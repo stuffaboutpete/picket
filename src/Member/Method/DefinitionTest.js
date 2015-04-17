@@ -234,7 +234,7 @@ describe('Member.Method.Definition', function(){
 	
 	it('returns empty array value for optional typed array argument', function(){
 		var propertyDefinition = new ClassyJS.Member.Method.Definition(
-			'protected myMethod ([string] = []) -> undefined'
+			'protected myMethod (string[] = []) -> undefined'
 		);
 		var defaultValue = propertyDefinition.getDefaultArgumentValue(0);
 		expect(defaultValue).toEqual([]);
@@ -245,11 +245,11 @@ describe('Member.Method.Definition', function(){
 	it('throws error when invalid typed array is provided as default for argument', function(){
 		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
 			'INVALID_ARGUMENT_DEFAULT',
-			'Argument type: [string]; Provided value: example'
+			'Argument type: string[]; Provided value: example'
 		);
 		expect(function(){
 			new ClassyJS.Member.Method.Definition(
-				'protected myMethod ([string] = example) -> undefined'
+				'protected myMethod (string[] = example) -> undefined'
 			);
 		}).toThrow(expectedFatal);
 	});

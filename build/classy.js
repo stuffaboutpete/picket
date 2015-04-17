@@ -143,7 +143,7 @@ if (!Object.create) {
 			return false;
 		}
 		if (Object.prototype.toString.call(value) == '[object Array]') {
-			var match = type.match(/^\[(.+)\]$/);
+			var match = type.match(/^(.+)\[\]$/);
 			if (match) {
 				for (var i in value) if (!this.isValidType(value[i], match[1])) return false;
 				return true;
@@ -1493,7 +1493,7 @@ if (!Object.create) {
 			this._argumentDefaultValues = [];
 			var optionalArgumentRegex = new RegExp(
 				'^(?:[A-Za-z0-9.\\[\\]]*(\\?)|(string|number|boolean|object|' +
-				'array|\\[[A-Za-z0-9.]+\\])\\s*=\\s*([A-Za-z0-9.{}\\[\\]]+))$'
+				'array|[A-Za-z0-9.]+\\[\\])\\s*=\\s*([A-Za-z0-9.{}\\[\\]]+))$'
 			);
 			var foundOptionalArgument = false;
 			for (var i = 0; i < arguments.length; i++) {
@@ -1535,7 +1535,7 @@ if (!Object.create) {
 						} else {
 							var throwInvalidArgumentDefault = true;
 						}
-					} else if (type == 'array' || type.match(/^\[[A-Za-z0-9.]+\]$/)) {
+					} else if (type == 'array' || type.match(/^[A-Za-z0-9.]+\[\]$/)) {
 						if (value == '[]') {
 							this._argumentTypeIdentifiers.push(type);
 							this._argumentDefaultValues.push([]);

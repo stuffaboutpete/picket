@@ -14,7 +14,7 @@ describe('Methods', function(){
 	
 	it('can be passed arguments', function(){
 		define('class My.Class', {
-			'public myMethod (number, number) -> [number]': function(num1, num2){
+			'public myMethod (number, number) -> number[]': function(num1, num2){
 				return [num1, num2];
 			}
 		});
@@ -213,7 +213,7 @@ describe('Methods', function(){
 			'public myArrayMethod (array = []) -> array': function(argument){
 				return argument;
 			},
-			'public myTypedArrayMethod ([string] = []) -> array': function(argument){
+			'public myTypedArrayMethod (string[] = []) -> array': function(argument){
 				return argument;
 			},
 			'public myObjectMethod (object = {}) -> object': function(argument){

@@ -33,7 +33,7 @@ describe('Access control', function(){
 			'public myPublic (string)': 'public',
 			'protected myProtected (string)': 'protected',
 			'private myPrivate (string)': 'private',
-			'public getValues () -> [string]': function(){
+			'public getValues () -> string[]': function(){
 				return [
 					this.myPublic(),
 					this.myProtected(),
@@ -57,7 +57,7 @@ describe('Access control', function(){
 				this.myProtected('protected');
 				this.myPrivate('private');
 			},
-			'public getValues () -> [string]': function(){
+			'public getValues () -> string[]': function(){
 				return [
 					this.myPublic(),
 					this.myProtected(),
@@ -274,7 +274,7 @@ describe('Access control', function(){
 			'private privateMethod () -> string': function(){
 				return 'private';
 			},
-			'public callMethods () -> [string]': function(){
+			'public callMethods () -> string[]': function(){
 				return [
 					this.publicMethod(),
 					this.protectedMethod(),
@@ -422,7 +422,7 @@ describe('Access control', function(){
 			'public constant PUBLIC_CONSTANT (string)': 'public',
 			'private constant PRIVATE_CONSTANT (string)': 'private',
 			'protected constant PROTECTED_CONSTANT (string)': 'protected',
-			'public getValues () -> [string]': function(){
+			'public getValues () -> string[]': function(){
 				return [
 					My.Class.PUBLIC_CONSTANT(),
 					My.Class.PRIVATE_CONSTANT(),
