@@ -1,6 +1,5 @@
 describe('TypeChecker', function(){
 	
-	// @todo Match ClassyJS interfaces
 	// @todo Regex
 	
 	var checker;
