@@ -47,9 +47,9 @@ describe('Member.Property.Definition', function(){
 	
 	it('can return type identifier from signature', function(){
 		var propertyDefinition = new ClassyJS.Member.Property.Definition(
-			'protected myProperty ([number])'
+			'protected myProperty (number[])'
 		);
-		expect(propertyDefinition.getTypeIdentifier()).toBe('[number]');
+		expect(propertyDefinition.getTypeIdentifier()).toBe('number[]');
 	});
 	
 	it('can parse signature with irregular whitespace', function(){
