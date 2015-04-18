@@ -459,7 +459,7 @@ if (!Object.create) {
 								}
 							}
 						} else if (typeof value == 'string'
-						&& (type == 'array' || type.match(/^\[(.+)\]$/))) {
+						&& (type == 'array' || type.match(/^(.+)\[\]$/))) {
 							var match = value.match(/push|pop|shift|unshift/);
 							if (match) {
 								return this.get(name)[match[0]].call(
