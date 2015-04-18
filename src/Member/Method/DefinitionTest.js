@@ -281,6 +281,13 @@ describe('Member.Method.Definition', function(){
 		expect(propertyDefinition.getReturnTypeIdentifier()).toBe('string');
 	});
 	
+	it('can return implicit undefined return type from signature', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'protected myMethod ()'
+		);
+		expect(propertyDefinition.getReturnTypeIdentifier()).toBe('undefined');
+	});
+	
 	it('can parse complex signature', function(){
 		var propertyDefinition = new ClassyJS.Member.Method.Definition(
 			'abstract static protected myMethod (number, string, null) -> [string]'

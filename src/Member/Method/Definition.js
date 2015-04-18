@@ -12,7 +12,7 @@
 			'^(?:\\s+)?(?:(static|abstract)(?:\\s+))?(?:(static|abstract)(?:\\s+))?' +
 			'(public|protected|private)\\s+(?:(static|abstract)(?:\\s+))?' +
 			'(?:(static|abstract)(?:\\s+))?([a-z][A-Za-z0-9.]*)(?:\\s+)?' +
-			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=|]*)\\)\\s+->\\s+([A-Za-z0-9.[\\]|]+)(?:\\s+)?$'
+			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=|]*)\\)(?:\\s+->\\s+([A-Za-z0-9.[\\]|]+))?(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -23,7 +23,7 @@
 		}
 		this._name = signatureMatch[6];
 		this._accessTypeIdentifier = signatureMatch[3];
-		this._returnTypeIdentifier = signatureMatch[8];
+		this._returnTypeIdentifier = signatureMatch[8] || 'undefined';
 		var staticAbstracts = [
 			signatureMatch[1],
 			signatureMatch[2],

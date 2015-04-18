@@ -46,6 +46,24 @@ describe('Methods', function(){
 		expect(function(){ myObject.myMethod('Example'); }).toThrow(expectedFatal);
 	});
 	
+	it('can omit return type and it is implicitly set to undefined', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+			'INVALID_RETURN_VALUE',
+			'Returned type: string; Expected type: undefined'
+		);
+		define('class My.Class', {
+			'public getUndefined ()': function(){
+				// Doing nothing returns undefined
+			},
+			'public failToGetUndefined ()': function(){
+				return 'string';
+			}
+		});
+		var myObject = new My.Class();
+		expect(myObject.getUndefined()).toBe(undefined);
+		expect(function(){ myObject.failToGetUndefined(); }).toThrow(expectedFatal);
+	});
+	
 	it('can access self as \'this\'', function(){
 		define('class My.Class', {
 			'public myMethod () -> My.Class': function(){ return this; }
