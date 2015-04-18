@@ -179,6 +179,18 @@ describe('TypeChecker', function(){
 		expect(checker.isValidType(new My.Example(), 'My.Example.Nested')).toBe(false);
 	});
 	
+	it('will verify valid \'self\' object instance if matching object is provided', function(){
+		var instance = {};
+		expect(checker.isValidType(instance, 'this', instance)).toBe(true);
+	});
+	
+	it('will reject invalid \'self\' object', function(){
+		expect(checker.isValidType({}, 'this', {})).toBe(false);
+		var constructor = function(){};
+		expect(checker.isValidType(new constructor(), 'this', constructor)).toBe(false);
+		expect(checker.isValidType({}, 'this')).toBe(false);
+	});
+	
 	it('will verify valid array of other types', function(){
 		expect(checker.isValidType(['one', 'two'], 'string[]')).toBe(true);
 		expect(checker.isValidType([1, 2, 3], 'number[]')).toBe(true);

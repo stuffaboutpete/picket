@@ -277,7 +277,11 @@ describe('Member.Method', function(){
 			accessInstance,
 			['Example', 123]
 		);
-		expect(typeChecker.isValidType).toHaveBeenCalledWith('Return', 'string');
+		expect(typeChecker.isValidType).toHaveBeenCalledWith(
+			'Return',
+			'string',
+			methodLocalOwnerInstance
+		);
 	});
 	
 	it('throws error if type checker indicates return value is not valid', function(){

@@ -72,6 +72,24 @@ describe('Methods', function(){
 		expect(myObject.myMethod()).toBe(myObject);
 	});
 	
+	it('can specify \'this\' as a return type', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+			'INVALID_RETURN_VALUE',
+			'Returned type: object; Expected type: this'
+		);
+		define('class My.Class', {
+			'public getSelf () -> this': function(){
+				return this;
+			},
+			'public failToGetSelf () -> this': function(){
+				return new My.Class();
+			}
+		});
+		var myObject = new My.Class();
+		expect(myObject.getSelf()).toBe(myObject);
+		expect(function(){ myObject.failToGetSelf(); }).toThrow(expectedFatal);
+	});
+	
 	it('can access own properties', function(){
 		define('class My.Class', {
 			'public myProperty (number)': 123,

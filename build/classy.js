@@ -130,7 +130,7 @@ if (!Object.create) {
 	
 	_.TypeChecker = function(){};
 	
-	_.TypeChecker.prototype.isValidType = function(value, type)
+	_.TypeChecker.prototype.isValidType = function(value, type, optionalThis)
 	{
 		if (typeof type != 'string') {
 			throw new _.TypeChecker.Fatal('NON_STRING_TYPE_IDENTIFIER');
@@ -151,6 +151,7 @@ if (!Object.create) {
 			return (type == 'array' || type == 'mixed');
 		}
 		if (type === 'mixed') return true;
+		if (type === 'this') return (value === optionalThis) ? true : false;
 		if (value === null) return (type == 'null');
 		if (typeof value == type) return true;
 		if (typeof value == 'object'
@@ -1433,7 +1434,8 @@ if (!Object.create) {
 		}
 		var isValidType = this._typeChecker.isValidType(
 			returnValue,
-			this._definition.getReturnTypeIdentifier()
+			this._definition.getReturnTypeIdentifier(),
+			localTarget
 		);
 		if (isValidType !== true) {
 			throw new _.Method.Fatal(

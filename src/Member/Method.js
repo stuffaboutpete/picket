@@ -144,7 +144,8 @@
 		}
 		var isValidType = this._typeChecker.isValidType(
 			returnValue,
-			this._definition.getReturnTypeIdentifier()
+			this._definition.getReturnTypeIdentifier(),
+			localTarget
 		);
 		if (isValidType !== true) {
 			throw new _.Method.Fatal(
