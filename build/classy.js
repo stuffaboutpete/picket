@@ -1435,7 +1435,7 @@ if (!Object.create) {
 		var isValidType = this._typeChecker.isValidType(
 			returnValue,
 			this._definition.getReturnTypeIdentifier(),
-			localTarget
+			target
 		);
 		if (isValidType !== true) {
 			throw new _.Method.Fatal(

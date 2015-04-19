@@ -355,4 +355,15 @@ describe('Inheritance', function(){
 		expect(My.Child.MY_CONSTANT()).toBe('Child constant');
 	});
 	
+	it('does not break return type hinting for self', function(){
+		define('class My.Parent', {
+			'public myMethod () -> this': function(){
+				return this;
+			}
+		});
+		define('class My.Child extends My.Parent');
+		var myChild = new My.Child();
+		expect(myChild.myMethod()).toBe(myChild);
+	});
+	
 });
