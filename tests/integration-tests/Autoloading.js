@@ -72,4 +72,14 @@ describe('Autoloading', function(){
 		start('AutoLoad.ClassS9yhHw', classMap);
 	});
 	
+	it('allows interface to be loaded and relationship is intact', function(done){
+		define('class My.AutoloadComplete', {
+			'public static complete (AutoLoad.Class7dgMw9) -> undefined': function(object){
+				expect(object.conformsTo('AutoLoad.Interface7F4dCu')).toBe(true);
+				done();
+			}
+		});
+		start('AutoLoad.Class7dgMw9', classMap);
+	});
+	
 });

@@ -4483,6 +4483,15 @@ if (!Object.create) {
 				}
 			}
 			
+			if (instantiator.getAutoLoader().isRunning()) {
+				var interfaces = typeObject.getInterfaces();
+				for (var i = 0; i < interfaces.length; i++) {
+					var interfaceObject = instantiator.getTypeRegistry();
+					if (interfaceObject === undefined) continue;
+					instantiator.getAutoLoader().continue(interfaces[i]);
+				}
+			}
+			
 			constructor.prototype.toString = function(){
 				return '[object ' + typeObject.getName() + ']'
 			};
@@ -4575,9 +4584,9 @@ if (!Object.create) {
 		
 	};
 	
-	window.start = function(className, methodName)
+	window.start = function(className, classMap)
 	{
-		instantiator.getAutoLoader().start(className, methodName);
+		instantiator.getAutoLoader().start(className, classMap);
 	};
 	
 	window.require = function(className, targetMethod)

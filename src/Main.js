@@ -89,6 +89,15 @@
 				}
 			}
 			
+			if (instantiator.getAutoLoader().isRunning()) {
+				var interfaces = typeObject.getInterfaces();
+				for (var i = 0; i < interfaces.length; i++) {
+					var interfaceObject = instantiator.getTypeRegistry();
+					if (interfaceObject === undefined) continue;
+					instantiator.getAutoLoader().continue(interfaces[i]);
+				}
+			}
+			
 			constructor.prototype.toString = function(){
 				return '[object ' + typeObject.getName() + ']'
 			};
