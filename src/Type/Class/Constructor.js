@@ -71,39 +71,39 @@
 						var type = property.getTypeIdentifier();
 						if (type == 'string' && arguments.length == 2) {
 							if (value === '+=') {
-								return this.set(name, this.get(name) + arguments[1]);
+								return _set(name, _get(name, this) + arguments[1], this);
 							} else if (value === '=+') {
-								return this.set(name, arguments[1] + this.get(name));
+								return _set(name, arguments[1] + _get(name, this), this);
 							}
 						} else if (type == 'number' && typeof value == 'string') {
 							var match = value.match(/^(\+|-)((?:\+|-)|[0-9]+)$/);
 							if (match) {
 								if (match[1] == '+' && match[2] == '+') {
-									return this.set(name, this.get(name) + 1);
+									return _set(name, _get(name, this) + 1, this);
 								} else if (match[1] == '-' && match[2] == '-') {
-									return this.set(name, this.get(name) - 1);
+									return _set(name, _get(name, this) - 1, this);
 								} else {
-									value = this.get(name);
+									value = _get(name, this);
 									value = (match[1] == '+')
 										? value + parseInt(match[2])
 										: value - parseInt(match[2]);
-									return this.set(name, value);
+									return _set(name, value, this);
 								}
 							}
 						} else if (typeof value == 'string'
 						&& (type == 'array' || type.match(/^(.+)\[\]$/))) {
 							var match = value.match(/push|pop|shift|unshift/);
 							if (match) {
-								return this.get(name)[match[0]].call(
-									this.get(name),
+								return _get(name, this)[match[0]].call(
+									_get(name, this),
 									arguments[1]
 								);
 							}
 						}
 						if (typeof value != 'undefined') {
-							return this.set(name, value);
+							return _set(name, value, this);
 						} else {
-							return this.get(name);
+							return _get(name, this);
 						}
 					};
 				})(name, properties[i]);
@@ -127,25 +127,6 @@
 				this.construct.apply(this, Array.prototype.slice.call(arguments, 0));
 			}
 			
-		};
-		
-		namespace[className].prototype.get = function(name)
-		{
-			return memberRegistry.getPropertyValue(
-				this,
-				arguments.callee.caller.caller.$$localOwner,
-				name
-			);
-		};
-		
-		namespace[className].prototype.set = function(name, value)
-		{
-			memberRegistry.setPropertyValue(
-				this,
-				arguments.callee.caller.caller.$$localOwner,
-				name,
-				value
-			);
 		};
 		
 		namespace[className].prototype.bind = function(name, targetMethod)
@@ -175,6 +156,25 @@
 					return proxyFunction.apply($$owner, arguments);
 				}
 			})(proxyFunction, parentMethod.$$owner, parentMethod.$$localOwner);
+		};
+		
+		var _get = function(name, object)
+		{
+			return memberRegistry.getPropertyValue(
+				object,
+				arguments.callee.caller.caller.$$localOwner,
+				name
+			);
+		};
+		
+		var _set = function(name, value, object)
+		{
+			memberRegistry.setPropertyValue(
+				object,
+				arguments.callee.caller.caller.$$localOwner,
+				name,
+				value
+			);
 		};
 		
 		var _appendMemberNames = function(properties, methods, classObject)

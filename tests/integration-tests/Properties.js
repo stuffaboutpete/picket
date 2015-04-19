@@ -9,27 +9,11 @@ describe('Properties', function(){
 			'public myProperty (string)': 'Example'
 		});
 		var myObject = new My.Class();
-		expect(myObject.get('myProperty')).toBe('Example');
-	});
-	
-	it('can be accessed using property name method', function(){
-		define('class My.Class', {
-			'public myProperty (string)': 'Example'
-		});
-		var myObject = new My.Class();
+		myObject.myProperty();
 		expect(myObject.myProperty()).toBe('Example');
 	});
 	
 	it('can be set', function(){
-		define('class My.Class', {
-			'public myProperty (string)': 'Example'
-		});
-		var myObject = new My.Class();
-		myObject.set('myProperty', 'New value');
-		expect(myObject.myProperty()).toBe('New value');
-	});
-	
-	it('can be set using property name method', function(){
 		define('class My.Class', {
 			'public myProperty (string)': 'Example'
 		});
