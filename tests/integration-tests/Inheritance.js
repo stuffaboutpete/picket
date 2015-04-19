@@ -294,7 +294,7 @@ describe('Inheritance', function(){
 		});
 		define('class My.Child extends My.Parent', {
 			'public triggerEvent () -> undefined': function(){
-				this.trigger('myEvent', []);
+				this.trigger('myEvent');
 			}
 		});
 		define('class My.Binder', {
@@ -319,7 +319,7 @@ describe('Inheritance', function(){
 		define('class My.Child', {
 			'public event myEvent (number)': undefined,
 			'public triggerEvent () -> undefined': function(){
-				this.trigger('myEvent', [123]);
+				this.trigger('myEvent', 123);
 			}
 		});
 		define('class My.Binder', {

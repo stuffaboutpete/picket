@@ -8,7 +8,7 @@ describe('Events', function(){
 		define('class My.EventClass', {
 			'public event myEvent ()': undefined,
 			'public triggerEvent () -> undefined': function(){
-				this.trigger('myEvent', []);
+				this.trigger('myEvent');
 			}
 		});
 		define('class My.TargetClass', {
@@ -30,7 +30,7 @@ describe('Events', function(){
 		define('class My.EventClass', {
 			'public event myEvent (string, number)': undefined,
 			'public triggerEvent () -> undefined': function(){
-				this.trigger('myEvent', ['Example', 123]);
+				this.trigger('myEvent', 'Example', 123);
 			}
 		});
 		define('class My.TargetClass', {
@@ -72,8 +72,8 @@ describe('Events', function(){
 			'public event firstEvent ()': undefined,
 			'public event secondEvent (string)': undefined,
 			'public triggerEvents () -> undefined': function(){
-				this.trigger('firstEvent', []);
-				this.trigger('secondEvent', ['string']);
+				this.trigger('firstEvent');
+				this.trigger('secondEvent', 'string');
 			}
 		});
 		define('class My.TargetClass', {

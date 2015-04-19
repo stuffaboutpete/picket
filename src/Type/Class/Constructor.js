@@ -134,9 +134,10 @@
 			memberRegistry.bindEvent(this, name, arguments.callee.caller.$$owner, targetMethod);
 		};
 		
-		namespace[className].prototype.trigger = function(name, arguments)
+		namespace[className].prototype.trigger = function(name)
 		{
-			memberRegistry.triggerEvent(this, name, arguments);
+			var args = [this, name, Array.prototype.slice.call(arguments, 1)];
+			memberRegistry.triggerEvent.apply(memberRegistry, args);
 		};
 		
 		namespace[className].prototype.conformsTo = function(interfaceName)

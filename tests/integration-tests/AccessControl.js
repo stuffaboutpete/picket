@@ -531,8 +531,8 @@ describe('Access control', function(){
 			'public bindAndTrigger () -> undefined': function(){
 				this.bind('publicEvent', 'targetMethod');
 				this.bind('protectedEvent', 'targetMethod');
-				this.trigger('publicEvent', []);
-				this.trigger('protectedEvent', []);
+				this.trigger('publicEvent');
+				this.trigger('protectedEvent');
 			},
 			'private targetMethod () -> undefined': function(){
 				this.eventsHandled('++');
@@ -547,7 +547,7 @@ describe('Access control', function(){
 		define('class My.Class', {
 			'public event publicEvent ()': undefined,
 			'public triggerEvent () -> undefined': function(){
-				this.trigger('publicEvent', []);
+				this.trigger('publicEvent');
 			}
 		});
 		define('class My.BindClass', {
@@ -576,7 +576,7 @@ describe('Access control', function(){
 		});
 		var myObject = new My.Class();
 		myObject.trigger('publicEvent', []);
-		expect(function(){ myObject.trigger('publicEvent', []); }).toThrow(expectedFatal);
+		expect(function(){ myObject.trigger('publicEvent'); }).toThrow(expectedFatal);
 	});
 	
 	it('denies external class from binding to protected event', function(){
@@ -610,7 +610,7 @@ describe('Access control', function(){
 				parent.construct();
 			},
 			'public triggerEvent () -> undefined': function(){
-				this.trigger('protectedEvent', []);
+				this.trigger('protectedEvent');
 			}
 		});
 		define('class My.ChildClass extends My.Class', {
@@ -632,7 +632,7 @@ describe('Access control', function(){
 	it('allows parent and child classes to trigger protected event', function(){
 		define('class My.ParentClass', {
 			'public triggerEventFromParent () -> undefined': function(){
-				this.trigger('protectedEvent', []);
+				this.trigger('protectedEvent');
 			}
 		});
 		define('class My.Class extends My.ParentClass', {
@@ -647,7 +647,7 @@ describe('Access control', function(){
 		});
 		define('class My.ChildClass extends My.Class', {
 			'public triggerEventFromChild () -> undefined': function(){
-				this.trigger('protectedEvent', []);
+				this.trigger('protectedEvent');
 			}
 		});
 		var myObject = new My.ChildClass();
