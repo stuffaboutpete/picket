@@ -20,7 +20,7 @@
 			}
 		}
 		
-		var Class = function()
+		namespace[className] = function()
 		{
 			
 			if (arguments.callee.caller.toString() == arguments.callee.toString()) {
@@ -128,14 +128,6 @@
 			}
 			
 		};
-		
-		if (typeof rootNamespaceName != 'undefined') {
-			eval('var ' + rootNamespaceName + ' = rootNamespaceValue');
-			eval(fullClassName + ' = ' + Class.toString());
-		} else {
-			eval('var ' + className + ' = ' + Class.toString());
-			namespace[className] = eval(className);
-		}
 		
 		namespace[className].prototype.get = function(name)
 		{
