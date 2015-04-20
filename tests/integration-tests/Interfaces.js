@@ -116,4 +116,20 @@ describe('Interfaces', function(){
 		expect(new My.ChildClass().conformsTo('My.IInterface')).toBe(true);
 	});
 	
+	it('can omit argument types and allow implementing class to choose', function(){
+		// The reason for this may not be clear; in
+		// practise the class which insists on the
+		// interface will have to use reflection (or
+		// some other technique) to determine what
+		// arguments to supply - this is very useful
+		// for dependency injection.
+		define('interface My.IInterface', [
+			'public myMethod -> undefined'
+		]);
+		define('class My.Class implements My.IInterface', {
+			'public myMethod (string, number) -> undefined': function(){}
+		});
+		expect(new My.Class().conformsTo('My.IInterface')).toBe(true);
+	});
+	
 });

@@ -32,12 +32,17 @@
 					'Provided type: ' + typeof value
 				);
 			}
+			if (!definition.hasArgumentTypes()) {
+				throw new _.Method.Fatal('NON_ABSTRACT_METHOD_DECLARED_WITH_NO_ARGUMENT_TYPES');
+			}
 			this._isAbstract = false;
 		}
-		var types = definition.getArgumentTypeIdentifiers();
-		for (var i = 0; i < types.length; i++) {
-			if (types[i] === 'undefined') throw new _.Method.Fatal('UNDEFINED_ARGUMENT_TYPE');
-			if (types[i] === 'null') throw new _.Method.Fatal('NULL_ARGUMENT_TYPE');
+		if (definition.hasArgumentTypes()) {
+			var types = definition.getArgumentTypeIdentifiers();
+			for (var i = 0; i < types.length; i++) {
+				if (types[i] === 'undefined') throw new _.Method.Fatal('UNDEFINED_ARGUMENT_TYPE');
+				if (types[i] === 'null') throw new _.Method.Fatal('NULL_ARGUMENT_TYPE');
+			}
 		}
 		this._value = value;
 		this._definition = definition;
@@ -48,6 +53,12 @@
 	_.Method.prototype.getName = function()
 	{
 		return this._definition.getName();
+	};
+	
+	_.Method.prototype.hasArgumentTypes = function()
+	{
+		// @todo Untested method
+		return (this._definition.hasArgumentTypes()) ? true : false;
 	};
 	
 	_.Method.prototype.getArgumentTypes = function()

@@ -435,7 +435,7 @@
 					_this,
 					typeObject,
 					memberName,
-					memberObject.getArgumentTypes(),
+					memberObject.hasArgumentTypes() ? memberObject.getArgumentTypes() : ['none'],
 					memberObject.isStatic()
 				);
 			} catch (error) {
@@ -654,12 +654,13 @@
 					var abstractMember = abstractMembers[j];
 					if (abstractMember.getName() === allMembers[i-1].getName()
 					&&	abstractMember.isStatic() === allMembers[i-1].isStatic()
-					&&	abstractMember.getReturnType() === allMembers[i-1].getReturnType()
-					&&	_arraysEqual(
-						abstractMember.getArgumentTypes(),
-						allMembers[i-1].getArgumentTypes()
-					)) {
-						abstractMembers.splice(j, 1);
+					&&	abstractMember.getReturnType() === allMembers[i-1].getReturnType()) {
+						if (!abstractMember.hasArgumentTypes() || _arraysEqual(
+							abstractMember.getArgumentTypes(),
+							allMembers[i-1].getArgumentTypes()
+						)) {
+							abstractMembers.splice(j, 1);
+						}
 					}
 				}
 			}

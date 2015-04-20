@@ -20,7 +20,9 @@
 			'Abstract or interface method should not provide an implementation',
 		NON_FUNCTION_IMPLEMENTATION: 'implementation must be provided as a function',
 		INTERACTION_WITH_ABSTRACT: 'This instance cannot be called as it is abstract',
-		NON_OBJECT_SCOPE_VARIABLES: 'Provided scope variables must be object'
+		NON_OBJECT_SCOPE_VARIABLES: 'Provided scope variables must be object',
+		NON_ABSTRACT_METHOD_DECLARED_WITH_NO_ARGUMENT_TYPES:
+			'Any method declared without argument types must be abstract'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Fatal', messages);

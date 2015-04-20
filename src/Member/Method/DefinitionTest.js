@@ -290,7 +290,7 @@ describe('Member.Method.Definition', function(){
 	
 	it('can parse complex signature', function(){
 		var propertyDefinition = new ClassyJS.Member.Method.Definition(
-			'abstract static protected myMethod (number, string, null) -> [string]'
+			'abstract static protected myMethod (number, string, null) -> string[]'
 		);
 		expect(propertyDefinition.isAbstract()).toBe(true);
 		expect(propertyDefinition.isStatic()).toBe(true);
@@ -301,13 +301,13 @@ describe('Member.Method.Definition', function(){
 			'string',
 			'null'
 		]);
-		expect(propertyDefinition.getReturnTypeIdentifier()).toBe('[string]');
+		expect(propertyDefinition.getReturnTypeIdentifier()).toBe('string[]');
 	});
 	
 	it('can parse signature with irregular whitespace', function(){
 		var propertyDefinition = new ClassyJS.Member.Method.Definition(
 			' 	abstract 	 static 	 	public 	' +
-			' someMethod( 	object,	  number,  	[string] 	)	 -> 	HTMLElement 	'
+			' someMethod( 	object,	  number,  	string[] 	)	 -> 	HTMLElement 	'
 		);
 		expect(propertyDefinition.isAbstract()).toBe(true);
 		expect(propertyDefinition.isStatic()).toBe(true);
@@ -316,9 +316,29 @@ describe('Member.Method.Definition', function(){
 		expect(propertyDefinition.getArgumentTypeIdentifiers()).toEqual([
 			'object',
 			'number',
-			'[string]'
+			'string[]'
 		]);
 		expect(propertyDefinition.getReturnTypeIdentifier()).toBe('HTMLElement');
+	});
+	
+	it('indicates if argument types are not provided and errors if they are accessed', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+			'UNDECLARED_ARGUMENT_TYPES_REQUESTED'
+		);
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'public myMethod -> boolean'
+		);
+		expect(propertyDefinition.hasArgumentTypes()).toBe(false);
+		expect(function(){
+			propertyDefinition.getArgumentTypeIdentifiers();
+		}).toThrow(expectedFatal);
+	});
+	
+	it('will indicate if argument types are declared even if they are zero-length', function(){
+		var propertyDefinition = new ClassyJS.Member.Method.Definition(
+			'public myMethod () -> boolean'
+		);
+		expect(propertyDefinition.hasArgumentTypes()).toBe(true);
 	});
 	
 });
