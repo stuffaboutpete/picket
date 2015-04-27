@@ -12,8 +12,10 @@ describe('Interfaces', function(){
 		define('interface My.IInterface');
 		define('class My.Class implements My.IInterface');
 		define('class My.OtherClass');
-		expect(new My.Class().conformsTo('My.IInterface')).toBe(true);
-		expect(new My.OtherClass().conformsTo('My.IInterface')).toBe(false);
+		expect(new Reflection.Class(My.Class).implementsInterface('My.IInterface')).toBe(true);
+		expect(
+			new Reflection.Class(My.OtherClass).implementsInterface('My.IInterface')
+		).toBe(false);
 	});
 	
 	it('can define abstract members which must be implemented before instantiation', function(){
@@ -27,7 +29,8 @@ describe('Interfaces', function(){
 		define('class My.ValidClass implements My.IInterface', {
 			'public myMethod () -> undefined': function(){}
 		});
-		expect(new My.ValidClass().conformsTo('My.IInterface')).toBe(true);
+		var reflectionClass = new Reflection.Class(My.ValidClass);
+		expect(reflectionClass.implementsInterface('My.IInterface')).toBe(true);
 		expect(function(){ new My.InvalidClass(); }).toThrow(expectedFatal);
 	});
 	
@@ -48,8 +51,9 @@ describe('Interfaces', function(){
 			'public firstMethod () -> undefined': function(){},
 			'public otherMethod (number) -> string': function(){}
 		});
-		expect(new My.ValidClass().conformsTo('My.IInterface')).toBe(true);
-		expect(new My.ValidClass().conformsTo('My.IOtherInterface')).toBe(true);
+		var reflectionClass = new Reflection.Class(My.ValidClass);
+		expect(reflectionClass.implementsInterface('My.IInterface')).toBe(true);
+		expect(reflectionClass.implementsInterface('My.IOtherInterface')).toBe(true);
 		expect(function(){ new My.InvalidClass(); }).toThrow(expectedFatal);
 	});
 	
@@ -113,7 +117,23 @@ describe('Interfaces', function(){
 			'public myMethod (object) -> array': function(){}
 		});
 		define('class My.ChildClass extends My.ParentClass');
-		expect(new My.ChildClass().conformsTo('My.IInterface')).toBe(true);
+		var reflectionClass = new Reflection.Class(My.ChildClass);
+		expect(reflectionClass.implementsInterface('My.IInterface')).toBe(true);
+	});
+	
+	it('can be used to type check method calls', function(){
+		var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			'METHOD_NOT_REGISTERED',
+			'Provided name: myMethod'
+		);
+		define('interface My.IInterface');
+		define('class My.Implementation implements My.IInterface');
+		define('class My.Class', {
+			'public myMethod (My.IInterface) -> undefined': function(string){}
+		});
+		var myObject = new My.Class();
+		expect(function(){ myObject.myMethod(123); }).toThrow(expectedFatal);
+		myObject.myMethod(new My.Implementation());
 	});
 	
 });

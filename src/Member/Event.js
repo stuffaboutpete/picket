@@ -42,9 +42,15 @@
 		return this._definition.getName();
 	};
 	
-	_.Event.prototype.getArgumentTypes = function()
+	_.Event.prototype.getArgumentTypeIdentifiers = function()
 	{
 		return this._definition.getArgumentTypeIdentifiers();
+	};
+	
+	_.Event.prototype.getAccessTypeIdentifier = function()
+	{
+		// @todo Method untested
+		return this._definition.getAccessTypeIdentifier();
 	};
 	
 	_.Event.prototype.requestBind = function(targetInstance, accessInstance)

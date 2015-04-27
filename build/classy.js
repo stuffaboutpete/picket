@@ -10,6 +10,45 @@ if (!Object.create) {
 		}
 	})()
 }
+if (!Function.prototype.bind) {
+	Function.prototype.bind = function(oThis) {
+		if (typeof this !== 'function') {
+			// closest thing possible to the ECMAScript 5
+			// internal IsCallable function
+			throw new TypeError(
+				'Function.prototype.bind - what is trying to be bound is not callable'
+			);
+		}
+		var aArgs = Array.prototype.slice.call(arguments, 1),
+			fToBind = this,
+			fNOP    = function() {},
+			fBound  = function() {
+				return fToBind.apply(this instanceof fNOP
+							 ? this
+							 : oThis,
+							 aArgs.concat(Array.prototype.slice.call(arguments)));
+			};
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
+		return fBound;
+	};
+}
+
+(function(_){
+	
+	_.Mocker = function(){};
+	
+	_.Mocker.prototype.getMock = function(constructor)
+	{
+		
+		var Mock = function(){};
+		Mock.prototype = constructor.prototype;
+		
+		return new Mock();
+		
+	};
+	
+})(window.ClassyJS = window.ClassyJS || {});
 
 (function(_){
 	
@@ -128,7 +167,16 @@ if (!Object.create) {
 
 (function(_){
 	
-	_.TypeChecker = function(){};
+	_.TypeChecker = function(reflectionFactory)
+	{
+		if (!(reflectionFactory instanceof ClassyJS.TypeChecker.ReflectionFactory)) {
+			throw new _.TypeChecker.Fatal(
+				'NO_REFLECTION_FACTORY_PROVIDED',
+				'Provided type: ' + typeof reflectionFactory
+			);
+		}
+		this._reflectionFactory = reflectionFactory;
+	};
 	
 	_.TypeChecker.prototype.isValidType = function(value, type)
 	{
@@ -153,9 +201,17 @@ if (!Object.create) {
 		if (type === 'mixed') return true;
 		if (value === null) return (type == 'null');
 		if (typeof value == type) return true;
-		if (typeof value == 'object'
-		&&	typeof value.conformsTo == 'function'
-		&&	value.conformsTo(type)) return true;
+		if (typeof value == 'object') {
+			try {
+				var reflectionClass = this._reflectionFactory.buildClass(value);
+				if (reflectionClass.implementsInterface(type)) return true;
+			} catch (error) {
+				if (!(error instanceof Reflection.Class.Fatal)
+				||  error.code != 'CLASS_DOES_NOT_EXIST') {
+					throw error;
+				}
+			}
+		}
 		var typeParts = type.split('.');
 		var namespace = window;
 		do {
@@ -194,13 +250,29 @@ if (!Object.create) {
 	
 })(window.ClassyJS = window.ClassyJS || {});
 
+(function(ClassyJS, _){
+	
+	_.ReflectionFactory = function(){};
+	
+	_.ReflectionFactory.prototype.buildClass = function(classInstance)
+	{
+		return new Reflection.Class(classInstance);
+	};
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.TypeChecker = window.ClassyJS.TypeChecker || {}
+);
+
 ;(function(ClassyJS, _){
 	
 	var messages = {
-		NON_STRING_TYPE_IDENTIFIER:	'Provided type identifier must be a string',
-		NON_ARRAY_VALUES:			'Provided values must be within an array',
-		NON_ARRAY_TYPES:			'Provided type identifiers must be within an array',
-		VALUE_TYPE_MISMATCH:		'Provided values must match length of provided type identifiers'
+		NO_REFLECTION_FACTORY_PROVIDED:
+			'An instance of ClassyJS.TypeChecker.ReflectionFactory must be provided',
+		NON_STRING_TYPE_IDENTIFIER: 'Provided type identifier must be a string',
+		NON_ARRAY_VALUES: 'Provided values must be within an array',
+		NON_ARRAY_TYPES: 'Provided type identifiers must be within an array',
+		VALUE_TYPE_MISMATCH: 'Provided values must match length of provided type identifiers'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('TypeChecker.Fatal', messages);
@@ -507,9 +579,12 @@ if (!Object.create) {
 		
 		namespace[className].prototype.get = function(name)
 		{
+			// Note that the '|| {}' below is due
+			// to a hack in ClassyJS.Member.Property.
+			// It should go if possible.
 			return memberRegistry.getPropertyValue(
 				this,
-				arguments.callee.caller.caller.$$localOwner,
+				arguments.callee.caller.caller.$$localOwner || {},
 				name
 			);
 		};
@@ -532,13 +607,6 @@ if (!Object.create) {
 		namespace[className].prototype.trigger = function(name, arguments)
 		{
 			memberRegistry.triggerEvent(this, name, arguments);
-		};
-		
-		namespace[className].prototype.conformsTo = function(interfaceName)
-		{
-			var interfaces = typeRegistry.getInterfacesFromClass(typeRegistry.getClass(this));
-			for (var i in interfaces) if (interfaces[i].getName() == interfaceName) return true;
-			return false;
 		};
 		
 		namespace[className].prototype.proxyMethod = function(proxyFunction)
@@ -1082,9 +1150,23 @@ if (!Object.create) {
 		return this._definition.getTypeIdentifier();
 	};
 	
+	_.Property.prototype.getAccessTypeIdentifier = function()
+	{
+		// @todo Method not tested
+		return this._definition.getAccessTypeIdentifier();
+	};
+	
 	_.Property.prototype.getDefaultValue = function(targetInstance, accessInstance)
 	{
-		_requestAccess(this, targetInstance, accessInstance);
+		// @todo This if statement is a hack - this
+		// class shouldn't be handling access control
+		// and its an issue for the Reflection.Property.
+		// Original state commented below.
+		// Also, related test disabled.
+		if (targetInstance && accessInstance) {
+			_requestAccess(this, targetInstance, accessInstance);
+		}
+		// _requestAccess(this, targetInstance, accessInstance);
 		if (Object.prototype.toString.call(this._defaultValue) == '[object Array]') {
 			var newArray = [];
 			for (var i = 0; i < this._defaultValue.length; i++) {
@@ -1339,7 +1421,7 @@ if (!Object.create) {
 		return this._definition.getName();
 	};
 	
-	_.Method.prototype.getArgumentTypes = function()
+	_.Method.prototype.getArgumentTypeIdentifiers = function()
 	{
 		return this._definition.getArgumentTypeIdentifiers();
 	};
@@ -1370,6 +1452,11 @@ if (!Object.create) {
 	_.Method.prototype.getDefaultArgumentValue = function(index)
 	{
 		return this._definition.getDefaultArgumentValue(index);
+	};
+	
+	_.Method.prototype.getAccessTypeIdentifier = function()
+	{
+		return this._definition.getAccessTypeIdentifier();
 	};
 	
 	_.Method.prototype.call = function(target, localTarget, accessInstance, args, scopeVariables)
@@ -1405,7 +1492,10 @@ if (!Object.create) {
 			this._definition.getAccessTypeIdentifier()
 		);
 		if (canAccess !== true) throw new _.Method.Fatal('ACCESS_NOT_ALLOWED');
-		var areValidTypes = this._typeChecker.areValidTypes(args, this.getArgumentTypes());
+		var areValidTypes = this._typeChecker.areValidTypes(
+			args,
+			this.getArgumentTypeIdentifiers()
+		);
 		if (scopeVariables) {
 			var originalScopeVariables = {};
 			for (var i in scopeVariables) {
@@ -1743,9 +1833,15 @@ if (!Object.create) {
 		return this._definition.getName();
 	};
 	
-	_.Event.prototype.getArgumentTypes = function()
+	_.Event.prototype.getArgumentTypeIdentifiers = function()
 	{
 		return this._definition.getArgumentTypeIdentifiers();
+	};
+	
+	_.Event.prototype.getAccessTypeIdentifier = function()
+	{
+		// @todo Method untested
+		return this._definition.getAccessTypeIdentifier();
 	};
 	
 	_.Event.prototype.requestBind = function(targetInstance, accessInstance)
@@ -2020,8 +2116,10 @@ if (!Object.create) {
 					'Constant type: ' + typeIdentifier
 				);
 			}
+			this._isAutoGenerated = false;
 		} else {
 			value = _generateValue(definition.getTypeIdentifier());
+			this._isAutoGenerated = true;
 		}
 		this._value = value;
 		this._definition = definition;
@@ -2033,20 +2131,46 @@ if (!Object.create) {
 		return this._definition.getName();
 	};
 	
+	_.Constant.prototype.getAccessTypeIdentifier = function()
+	{
+		// @todo Method untested
+		return this._definition.getAccessTypeIdentifier();
+	};
+	
+	_.Constant.prototype.getTypeIdentifier = function()
+	{
+		// @todo Method untested
+		return this._definition.getTypeIdentifier();
+	};
+	
+	_.Constant.prototype.isAutoGenerated = function()
+	{
+		// @todo Method untested
+		return this._isAutoGenerated;
+	};
+	
 	_.Constant.prototype.get = function(targetConstructor, accessInstance)
 	{
-		if (typeof targetConstructor != 'function') {
-			throw new _.Constant.Fatal(
-				'NON_FUNCTION_TARGET_CONSTRUCTOR_PROVIDED',
-				'Provided type: ' + typeof targetConstructor
+		// @todo This if statment is a hack. This
+		// class should not control access and it
+		// causes an issue for Reflection.Constant.
+		// Originally all access checking was done,
+		// not just when the arguments are provided.
+		// Also, note that the related test is disabled.
+		if (targetConstructor && accessInstance) {
+			if (typeof targetConstructor != 'function') {
+				throw new _.Constant.Fatal(
+					'NON_FUNCTION_TARGET_CONSTRUCTOR_PROVIDED',
+					'Provided type: ' + typeof targetConstructor
+				);
+			}
+			var canAccess = this._accessController.canAccess(
+				targetConstructor,
+				accessInstance,
+				this._definition.getAccessTypeIdentifier()
 			);
+			if (canAccess !== true) throw new _.Constant.Fatal('ACCESS_NOT_ALLOWED');
 		}
-		var canAccess = this._accessController.canAccess(
-			targetConstructor,
-			accessInstance,
-			this._definition.getAccessTypeIdentifier()
-		);
-		if (canAccess !== true) throw new _.Constant.Fatal('ACCESS_NOT_ALLOWED');
 		return this._value;
 	};
 	
@@ -2502,6 +2626,7 @@ if (!Object.create) {
 		this._classes = [];
 		this._instances = [];
 		this._interfaces = {};
+		this._mocks = [];
 		this._namespaceManager = namespaceManager;
 	};
 	
@@ -2613,6 +2738,15 @@ if (!Object.create) {
 		_getClassData(this, classObject).interfaces.push(interfaceName);
 	};
 	
+	_.Type.prototype.registerMock = function(instance, classObject)
+	{
+		// @todo Type check both arguments
+		this._mocks.push({
+			instance:		instance,
+			classObject:	classObject
+		});
+	};
+	
 	_.Type.prototype.classExists = function(classIdentifier)
 	{
 		// @todo Method untested
@@ -2633,10 +2767,28 @@ if (!Object.create) {
 				'Provided type: ' + typeof classIdentifier
 			);
 		}
-		if (typeof classIdentifier == 'object') classIdentifier = classIdentifier.constructor;
+		if (typeof classIdentifier == 'object') {
+			var originalClassIdentifier = classIdentifier;
+			classIdentifier = classIdentifier.constructor;
+		}
 		var classData = _getClassData(this, classIdentifier);
-		if (classData) return classData.classObject;
+		if (classData) {
+			return classData.classObject;
+		} else {
+			for (var i = 0; i < this._mocks.length; i++) {
+				if (this._mocks[i].instance === originalClassIdentifier) {
+					return this._mocks[i].classObject;
+				}
+			}
+		}
 		throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
+	};
+	
+	_.Type.prototype.interfaceExists = function(name)
+	{
+		// @todo Method untested
+		var interfaceObject = this.getInterface(name);
+		return (interfaceObject === undefined) ? false : true;
 	};
 	
 	_.Type.prototype.getInterface = function(name)
@@ -2653,6 +2805,10 @@ if (!Object.create) {
 			);
 		}
 		if (!_classObjectIsRegistered(this, classObject)) {
+			for (var i = 0; i < this._mocks.length; i++) {
+				if (this._mocks[i].classObject !== classObject) continue;
+				return this._mocks[i].classObject.getInterfaces();
+			}
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
 		var interfaces = [];
@@ -2791,6 +2947,14 @@ if (!Object.create) {
 	var _classObjectIsRegistered = function(_this, classObject)
 	{
 		return (_getClassData(_this, classObject)) ? true : false;
+	};
+	
+	var _isMock = function(_this, instance)
+	{
+		for (var i = 0; i < _this._mocks.length; i++) {
+			if (_this._mocks[i].instance === instance) return true;
+		}
+		return false;
 	};
 	
 })(
@@ -3047,7 +3211,7 @@ if (!Object.create) {
 		var methods = _getAllMethodsByName(this, classObject, name);
 		toInspectMethods:
 		for (var i = 0; i < methods.length; i++) {
-			var argumentTypes = methods[i].getArgumentTypes();
+			var argumentTypes = methods[i].getArgumentTypeIdentifiers();
 			if (shouldBeStatic != methods[i].isStatic()) continue;
 			if (args.length > argumentTypes.length) continue;
 			if (args.length < argumentTypes.length) {
@@ -3138,7 +3302,7 @@ if (!Object.create) {
 				this,
 				classObject,
 				targetMethod,
-				eventObject.getArgumentTypes(),
+				eventObject.getArgumentTypeIdentifiers(),
 				false
 			);
 		} catch (error) {
@@ -3281,7 +3445,7 @@ if (!Object.create) {
 					_this,
 					typeObject,
 					memberName,
-					memberObject.getArgumentTypes(),
+					memberObject.getArgumentTypeIdentifiers(),
 					memberObject.isStatic()
 				);
 			} catch (error) {
@@ -3295,7 +3459,7 @@ if (!Object.create) {
 				throw new _.Member.Fatal(
 					'METHOD_ALREADY_REGISTERED',
 					'Method name: ' + memberName + '; ' +
-					'Argument types: ' + (memberObject.getArgumentTypes().join(', ') || '(none)') +
+					'Argument types: ' + (memberObject.getArgumentTypeIdentifiers().join(', ') || '(none)') +
 					'; ' +
 					'Is static: ' + (memberObject.isStatic() ? 'true' : 'false')
 				);
@@ -3398,10 +3562,10 @@ if (!Object.create) {
 			toLookThroughMethods:
 			for (var i = 0; i < methods.length; i++) {
 				if (methods[i].getName() == methodName
-				&&	argumentTypes.length == methods[i].getArgumentTypes().length
+				&&	argumentTypes.length == methods[i].getArgumentTypeIdentifiers().length
 				&&	isStatic === methods[i].isStatic()) {
 					for (var j = 0; j < argumentTypes.length; j++) {
-						if (argumentTypes[j] != methods[i].getArgumentTypes()[j]) {
+						if (argumentTypes[j] != methods[i].getArgumentTypeIdentifiers()[j]) {
 							continue toLookThroughMethods;
 						}
 					}
@@ -3502,8 +3666,8 @@ if (!Object.create) {
 					&&	abstractMember.isStatic() === allMembers[i-1].isStatic()
 					&&	abstractMember.getReturnType() === allMembers[i-1].getReturnType()
 					&&	_arraysEqual(
-						abstractMember.getArgumentTypes(),
-						allMembers[i-1].getArgumentTypes()
+						abstractMember.getArgumentTypeIdentifiers(),
+						allMembers[i-1].getArgumentTypeIdentifiers()
 					)) {
 						abstractMembers.splice(j, 1);
 					}
@@ -3591,6 +3755,7 @@ if (!Object.create) {
 		this._autoLoader;
 		this._includer;
 		this._autoLoadInstantiator;
+		this._reflectionFactory;
 	};
 	
 	_.Instantiator.prototype.getTypeFactory = function()
@@ -3776,7 +3941,9 @@ if (!Object.create) {
 	_.Instantiator.prototype.getTypeChecker = function()
 	{
 		if (!this._typeChecker) {
-			this._typeChecker = new ClassyJS.TypeChecker();
+			this._typeChecker = new ClassyJS.TypeChecker(
+				new ClassyJS.TypeChecker.ReflectionFactory()
+			);
 		}
 		return this._typeChecker;
 	};
@@ -3818,6 +3985,14 @@ if (!Object.create) {
 			this._autoLoadInstantiator = new ClassyJS.AutoLoader.Instantiator();
 		}
 		return this._autoLoadInstantiator;
+	};
+	
+	_.Instantiator.prototype.getReflectionFactory = function()
+	{
+		if (!this._reflectionFactory) {
+			this._reflectionFactory = new ClassyJS.Reflection.Factory();
+		}
+		return this._reflectionFactory;
 	};
 	
 })(window.ClassyJS = window.ClassyJS || {});
@@ -4147,76 +4322,1542 @@ if (!Object.create) {
 );
 
 
-(function(_){
+(function(ClassyJS, _){
 	
-	_.Type = function(name, type)
+	_.Factory = function(){};
+	
+	_.Factory.prototype.buildClass = function(identifier)
 	{
-		this._name = name;
-		this._type = type;
+		return new ClassyJS.Reflection.Class(identifier);
 	};
 	
-	_.Type.acceptClassDependencies = function(namespaceManager, typeRegistry, memberRegistry)
+	_.Factory.prototype.buildClassInstance = function(instance)
 	{
-		_.Type._namespaceManager = namespaceManager;
-		_.Type._typeRegistry = typeRegistry;
-		_.Type._memberRegistry = memberRegistry;
+		return new ClassyJS.Reflection.ClassInstance(instance);
 	};
 	
-	_.Type.prototype.getMethods = function()
+	_.Factory.prototype.buildInterface = function(instance)
 	{
-		var members = _getMembers(this);
-		var methods = [];
-		for (var i in members) {
-			if (members[i] instanceof ClassyJS.Member.Method) {
-				methods.push(new Reflection.Method(members[i]));
+		return new ClassyJS.Reflection.Interface(instance);
+	};
+	
+	_.Factory.prototype.buildProperty = function(className, propertyName)
+	{
+		return new ClassyJS.Reflection.Property(className, propertyName);
+	};
+	
+	_.Factory.prototype.buildMethod = function(className, methodName)
+	{
+		return new ClassyJS.Reflection.Method(className, methodName);
+	};
+	
+	_.Factory.prototype.buildEvent = function(className, eventName)
+	{
+		return new ClassyJS.Reflection.Event(className, eventName);
+	};
+	
+	_.Factory.prototype.buildConstant = function(className, constantName)
+	{
+		return new ClassyJS.Reflection.Constant(className, constantName);
+	};
+	
+	_.Factory.prototype.buildPropertyInstance = function(objectInstance, propertyName)
+	{
+		return new ClassyJS.Reflection.PropertyInstance(objectInstance, propertyName);
+	};
+	
+	_.Factory.prototype.buildMethodInstance = function(objectInstance, methodName)
+	{
+		return new ClassyJS.Reflection.MethodInstance(objectInstance, methodName);
+	};
+	
+	_.Factory.prototype.buildEventInstance = function(objectInstance, eventName)
+	{
+		return new ClassyJS.Reflection.EventInstance(objectInstance, eventName);
+	};
+	
+	_.Factory.prototype.buildArgument = function(identifier, isOptional, defaultValue, owner)
+	{
+		return new ClassyJS.Reflection.Argument(identifier, isOptional, defaultValue, owner);
+	};
+	
+	_.Factory.prototype.buildType = function(identifier)
+	{
+		return new ClassyJS.Reflection.Type(identifier);
+	};
+	
+	_.Factory.prototype.buildAccessType = function(identifier)
+	{
+		return new ClassyJS.Reflection.AccessType(identifier);
+	};
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+(function(ClassyJS, _){
+	
+	// @todo propertyExists, methodExists, etc
+	
+	_.Class = function(identifier)
+	{
+		
+		if (typeof identifier == 'string') {
+			identifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+				identifier
+			);
+		}
+		
+		if (typeof identifier != 'function' && typeof identifier != 'object') {
+			throw new _.Class.Fatal(
+				'INVALID_IDENTIFIER_PROVIDED',
+				'Provided type: ' + typeof identifier
+			);
+		}
+		
+		if (!ClassyJS._instantiator.getTypeRegistry().classExists(identifier)) {
+			throw new _.Class.Fatal('CLASS_DOES_NOT_EXIST');
+		}
+		
+		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(identifier);
+		
+	};
+	
+	_.Class.prototype.getName = function()
+	{
+		return this._classObject.getName();
+	};
+	
+	_.Class.prototype.hasParent = function()
+	{
+		return this._classObject.isExtension();
+	};
+	
+	_.Class.prototype.getParent = function()
+	{
+		var parentClassName = this._classObject.getParentClass();
+		return ClassyJS._instantiator.getReflectionFactory().buildClass(parentClassName);
+	};
+	
+	_.Class.prototype.getInterfaces = function()
+	{
+		var interfaceNames = this._classObject.getInterfaces();
+		var reflectionInterfaces = [];
+		for (var i = 0; i < interfaceNames.length; i++) {
+			reflectionInterfaces.push(
+				ClassyJS._instantiator.getReflectionFactory().buildInterface(interfaceNames[i])
+			);
+		}
+		return reflectionInterfaces;
+	};
+	
+	_.Class.prototype.implementsInterface = function(interfaceName)
+	{
+		var interfaces = ClassyJS._instantiator.getTypeRegistry().getInterfacesFromClass(
+			this._classObject
+		);
+		for (var i = 0; i < interfaces.length; i++) {
+			if (interfaces[i] === interfaceName || interfaces[i].getName() === interfaceName) {
+				return true;
 			}
 		}
-		return methods;
+		return false;
 	};
 	
-	_.Type.prototype.getProperties = function()
+	_.Class.prototype.getMembers = function()
 	{
-		var members = _getMembers(this);
-		var properties = [];
-		for (var i in members) {
-			if (members[i] instanceof ClassyJS.Member.Property) {
-				properties.push(new Reflection.Property(members[i]));
-			}
-		}
-		return properties;
+		return _convertToReflectionMembers(this, _getMembers(this));
+	};
+	
+	_.Class.prototype.getProperties = function()
+	{
+		return _getFilteredMembers(this, ClassyJS.Member.Property);
+	};
+	
+	_.Class.prototype.getProperty = function(name)
+	{
+		// @todo Ensure name is a string or undefined
+		var propertiesArray = _getFilteredMembers(this, ClassyJS.Member.Property, name);
+		// @todo Throw if length is not 1
+		return propertiesArray[0];
+	};
+	
+	_.Class.prototype.getMethods = function(name)
+	{
+		// @todo Ensure name is a string or undefined
+		return _getFilteredMembers(this, ClassyJS.Member.Method, name);
+	};
+	
+	_.Class.prototype.getEvents = function(name)
+	{
+		// @todo Ensure name is a string or undefined
+		return _getFilteredMembers(this, ClassyJS.Member.Event, name);
+	};
+	
+	_.Class.prototype.getEvent = function(name)
+	{
+		// @todo Ensure name is a string or undefined
+		var eventsArray = _getFilteredMembers(this, ClassyJS.Member.Event, name);
+		// @todo Throw if length is not 1
+		return eventsArray[0];
+	};
+	
+	_.Class.prototype.getConstants = function(name)
+	{
+		// @todo Ensure name is a string or undefined
+		return _getFilteredMembers(this, ClassyJS.Member.Constant, name);
+	};
+	
+	_.Class.prototype.getConstant = function(name)
+	{
+		// @todo Ensure name is a string or undefined
+		var constantsArray = _getFilteredMembers(this, ClassyJS.Member.Constant, name);
+		// @todo Throw if length is not 1
+		return constantsArray[0];
+	};
+	
+	_.Class.prototype.isAbstract = function()
+	{
+		return (_getAbstractType(this) == 'none') ? false : true;
+	};
+	
+	_.Class.prototype.isExplicitAbstract = function()
+	{
+		return (_getAbstractType(this) == 'explicit') ? true : false;
+	};
+	
+	_.Class.prototype.isImplicitAbstract = function()
+	{
+		return (_getAbstractType(this) == 'implicit') ? true : false;
+	};
+	
+	_.Class.prototype.createNew = function()
+	{
+		var args = Array.prototype.splice.call(arguments, 0);
+		args.unshift(null);
+		var constructor = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			this._classObject.getName()
+		);
+		var F = constructor.bind.apply(constructor, args);
+		return new F();
+	};
+	
+	_.Class.prototype.getMock = function()
+	{
+		
+		// Get the real constructor function
+		// for the class and ensure it is a function
+		var constructor = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			this.getName()
+		);
+		
+		// Create a proxy class, assigning
+		// the target class's prototype to it
+		var Mock = function(){};
+		Mock.prototype = constructor.prototype;
+		
+		// Create an instance of the proxy
+		var mock = new Mock();
+		
+		var properties = _filterByType(this, ClassyJS.Member.Property, _getMembers(this));
+		var methods = _filterByType(this, ClassyJS.Member.Method, _getMembers(this));
+		
+		for (var i = 0; i < properties.length; i++) mock[properties[i].getName()] = function(){};
+		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
+		
+		// @todo Test this line
+		ClassyJS._instantiator.getTypeRegistry().registerMock(mock, this._classObject);
+		
+		// Return the finished mock
+		return mock;
+		
 	};
 	
 	var _getMembers = function(_this)
 	{
-		try {
-			if (_this._type == 'interface') {
-				return _.Type._memberRegistry.getMembers(
-					_.Type._typeRegistry.getInterface(_this._name)
+		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+	};
+	
+	var _getFilteredMembers = function(_this, type, name)
+	{
+		return _convertToReflectionMembers(
+			_this,
+			_filterByName(
+				_this,
+				name,
+				_filterByType(
+					_this,
+					type,
+					_getMembers(_this)
+				)
+			)
+		);
+	};
+	
+	var _filterByType = function(_this, type, members)
+	{
+		if (!type) return members;
+		var filteredMembers = [];
+		for (var i = 0; i < members.length; i++) {
+			if (members[i] instanceof type) filteredMembers.push(members[i]);
+		}
+		return filteredMembers;
+	};
+	
+	_filterByName = function(_this, name, members)
+	{
+		if (!name) return members;
+		var filteredMembers = [];
+		for (var i = 0; i < members.length; i++) {
+			if (members[i].getName() == name) filteredMembers.push(members[i]);
+		}
+		return filteredMembers;
+	};
+	
+	var _convertToReflectionMembers = function(_this, members)
+	{
+		var reflectionMembers = [];
+		for (var i = 0; i < members.length; i++) {
+			if (members[i] instanceof ClassyJS.Member.Property) {
+				reflectionMembers.push(
+					ClassyJS._instantiator.getReflectionFactory().buildProperty(
+						_this.getName(),
+						members[i].getName()
+					)
 				);
-			} else {
-				return _.Type._memberRegistry.getMembers(
-					_.Type._typeRegistry.getClass(
-						_.Type._namespaceManager.getNamespaceObject(_this._name)
+			} else if (members[i] instanceof ClassyJS.Member.Method) {
+				reflectionMembers.push(
+					ClassyJS._instantiator.getReflectionFactory().buildMethod(
+						_this.getName(),
+						members[i].getName()
+					)
+				);
+			} else if (members[i] instanceof ClassyJS.Member.Event) {
+				reflectionMembers.push(
+					ClassyJS._instantiator.getReflectionFactory().buildEvent(
+						_this.getName(),
+						members[i].getName()
+					)
+				);
+			} else if (members[i] instanceof ClassyJS.Member.Constant) {
+				reflectionMembers.push(
+					ClassyJS._instantiator.getReflectionFactory().buildConstant(
+						_this.getName(),
+						members[i].getName()
 					)
 				);
 			}
-		} catch (error) {
-			if (error instanceof ClassyJS.Registry.Type.Fatal
-			&&  error.code == 'CLASS_NOT_REGISTERED') {
-				return [];
-			} else {
-				throw error;
-			}
 		}
+		return reflectionMembers;
 	};
 	
-})(window.Reflection = window.Reflection || {});
+	var _getAbstractType = function(_this)
+	{
+		try {
+			_this._classObject.requestInstantiation();
+		} catch (error) {
+			if (!(error instanceof ClassyJS.Type.Class.Fatal)) throw error;
+			if (error.code == 'CANNOT_INSTANTIATE_ABSTRACT_CLASS') return 'explicit';
+			if (error.code == 'CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS') return 'implicit';
+			if (error.code == 'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS') {
+				return 'implicit';
+			}
+			// @todo Throw new error - we shouldn't get here
+		}
+		return 'none';
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Class = _.Class;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
 
-;(function(ClassyJS, _){
+;(function(ClassyJS, Reflection, _){
 	
 	var messages = {
-		NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER:
-			'Object returned from namespace manager was not a function as expected'
+		CLASS_DOES_NOT_EXIST: 'Provided identifier does not describe a valid class',
+		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be a string, function or object'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Class.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Class = window.ClassyJS.Reflection.Class || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.ClassInstance = function(instance)
+	{
+		
+		if (typeof instance != 'object') {
+			throw new _.ClassInstance.Fatal(
+				'INVALID_IDENTIFIER_PROVIDED',
+				'Provided type: ' + typeof instance
+			);
+		}
+		
+		if (!ClassyJS._instantiator.getTypeRegistry().classExists(instance)) {
+			throw new _.ClassInstance.Fatal('CLASS_DOES_NOT_EXIST');
+		}
+		
+		this._instance = instance;
+		
+	};
+	
+	_.ClassInstance.prototype.getClass = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildClass(this._instance);
+	};
+	
+	_.ClassInstance.prototype.getMemberInstances = function()
+	{
+		return _convertToReflectionMembers(this, _getMembers(this));
+	};
+	
+	_.ClassInstance.prototype.getPropertyInstances = function()
+	{
+		return _getFilteredMembers(this, ClassyJS.Member.Property);
+	};
+	
+	_.ClassInstance.prototype.getPropertyInstance = function(name)
+	{
+		// @todo Ensure name is a string or undefined
+		var propertiesArray = _getFilteredMembers(this, ClassyJS.Member.Property, name);
+		// @todo Throw if length is not 1
+		return propertiesArray[0];
+	};
+	
+	_.ClassInstance.prototype.getMethodInstances = function(name)
+	{
+		return _getFilteredMembers(this, ClassyJS.Member.Method, name);
+	};
+	
+	_.ClassInstance.prototype.getEventInstances = function()
+	{
+		return _getFilteredMembers(this, ClassyJS.Member.Event);
+	};
+	
+	_.ClassInstance.prototype.getEventInstance = function(name)
+	{
+		// @todo Ensure name is a string or undefined
+		var eventsArray =  _getFilteredMembers(this, ClassyJS.Member.Event, name);
+		// @todo Throw if length is not 1
+		return eventsArray[0];
+	};
+	
+	var _getMembers = function(_this)
+	{
+		var classObject = ClassyJS._instantiator.getTypeRegistry().getClass(_this._instance);
+		return ClassyJS._instantiator.getMemberRegistry().getMembers(classObject);
+	};
+	
+	var _getFilteredMembers = function(_this, type, name)
+	{
+		return _convertToReflectionMembers(
+			_this,
+			_filterByName(
+				_this,
+				name,
+				_filterByType(
+					_this,
+					type,
+					_getMembers(_this)
+				)
+			)
+		);
+	};
+	
+	var _filterByType = function(_this, type, members)
+	{
+		if (!type) return members;
+		var filteredMembers = [];
+		for (var i = 0; i < members.length; i++) {
+			if (members[i] instanceof type) filteredMembers.push(members[i]);
+		}
+		return filteredMembers;
+	};
+	
+	_filterByName = function(_this, name, members)
+	{
+		if (!name) return members;
+		var filteredMembers = [];
+		for (var i = 0; i < members.length; i++) {
+			if (members[i].getName() == name) filteredMembers.push(members[i]);
+		}
+		return filteredMembers;
+	};
+	
+	var _convertToReflectionMembers = function(_this, members)
+	{
+		var reflectionMembers = [];
+		var factory = ClassyJS._instantiator.getReflectionFactory();
+		for (var i = 0; i < members.length; i++) {
+			if (members[i] instanceof ClassyJS.Member.Property) {
+				reflectionMembers.push(factory.buildPropertyInstance(
+					_this._instance,
+					members[i].getName()
+				));
+			} else if (members[i] instanceof ClassyJS.Member.Method) {
+				reflectionMembers.push(factory.buildMethodInstance(
+					_this._instance,
+					members[i].getName()
+				));
+			} else if (members[i] instanceof ClassyJS.Member.Event) {
+				reflectionMembers.push(factory.buildEventInstance(
+					_this._instance,
+					members[i].getName()
+				));
+			} else {
+				continue;
+			}
+		}
+		return reflectionMembers;
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.ClassInstance = _.ClassInstance;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		CLASS_DOES_NOT_EXIST: 'Provided object is not an instance of a valid class',
+		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be an object instance'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.ClassInstance.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.ClassInstance = window.ClassyJS.Reflection.ClassInstance || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.Interface = function(name)
+	{
+		
+		if (typeof name != 'string') {
+			throw new _.Interface.Fatal(
+				'NON_STRING_INTERFACE_NAME_PROVIDED',
+				'Provided type: ' +  typeof name
+			);
+		}
+		
+		if (!ClassyJS._instantiator.getTypeRegistry().interfaceExists(name)) {
+			throw new _.Interface.Fatal(
+				'INTERFACE_DOES_NOT_EXIST',
+				'Provided name: ' + name
+			);
+		}
+		
+		this._interfaceObject = ClassyJS._instantiator.getTypeRegistry().getInterface(name);
+		
+	};
+	
+	_.Interface.prototype.getName = function()
+	{
+		return this._interfaceObject.getName();
+	};
+	
+	_.Interface.prototype.getMembers = function()
+	{
+		return _convertToReflectionMembers(this, _getMembers(this));
+	};
+	
+	_.Interface.prototype.getMethods = function(name)
+	{
+		return _getFilteredMembers(this, ClassyJS.Member.Method, name);
+	};
+	
+	_.Interface.prototype.getEvents = function()
+	{
+		return _getFilteredMembers(this, ClassyJS.Member.Event);
+	};
+	
+	_.Interface.prototype.getEvent = function(name)
+	{
+		return _getFilteredMembers(this, ClassyJS.Member.Event, name);
+	};
+	
+	_.Interface.prototype.getMock = function()
+	{
+		
+		var Mock = function(){};
+		
+		var mock = new Mock();
+		
+		var properties = _filterByType(this, ClassyJS.Member.Property, _getMembers(this));
+		var methods = _filterByType(this, ClassyJS.Member.Method, _getMembers(this));
+		
+		for (var i = 0; i < properties.length; i++) mock[properties[i].getName()] = function(){};
+		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
+		
+		mock.bind = function(){};
+		
+		ClassyJS._instantiator.getTypeRegistry().registerMock(mock, new ClassyJS.Type.Class(
+			new ClassyJS.Type.Class.Definition(
+				'class ClassyJS.Mock' + Math.floor(Math.random() * 999999) + ' implements ' + this._interfaceObject.getName()
+			),
+			ClassyJS._instantiator.getTypeRegistry(),
+			ClassyJS._instantiator.getMemberRegistry(),
+			ClassyJS._instantiator.getNamespaceManager()
+		));
+		
+		return mock;
+		
+	};
+	
+	var _getMembers = function(_this)
+	{
+		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._interfaceObject);
+	};
+	
+	var _getFilteredMembers = function(_this, type, name)
+	{
+		return _convertToReflectionMembers(
+			_this,
+			_filterByName(
+				_this,
+				name,
+				_filterByType(
+					_this,
+					type,
+					_getMembers(_this)
+				)
+			)
+		);
+	};
+	
+	var _filterByType = function(_this, type, members)
+	{
+		if (!type) return members;
+		var filteredMembers = [];
+		for (var i = 0; i < members.length; i++) {
+			if (members[i] instanceof type) filteredMembers.push(members[i]);
+		}
+		return filteredMembers;
+	};
+	
+	_filterByName = function(_this, name, members)
+	{
+		if (!name) return members;
+		var filteredMembers = [];
+		for (var i = 0; i < members.length; i++) {
+			if (members[i].getName() == name) filteredMembers.push(members[i]);
+		}
+		return filteredMembers;
+	};
+	
+	var _convertToReflectionMembers = function(_this, members)
+	{
+		var reflectionMembers = [];
+		for (var i = 0; i < members.length; i++) {
+			if (members[i] instanceof ClassyJS.Member.Method) {
+				reflectionMembers.push(
+					ClassyJS._instantiator.getReflectionFactory().buildMethod(members[i])
+				);
+			} else if (members[i] instanceof ClassyJS.Member.Event) {
+				reflectionMembers.push(
+					ClassyJS._instantiator.getReflectionFactory().buildEvent(members[i])
+				);
+			}
+		}
+		return reflectionMembers;
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Interface = _.Interface;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		INTERFACE_DOES_NOT_EXIST: 'Provided name does not describe a valid interface',
+		NON_STRING_INTERFACE_NAME_PROVIDED: 'The provided name must be a string'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Interface.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Interface = window.ClassyJS.Reflection.Interface || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.Property = function(classIdentifier, propertyName)
+	{
+		
+		if (typeof classIdentifier == 'string') {
+			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+				classIdentifier
+			);
+		}
+		
+		if (typeof classIdentifier != 'function' && typeof classIdentifier != 'object') {
+			throw new _.Property.Fatal(
+				'INVALID_IDENTIFIER_PROVIDED',
+				'Provided type: ' + typeof classIdentifier
+			);
+		}
+		
+		if (typeof propertyName != 'string') {
+			throw new _.Property.Fatal(
+				'NON_STRING_PROPERTY_NAME_PROVIDED',
+				'Provided type: ' + typeof propertyName
+			);
+		}
+		
+		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+			throw new _.Property.Fatal('CLASS_DOES_NOT_EXIST');
+		}
+		
+		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		
+		var members = _getMembers(this);
+		
+		for (var i = 0; i < members.length; i++) {
+			
+			if (members[i] instanceof ClassyJS.Member.Property
+			&&  members[i].getName() == propertyName) {
+				this._propertyObject = members[i];
+				return;
+			}
+			
+		}
+		
+		throw new _.Property.Fatal(
+			'PROPERTY_DOES_NOT_EXIST',
+			'Property name: ' + propertyName
+		);
+		
+	};
+	
+	_.Property.prototype.getName = function()
+	{
+		return this._propertyObject.getName();
+	};
+	
+	_.Property.prototype.getType = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildType(
+			this._propertyObject.getTypeIdentifier()
+		);
+	};
+	
+	_.Property.prototype.getAccessType = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+			this._propertyObject.getAccessTypeIdentifier()
+		);
+	};
+	
+	_.Property.prototype.hasDefaultValue = function()
+	{
+		try {
+			this.getDefaultValue();
+		} catch (error) {
+			if (!(error instanceof _.Property.Fatal)
+			||  error.code != 'UNDEFINED_DEFAULT_VALUE_REQUESTED') {
+				throw error;
+			}
+			return false;
+		}
+		return true;
+	};
+	
+	_.Property.prototype.getDefaultValue = function()
+	{
+		var defaultValue = this._propertyObject.getDefaultValue();
+		if (defaultValue === null) throw new _.Property.Fatal('UNDEFINED_DEFAULT_VALUE_REQUESTED');
+		return defaultValue;
+	};
+	
+	_.Property.prototype.getClass = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+			this._classObject.getName()
+		);
+	};
+	
+	var _getMembers = function(_this)
+	{
+		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Property = _.Property;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be a string, function or object',
+		NON_STRING_PROPERTY_NAME_PROVIDED: 'Provided property name must be a string',
+		CLASS_DOES_NOT_EXIST: 'Provided identifier does not describe a valid class',
+		PROPERTY_DOES_NOT_EXIST:
+			'Provided property name and class identifier do not describe a valid property',
+		UNDEFINED_DEFAULT_VALUE_REQUESTED:
+			'A call was made to \'getDefaultValue\' when no default value exists'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Property.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Property = window.ClassyJS.Reflection.Property || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.PropertyInstance = function(objectInstance, propertyName)
+	{
+		
+		// Force an error if the
+		// property is not valid
+		ClassyJS._instantiator.getMemberRegistry().getPropertyValue(
+			objectInstance,
+			objectInstance,
+			propertyName
+		);
+		
+		this._objectInstance = objectInstance;
+		this._name = propertyName;
+		
+	};
+	
+	_.PropertyInstance.prototype.getProperty = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildProperty(
+			this._objectInstance,
+			this._name
+		);
+	};
+	
+	_.PropertyInstance.prototype.getValue = function()
+	{
+		return ClassyJS._instantiator.getMemberRegistry().getPropertyValue(
+			this._objectInstance,
+			this._objectInstance,
+			this._name
+		);
+	};
+	
+	_.PropertyInstance.prototype.setValue = function(value)
+	{
+		ClassyJS._instantiator.getMemberRegistry().setPropertyValue(
+			this._objectInstance,
+			this._objectInstance,
+			this._name,
+			value
+		);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.PropertyInstance = _.PropertyInstance;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.PropertyInstance.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.PropertyInstance = window.ClassyJS.Reflection.PropertyInstance || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.Method = function(classIdentifier, methodName)
+	{
+		
+		if (typeof classIdentifier == 'string') {
+			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+				classIdentifier
+			);
+		}
+		
+		if (typeof classIdentifier != 'function' && typeof classIdentifier != 'object') {
+			throw new _.Method.Fatal(
+				'INVALID_IDENTIFIER_PROVIDED',
+				'Provided type: ' + typeof classIdentifier
+			);
+		}
+		
+		if (typeof methodName != 'string') {
+			throw new _.Method.Fatal(
+				'NON_STRING_METHOD_NAME_PROVIDED',
+				'Provided type: ' + typeof methodName
+			);
+		}
+		
+		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+			throw new _.Method.Fatal('CLASS_DOES_NOT_EXIST');
+		}
+		
+		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		
+		var members = _getMembers(this);
+		
+		for (var i = 0; i < members.length; i++) {
+			
+			if (members[i] instanceof ClassyJS.Member.Method
+			&&  members[i].getName() == methodName) {
+				this._methodObject = members[i];
+				return;
+			}
+			
+		}
+		
+		throw new _.Method.Fatal(
+			'METHOD_DOES_NOT_EXIST',
+			'Method name: ' + methodName
+		);
+		
+	};
+	
+	_.Method.prototype.getName = function()
+	{
+		return this._methodObject.getName();
+	};
+	
+	_.Method.prototype.getAccessType = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+			this._methodObject.getAccessTypeIdentifier()
+		);
+	};
+	
+	_.Method.prototype.getArguments = function()
+	{
+		var types = this._methodObject.getArgumentTypeIdentifiers();
+		var reflectionArguments = [];
+		for (var i = 0; i < types.length; i++) {
+			var isOptional = this._methodObject.argumentIsOptional(i);
+			reflectionArguments.push(ClassyJS._instantiator.getReflectionFactory().buildArgument(
+				types[i],
+				isOptional,
+				isOptional ? this._methodObject.getDefaultArgumentValue(i) : undefined,
+				this
+			));
+		}
+		return reflectionArguments;
+	};
+	
+	_.Method.prototype.getClass = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+			this._classObject.getName()
+		);
+	};
+	
+	var _getMembers = function(_this)
+	{
+		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Method = _.Method;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
+			'Class dependencies must be provided via \'acceptClassDependencies\' ' +
+			'before any instance can be created',
+		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be a string, function or object',
+		NON_STRING_METHOD_NAME_PROVIDED: 'Provided method name must be a string',
+		CLASS_DOES_NOT_EXIST: 'Provided identifier does not describe a valid class',
+		METHOD_DOES_NOT_EXIST:
+			'Provided method name and class identifier do not describe a valid method'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Method.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Method = window.ClassyJS.Reflection.Method || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.MethodInstance = function(objectInstance, methodName)
+	{
+		
+		// @todo Check class exists (typeRegistry.classExists(objectInstance))
+		
+		var classObject = ClassyJS._instantiator.getTypeRegistry().getClass(objectInstance);
+		
+		var members = ClassyJS._instantiator.getMemberRegistry().getMembers(classObject);
+		
+		var methodExists = false;
+		
+		for (var i = 0; i < members.length; i++) {
+			if (!(members[i] instanceof ClassyJS.Member.Method)) continue;
+			if (members[i].getName() == methodName) {
+				methodExists = true;
+				break;
+			}
+		}
+		
+		if (!methodExists) {
+			throw new _.MethodInstance.Fatal(
+				'METHOD_DOES_NOT_EXIST',
+				'Method name: ' + methodName
+			);
+		}
+		
+		this._objectInstance = objectInstance;
+		this._name = methodName;
+		
+	};
+	
+	_.MethodInstance.prototype.getMethod = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildMethod(
+			this._objectInstance,
+			this._name
+		);
+	};
+	
+	_.MethodInstance.prototype.call = function()
+	{
+		return ClassyJS._instantiator.getMemberRegistry().callMethod(
+			this._objectInstance,
+			this._objectInstance,
+			this._name,
+			Array.prototype.splice.call(arguments, 0, arguments.length)
+		);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.MethodInstance = _.MethodInstance;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		METHOD_DOES_NOT_EXIST:
+			'Provided method name and class instance do not describe a valid method'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.MethodInstance.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.MethodInstance = window.ClassyJS.Reflection.MethodInstance || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.Event = function(classIdentifier, eventName)
+	{
+		
+		if (typeof classIdentifier == 'string') {
+			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+				classIdentifier
+			);
+		}
+		
+		if (typeof classIdentifier != 'function' && typeof classIdentifier != 'object') {
+			throw new _.Event.Fatal(
+				'INVALID_IDENTIFIER_PROVIDED',
+				'Provided type: ' + typeof classIdentifier
+			);
+		}
+		
+		if (typeof eventName != 'string') {
+			throw new _.Event.Fatal(
+				'NON_STRING_EVENT_NAME_PROVIDED',
+				'Provided type: ' + typeof eventName
+			);
+		}
+		
+		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+			throw new _.Event.Fatal('CLASS_DOES_NOT_EXIST');
+		}
+		
+		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		
+		var members = _getMembers(this);
+		
+		for (var i = 0; i < members.length; i++) {
+			
+			if (members[i] instanceof ClassyJS.Member.Event
+			&&  members[i].getName() == eventName) {
+				this._eventObject = members[i];
+				return;
+			}
+			
+		}
+		
+		throw new _.Event.Fatal(
+			'EVENT_DOES_NOT_EXIST',
+			'Event name: ' + eventName
+		);
+		
+	};
+	
+	_.Event.prototype.getName = function()
+	{
+		return this._eventObject.getName();
+	};
+	
+	_.Event.prototype.getArguments = function()
+	{
+		var types = this._eventObject.getArgumentTypeIdentifiers();
+		var reflectionArguments = [];
+		for (var i = 0; i < types.length; i++) {
+			reflectionArguments.push(ClassyJS._instantiator.getReflectionFactory().buildArgument(
+				types[i],
+				false,
+				undefined,
+				this
+			));
+		}
+		return reflectionArguments;
+	};
+	
+	_.Event.prototype.getAccessType = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+			this._eventObject.getAccessTypeIdentifier()
+		);
+	};
+	
+	_.Event.prototype.getClass = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+			this._classObject.getName()
+		);
+	};
+	
+	var _getMembers = function(_this)
+	{
+		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Event = _.Event;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
+			'Class dependencies must be provided via \'acceptClassDependencies\' ' +
+			'before any instance can be created',
+		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be a string, function or object',
+		NON_STRING_EVENT_NAME_PROVIDED: 'Provided event name must be a string',
+		CLASS_DOES_NOT_EXIST: 'Provided identifier does not describe a valid class',
+		EVENT_DOES_NOT_EXIST:
+			'Provided event name and class identifier do not describe a valid event'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Event.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Event = window.ClassyJS.Reflection.Event || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.EventInstance = function(objectInstance, eventName)
+	{
+		
+		// @todo Check class exists (typeRegistry.classExists(objectInstance))
+		
+		var classObject = ClassyJS._instantiator.getTypeRegistry().getClass(objectInstance);
+		
+		var members = ClassyJS._instantiator.getMemberRegistry().getMembers(classObject);
+		
+		var eventExists = false;
+		
+		for (var i = 0; i < members.length; i++) {
+			if (!(members[i] instanceof ClassyJS.Member.Event)) continue;
+			if (members[i].getName() == eventName) {
+				eventExists = true;
+				break;
+			}
+		}
+		
+		if (!eventExists) {
+			throw new _.EventInstance.Fatal(
+				'EVENT_DOES_NOT_EXIST',
+				'Event name: ' + eventName
+			);
+		}
+		
+		this._objectInstance = objectInstance;
+		this._name = eventName;
+		
+	};
+	
+	_.EventInstance.prototype.getEvent = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildEvent(
+			this._objectInstance,
+			this._name
+		);
+	};
+	
+	_.EventInstance.prototype.trigger = function()
+	{
+		ClassyJS._instantiator.getMemberRegistry().triggerEvent(
+			this._objectInstance,
+			this._name,
+			Array.prototype.splice.call(arguments, 0, arguments.length)
+		);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.EventInstance = _.EventInstance;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		EVENT_DOES_NOT_EXIST:
+			'Provided event name and class instance do not describe a valid event'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.EventInstance.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.EventInstance = window.ClassyJS.Reflection.EventInstance || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.Constant = function(classIdentifier, constantName)
+	{
+		
+		if (typeof classIdentifier == 'string') {
+			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+				classIdentifier
+			);
+		}
+		
+		if (typeof classIdentifier != 'function' && typeof classIdentifier != 'object') {
+			throw new _.Constant.Fatal(
+				'INVALID_IDENTIFIER_PROVIDED',
+				'Provided type: ' + typeof classIdentifier
+			);
+		}
+		
+		if (typeof constantName != 'string') {
+			throw new _.Constant.Fatal(
+				'NON_STRING_CONSTANT_NAME_PROVIDED',
+				'Provided type: ' + typeof constantName
+			);
+		}
+		
+		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+			throw new _.Constant.Fatal('CLASS_DOES_NOT_EXIST');
+		}
+		
+		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		
+		var members = _getMembers(this);
+		
+		for (var i = 0; i < members.length; i++) {
+			
+			if (members[i] instanceof ClassyJS.Member.Constant
+			&&  members[i].getName() == constantName) {
+				this._constantObject = members[i];
+				return;
+			}
+			
+		}
+		
+		throw new _.Constant.Fatal(
+			'CONSTANT_DOES_NOT_EXIST',
+			'Constant name: ' + constantName
+		);
+		
+	};
+	
+	_.Constant.prototype.getName = function()
+	{
+		return this._constantObject.getName();
+	};
+	
+	_.Constant.prototype.getType = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildType(
+			this._constantObject.getTypeIdentifier()
+		);
+	};
+	
+	_.Constant.prototype.getAccessType = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+			this._constantObject.getAccessTypeIdentifier()
+		);
+	};
+	
+	_.Constant.prototype.getValue = function()
+	{
+		return this._constantObject.get();
+	};
+	
+	_.Constant.prototype.isAutoGenerated = function()
+	{
+		return this._constantObject.isAutoGenerated();
+	};
+	
+	_.Constant.prototype.getClass = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+			this._classObject.getName()
+		);
+	};
+	
+	var _getMembers = function(_this)
+	{
+		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Constant = _.Constant;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
+			'Class dependencies must be provided via \'acceptClassDependencies\' ' +
+			'before any instance can be created',
+		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be a string, function or object',
+		NON_STRING_CONSTANT_NAME_PROVIDED: 'Provided constant name must be a string',
+		CLASS_DOES_NOT_EXIST: 'Provided identifier does not describe a valid class',
+		CONSTANT_DOES_NOT_EXIST:
+			'Provided constant name and class identifier do not describe a valid constant',
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Constant.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Constant = window.ClassyJS.Reflection.Constant || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.Argument = function(typeIdentifier, isOptional, defaultValue, owner)
+	{
+		
+		// @todo Possibly check the caller is a
+		// member of the Reflection API as, as far
+		// as I can imagine, it does not make sense
+		// for client code to instantiate this class. 
+		
+		if (typeof typeIdentifier != 'string') {
+			throw new _.Argument.Fatal(
+				'NON_STRING_TYPE_IDENTIFIER_SUPPLIED',
+				'Provided type: ' + typeof typeIdentifier
+			);
+		}
+		
+		if (typeof isOptional != 'boolean') {
+			throw new _.Argument.Fatal(
+				'NON_BOOLEAN_OPTIONAL_FLAG_SUPPLIED',
+				'Provided type: ' + typeof isOptional
+			);
+		}
+		
+		if (!isOptional && typeof defaultValue != 'undefined') {
+			throw new _.Argument.Fatal('UNEXPECTED_DEFAULT_PROVIDED');
+		}
+		
+		if (['string', 'object', 'function'].indexOf(typeof owner) == -1) {
+			throw new _.Argument.Fatal(
+				'INVALID_OWNER_TYPE_PROVIDED',
+				'Provided type: ' + typeof owner
+			);
+		}
+		
+		this._typeIdentifier = typeIdentifier;
+		this._isOptional = isOptional;
+		this._defaultValue = defaultValue;
+		this._owner = owner;
+		
+	};
+	
+	_.Argument.prototype.getType = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildType(this._typeIdentifier);
+	};
+	
+	_.Argument.prototype.isOptional = function()
+	{
+		return this._isOptional;
+	};
+	
+	_.Argument.prototype.hasDefaultValue = function()
+	{
+		return (this._defaultValue === undefined) ? false : true;
+	};
+	
+	_.Argument.prototype.getDefaultValue = function()
+	{
+		if (this._defaultValue === undefined) throw new _.Argument.Fatal('NON_DEFAULT_RETRIEVED');
+		return this._defaultValue;
+	};
+	
+	_.Argument.prototype.getClass = function()
+	{
+		return ClassyJS._instantiator.getReflectionFactory().buildClass(this._owner);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Argument = _.Argument;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		NON_STRING_TYPE_IDENTIFIER_SUPPLIED: 'The provided type identifier must be a string',
+		NON_BOOLEAN_OPTIONAL_FLAG_SUPPLIED:
+			'The provided flag indicating whether the argument is optional must be a boolean',
+		UNEXPECTED_DEFAULT_PROVIDED:
+			'A default value was provided even though it was ' +
+			'indicated that the argument is not optional',
+		INVALID_OWNER_TYPE_PROVIDED: 'The provided owner must be an object, function or string',
+		NON_DEFAULT_RETRIEVED: 'A call was made to getDefaultValue when no default exists'
+	};
+	
+	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Argument.Fatal', messages);
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
+	window.ClassyJS.Reflection.Argument = window.ClassyJS.Reflection.Argument || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.AccessType = function(identifier)
+	{
+		// @todo Everything
+		this._identifier = identifier;
+	};
+	
+	_.AccessType.prototype.getIdentifier = function()
+	{
+		return this._identifier;
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.AccessType = _.AccessType;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+(function(ClassyJS, _){
+	
+	_.Type = function(identifier)
+	{
+		
+		if (typeof identifier != 'string') {
+			throw new _.Type.Fatal(
+				'NON_STRING_IDENTIFIER_PROVIDED',
+				'Provided type: ' + typeof identifier
+			);
+		}
+		
+		this._identifier = identifier;
+		
+	};
+	
+	_.Type.prototype.getIdentifier = function()
+	{
+		return this._identifier;
+	};
+	
+	_.Type.prototype.isValidValue = function(value)
+	{
+		return ClassyJS._instantiator.getTypeChecker().isValidType(value, this._identifier);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Type = _.Type;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);
+
+;(function(ClassyJS, Reflection, _){
+	
+	var messages = {
+		NON_STRING_IDENTIFIER_PROVIDED: 'The provided type identifier must be a string'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Type.Fatal', messages);
@@ -4227,174 +5868,6 @@ if (!Object.create) {
 	window.ClassyJS.Reflection.Type = window.ClassyJS.Reflection.Type || {}
 );
 
-(function(ClassyJS, Reflection, _){
-	
-	_.Class = function(className)
-	{
-		return _.call(this, className, 'class');
-	};
-	
-	ClassyJS.Inheritance.makeChild(_.Class, _);
-	
-	_.Class.prototype.getMock = function()
-	{
-		
-		// Get the real constructor function
-		// for the class and ensure it is a function
-		var constructor = _._namespaceManager.getNamespaceObject(this._name);
-		if (typeof constructor != 'function') {
-			throw new _.Mocker.Fatal(
-				'NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER',
-				'Returned type: ' + typeof constructor + '; Provided identifier: ' + this._name
-			);
-		}
-		
-		// Create a proxy class, assigning
-		// the target class's prototype to it
-		var Mock = function(){};
-		Mock.prototype = constructor.prototype;
-		
-		// Create an instance of the proxy
-		var mock = new Mock();
-		
-		var methods = this.getMethods();
-		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
-		
-		// Return the finished mock
-		return mock;
-		
-	};
-	
-	Reflection.Class = _.Class;
-	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.Reflection = window.Reflection || {},
-	window.Reflection.Type = window.Reflection.Type || {}
-);
-
-(function(ClassyJS, Reflection, _){
-	
-	_.Interface = function(interfaceName)
-	{
-		return _.call(this, interfaceName, 'interface');
-	};
-	
-	ClassyJS.Inheritance.makeChild(_.Interface, _);
-	
-	_.Interface.prototype.getMock = function()
-	{
-		
-		var Mock = function(){};
-		
-		Mock.prototype.conformsTo = (function(name){
-			return function(interfaceName){
-				return (interfaceName === name);
-			}
-		})(this._name);
-		
-		var mock = new Mock();
-		
-		var methods = this.getMethods();
-		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
-		
-		return mock;
-		
-	}
-	
-	Reflection.Interface = _.Interface;
-	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.Reflection = window.Reflection || {},
-	window.Reflection.Type = window.Reflection.Type || {}
-);
-
-(function(_){
-	
-	_.Member = function(identifier)
-	{
-		this._memberObject = identifier;
-	};
-	
-	_.Member.acceptClassDependencies = function(memberRegistry)
-	{
-		_.Member._memberRegistry = memberRegistry;
-	};
-	
-	
-	_.Member.prototype.getName = function()
-	{
-		return this._memberObject.getName();
-	};
-	
-})(window.Reflection = window.Reflection || {});
-
-(function(ClassyJS, Reflection, _){
-	
-	_.Method = function(identifier)
-	{
-		return _.call(this, identifier);
-	};
-	
-	ClassyJS.Inheritance.makeChild(_.Method, _);
-	
-	_.Method.prototype.getArguments = function()
-	{
-		var arguments = [];
-		var argumentIdentifiers = this._memberObject.getArgumentTypes();
-		for (var i in argumentIdentifiers) {
-			arguments.push(new Reflection.Method.Argument(argumentIdentifiers[i]));
-		}
-		return arguments;
-	};
-	
-	Reflection.Method = _.Method;
-	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.Reflection = window.Reflection || {},
-	window.Reflection.Member = window.Reflection.Member || {}
-);
-
-(function(ClassyJS, Reflection, Member, _){
-	
-	_.Argument = function(identifier)
-	{
-		this._identifier = identifier;
-	};
-	
-	_.Argument.prototype.getIdentifier = function()
-	{
-		return this._identifier;
-	};
-	
-	Reflection.Method.Argument = _.Argument;
-	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.Reflection = window.Reflection || {},
-	window.Reflection.Member = window.Reflection.Member || {},
-	window.Reflection.Member.Method = window.Reflection.Member.Method || {}
-);
-
-(function(ClassyJS, Reflection, _){
-	
-	_.Property = function(identifier)
-	{
-		return _.call(this, identifier);
-	};
-	
-	ClassyJS.Inheritance.makeChild(_.Property, _);
-	
-	Reflection.Property = _.Property;
-	
-})(
-	window.ClassyJS = window.ClassyJS || {},
-	window.Reflection = window.Reflection || {},
-	window.Reflection.Member = window.Reflection.Member || {}
-);
-
 (function(){
 	
 	// Allow us to create basic objects
@@ -4402,6 +5875,12 @@ if (!Object.create) {
 	// are creating single instances of
 	// said classes
 	var instantiator = new ClassyJS.Instantiator();
+	
+	// We'll make this available to the
+	// various reflection classes by
+	// storing it 'globally'
+	ClassyJS._instantiator = instantiator;
+	
 	var namespaceManager = instantiator.getNamespaceManager();
 	
 	// Create one global function which
@@ -4555,9 +6034,12 @@ if (!Object.create) {
 				
 				constructor[constants[i]] = (function(name){
 					return function(){
+						// Note that the '|| {}' below is due
+						// to a hack in ClassyJS.Member.Constant.
+						// It should go if possible.
 						return instantiator.getMemberRegistry().getConstant(
 							constructor,
-							arguments.callee.caller.$$localOwner,
+							arguments.callee.caller.$$localOwner || {},
 							name
 						);
 					};
@@ -4645,14 +6127,6 @@ if (!Object.create) {
 			}
 		}
 	};
-	
-	Reflection.Type.acceptClassDependencies(
-		instantiator.getNamespaceManager(),
-		instantiator.getTypeRegistry(),
-		instantiator.getMemberRegistry()
-	);
-	
-	Reflection.Member.acceptClassDependencies(instantiator.getMemberRegistry());
 	
 })();
 

@@ -11,6 +11,7 @@
 		this._classes = [];
 		this._instances = [];
 		this._interfaces = {};
+		this._mocks = [];
 		this._namespaceManager = namespaceManager;
 	};
 	
@@ -122,6 +123,15 @@
 		_getClassData(this, classObject).interfaces.push(interfaceName);
 	};
 	
+	_.Type.prototype.registerMock = function(instance, classObject)
+	{
+		// @todo Type check both arguments
+		this._mocks.push({
+			instance:		instance,
+			classObject:	classObject
+		});
+	};
+	
 	_.Type.prototype.classExists = function(classIdentifier)
 	{
 		// @todo Method untested
@@ -142,10 +152,28 @@
 				'Provided type: ' + typeof classIdentifier
 			);
 		}
-		if (typeof classIdentifier == 'object') classIdentifier = classIdentifier.constructor;
+		if (typeof classIdentifier == 'object') {
+			var originalClassIdentifier = classIdentifier;
+			classIdentifier = classIdentifier.constructor;
+		}
 		var classData = _getClassData(this, classIdentifier);
-		if (classData) return classData.classObject;
+		if (classData) {
+			return classData.classObject;
+		} else {
+			for (var i = 0; i < this._mocks.length; i++) {
+				if (this._mocks[i].instance === originalClassIdentifier) {
+					return this._mocks[i].classObject;
+				}
+			}
+		}
 		throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
+	};
+	
+	_.Type.prototype.interfaceExists = function(name)
+	{
+		// @todo Method untested
+		var interfaceObject = this.getInterface(name);
+		return (interfaceObject === undefined) ? false : true;
 	};
 	
 	_.Type.prototype.getInterface = function(name)
@@ -162,6 +190,10 @@
 			);
 		}
 		if (!_classObjectIsRegistered(this, classObject)) {
+			for (var i = 0; i < this._mocks.length; i++) {
+				if (this._mocks[i].classObject !== classObject) continue;
+				return this._mocks[i].classObject.getInterfaces();
+			}
 			throw new _.Type.Fatal('CLASS_NOT_REGISTERED');
 		}
 		var interfaces = [];
@@ -300,6 +332,14 @@
 	var _classObjectIsRegistered = function(_this, classObject)
 	{
 		return (_getClassData(_this, classObject)) ? true : false;
+	};
+	
+	var _isMock = function(_this, instance)
+	{
+		for (var i = 0; i < _this._mocks.length; i++) {
+			if (_this._mocks[i].instance === instance) return true;
+		}
+		return false;
 	};
 	
 })(

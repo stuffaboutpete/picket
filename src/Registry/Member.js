@@ -201,7 +201,7 @@
 		var methods = _getAllMethodsByName(this, classObject, name);
 		toInspectMethods:
 		for (var i = 0; i < methods.length; i++) {
-			var argumentTypes = methods[i].getArgumentTypes();
+			var argumentTypes = methods[i].getArgumentTypeIdentifiers();
 			if (shouldBeStatic != methods[i].isStatic()) continue;
 			if (args.length > argumentTypes.length) continue;
 			if (args.length < argumentTypes.length) {
@@ -292,7 +292,7 @@
 				this,
 				classObject,
 				targetMethod,
-				eventObject.getArgumentTypes(),
+				eventObject.getArgumentTypeIdentifiers(),
 				false
 			);
 		} catch (error) {
@@ -435,7 +435,7 @@
 					_this,
 					typeObject,
 					memberName,
-					memberObject.getArgumentTypes(),
+					memberObject.getArgumentTypeIdentifiers(),
 					memberObject.isStatic()
 				);
 			} catch (error) {
@@ -449,7 +449,7 @@
 				throw new _.Member.Fatal(
 					'METHOD_ALREADY_REGISTERED',
 					'Method name: ' + memberName + '; ' +
-					'Argument types: ' + (memberObject.getArgumentTypes().join(', ') || '(none)') +
+					'Argument types: ' + (memberObject.getArgumentTypeIdentifiers().join(', ') || '(none)') +
 					'; ' +
 					'Is static: ' + (memberObject.isStatic() ? 'true' : 'false')
 				);
@@ -552,10 +552,10 @@
 			toLookThroughMethods:
 			for (var i = 0; i < methods.length; i++) {
 				if (methods[i].getName() == methodName
-				&&	argumentTypes.length == methods[i].getArgumentTypes().length
+				&&	argumentTypes.length == methods[i].getArgumentTypeIdentifiers().length
 				&&	isStatic === methods[i].isStatic()) {
 					for (var j = 0; j < argumentTypes.length; j++) {
-						if (argumentTypes[j] != methods[i].getArgumentTypes()[j]) {
+						if (argumentTypes[j] != methods[i].getArgumentTypeIdentifiers()[j]) {
 							continue toLookThroughMethods;
 						}
 					}
@@ -656,8 +656,8 @@
 					&&	abstractMember.isStatic() === allMembers[i-1].isStatic()
 					&&	abstractMember.getReturnType() === allMembers[i-1].getReturnType()
 					&&	_arraysEqual(
-						abstractMember.getArgumentTypes(),
-						allMembers[i-1].getArgumentTypes()
+						abstractMember.getArgumentTypeIdentifiers(),
+						allMembers[i-1].getArgumentTypeIdentifiers()
 					)) {
 						abstractMembers.splice(j, 1);
 					}

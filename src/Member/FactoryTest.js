@@ -32,7 +32,7 @@ describe('Member.Factory', function(){
 		methodDefinition = new ClassyJS.Member.Method.Definition('public myMethod () -> undefined');
 		eventDefinition = new ClassyJS.Member.Event.Definition('public event myEvent()');
 		constantDefinition = new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT');
-		typeChecker = new ClassyJS.TypeChecker();
+		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
 		accessController = new ClassyJS.Access.Controller(
 			new ClassyJS.Registry.Type(
 				new ClassyJS.NamespaceManager()

@@ -5,6 +5,12 @@
 	// are creating single instances of
 	// said classes
 	var instantiator = new ClassyJS.Instantiator();
+	
+	// We'll make this available to the
+	// various reflection classes by
+	// storing it 'globally'
+	ClassyJS._instantiator = instantiator;
+	
 	var namespaceManager = instantiator.getNamespaceManager();
 	
 	// Create one global function which
@@ -158,9 +164,12 @@
 				
 				constructor[constants[i]] = (function(name){
 					return function(){
+						// Note that the '|| {}' below is due
+						// to a hack in ClassyJS.Member.Constant.
+						// It should go if possible.
 						return instantiator.getMemberRegistry().getConstant(
 							constructor,
-							arguments.callee.caller.$$localOwner,
+							arguments.callee.caller.$$localOwner || {},
 							name
 						);
 					};
@@ -248,13 +257,5 @@
 			}
 		}
 	};
-	
-	Reflection.Type.acceptClassDependencies(
-		instantiator.getNamespaceManager(),
-		instantiator.getTypeRegistry(),
-		instantiator.getMemberRegistry()
-	);
-	
-	Reflection.Member.acceptClassDependencies(instantiator.getMemberRegistry());
 	
 })();
