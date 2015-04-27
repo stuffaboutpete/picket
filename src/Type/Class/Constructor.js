@@ -139,9 +139,12 @@
 		
 		namespace[className].prototype.get = function(name)
 		{
+			// Note that the '|| {}' below is due
+			// to a hack in ClassyJS.Member.Property.
+			// It should go if possible.
 			return memberRegistry.getPropertyValue(
 				this,
-				arguments.callee.caller.caller.$$localOwner,
+				arguments.callee.caller.caller.$$localOwner || {},
 				name
 			);
 		};
@@ -164,13 +167,6 @@
 		namespace[className].prototype.trigger = function(name, arguments)
 		{
 			memberRegistry.triggerEvent(this, name, arguments);
-		};
-		
-		namespace[className].prototype.conformsTo = function(interfaceName)
-		{
-			var interfaces = typeRegistry.getInterfacesFromClass(typeRegistry.getClass(this));
-			for (var i in interfaces) if (interfaces[i].getName() == interfaceName) return true;
-			return false;
 		};
 		
 		namespace[className].prototype.proxyMethod = function(proxyFunction)

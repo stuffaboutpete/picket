@@ -1,8 +1,7 @@
-;(function(ClassyJS, _){
+;(function(ClassyJS, Reflection, _){
 	
 	var messages = {
-		NON_FUNCTION_RETURNED_FROM_NAMESPACE_MANAGER:
-			'Object returned from namespace manager was not a function as expected'
+		NON_STRING_IDENTIFIER_PROVIDED: 'The provided type identifier must be a string'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Type.Fatal', messages);

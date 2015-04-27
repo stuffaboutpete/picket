@@ -22,12 +22,16 @@ describe('Type.Factory', function(){
 		classDefinition = new ClassyJS.Type.Class.Definition('class MyClass');
 		interfaceDefinition = new ClassyJS.Type.Interface.Definition('interface IMyInterface');
 		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
-		memberRegistry = new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker());
+		memberRegistry = new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker(
+			new ClassyJS.TypeChecker.ReflectionFactory()
+		));
 		namespaceManager = new ClassyJS.NamespaceManager();
 		classObject = new ClassyJS.Type.Class(
 			classDefinition,
 			typeRegistry,
-			new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker()),
+			new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker(
+				new ClassyJS.TypeChecker.ReflectionFactory()
+			)),
 			namespaceManager
 		);
 		interfaceObject = new ClassyJS.Type.Interface();

@@ -481,7 +481,8 @@ describe('Access control', function(){
 			'private constant PRIVATE_CONSTANT (string)': 'private',
 			'protected constant PROTECTED_CONSTANT (string)': 'protected'
 		});
-		expect(function(){ My.Class.PRIVATE_CONSTANT(); }).toThrow(privateConstantFatal);
+		expect(function(){
+			My.Class.PRIVATE_CONSTANT(); }).toThrow(privateConstantFatal);
 		expect(function(){ My.Class.PROTECTED_CONSTANT(); }).toThrow(protectedConstantFatal);
 	});
 	
