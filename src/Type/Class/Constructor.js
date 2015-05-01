@@ -140,13 +140,6 @@
 			memberRegistry.triggerEvent.apply(memberRegistry, args);
 		};
 		
-		namespace[className].prototype.conformsTo = function(interfaceName)
-		{
-			var interfaces = typeRegistry.getInterfacesFromClass(typeRegistry.getClass(this));
-			for (var i in interfaces) if (interfaces[i].getName() == interfaceName) return true;
-			return false;
-		};
-		
 		namespace[className].prototype.proxyMethod = function(proxyFunction)
 		{
 			var parentMethod = arguments.callee.caller;

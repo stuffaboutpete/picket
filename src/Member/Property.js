@@ -46,9 +46,23 @@
 		return this._definition.getTypeIdentifier();
 	};
 	
+	_.Property.prototype.getAccessTypeIdentifier = function()
+	{
+		// @todo Method not tested
+		return this._definition.getAccessTypeIdentifier();
+	};
+	
 	_.Property.prototype.getDefaultValue = function(targetInstance, accessInstance)
 	{
-		_requestAccess(this, targetInstance, accessInstance);
+		// @todo This if statement is a hack - this
+		// class shouldn't be handling access control
+		// and its an issue for the Reflection.Property.
+		// Original state commented below.
+		// Also, related test disabled.
+		if (targetInstance && accessInstance) {
+			_requestAccess(this, targetInstance, accessInstance);
+		}
+		// _requestAccess(this, targetInstance, accessInstance);
 		if (Object.prototype.toString.call(this._defaultValue) == '[object Array]') {
 			var newArray = [];
 			for (var i = 0; i < this._defaultValue.length; i++) {

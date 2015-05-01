@@ -10,7 +10,7 @@ describe('Member.Method', function(){
 	
 	beforeEach(function(){
 		definition = new ClassyJS.Member.Method.Definition('public myMethod () -> undefined');
-		typeChecker = new ClassyJS.TypeChecker();
+		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
 		accessController = new ClassyJS.Access.Controller(
 			new ClassyJS.Registry.Type(
 				new ClassyJS.NamespaceManager()
@@ -172,7 +172,7 @@ describe('Member.Method', function(){
 	
 	it('returns argument types from definition', function(){
 		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'number']);
-		expect(method.getArgumentTypes()).toEqual(['string', 'number']);
+		expect(method.getArgumentTypeIdentifiers()).toEqual(['string', 'number']);
 	});
 	
 	it('returns isAbstract from definition', function(){

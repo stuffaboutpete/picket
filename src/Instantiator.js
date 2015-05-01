@@ -26,6 +26,7 @@
 		this._autoLoader;
 		this._includer;
 		this._autoLoadInstantiator;
+		this._reflectionFactory;
 	};
 	
 	_.Instantiator.prototype.getTypeFactory = function()
@@ -211,7 +212,9 @@
 	_.Instantiator.prototype.getTypeChecker = function()
 	{
 		if (!this._typeChecker) {
-			this._typeChecker = new ClassyJS.TypeChecker();
+			this._typeChecker = new ClassyJS.TypeChecker(
+				new ClassyJS.TypeChecker.ReflectionFactory()
+			);
 		}
 		return this._typeChecker;
 	};
@@ -253,6 +256,14 @@
 			this._autoLoadInstantiator = new ClassyJS.AutoLoader.Instantiator();
 		}
 		return this._autoLoadInstantiator;
+	};
+	
+	_.Instantiator.prototype.getReflectionFactory = function()
+	{
+		if (!this._reflectionFactory) {
+			this._reflectionFactory = new ClassyJS.Reflection.Factory();
+		}
+		return this._reflectionFactory;
 	};
 	
 })(window.ClassyJS = window.ClassyJS || {});

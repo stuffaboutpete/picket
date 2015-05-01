@@ -21,7 +21,7 @@ describe('Registry.Member', function(){
 	
 	beforeEach(function(){
 		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
-		typeChecker = new ClassyJS.TypeChecker();
+		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
 		accessController = new ClassyJS.Access.Controller(typeRegistry);
 		registry = new ClassyJS.Registry.Member(typeRegistry, typeChecker);
 		classObject = new ClassyJS.Type.Class(
@@ -29,7 +29,7 @@ describe('Registry.Member', function(){
 			new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 			new ClassyJS.Registry.Member(
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.TypeChecker()
+				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 			),
 			new ClassyJS.NamespaceManager()
 		);
@@ -184,7 +184,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -193,7 +193,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -318,8 +318,8 @@ describe('Registry.Member', function(){
 			spyOn(methodObject2, 'isAbstract').and.returnValue(false);
 			spyOn(methodObject, 'isStatic').and.returnValue(false);
 			spyOn(methodObject2, 'isStatic').and.returnValue(false);
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string']);
-			spyOn(methodObject2, 'getArgumentTypes').and.returnValue(['string']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['string']);
+			spyOn(methodObject2, 'getArgumentTypeIdentifiers').and.returnValue(['string']);
 			spyOn(typeRegistry, 'hasParent').and.callFake(function(target){
 				return (target === classObject) ? true : false;
 			});
@@ -470,8 +470,8 @@ describe('Registry.Member', function(){
 		});
 		
 		it('can be registered with same name as previous against same class', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string']);
-			spyOn(methodObject2, 'getArgumentTypes').and.returnValue(['number']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['string']);
+			spyOn(methodObject2, 'getArgumentTypeIdentifiers').and.returnValue(['number']);
 			registry.register(methodObject2, classObject);
 		});
 		
@@ -480,8 +480,8 @@ describe('Registry.Member', function(){
 				'METHOD_ALREADY_REGISTERED',
 				'Method name: myMethod; Argument types: string, number; Is static: false'
 			);
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string', 'number']);
-			spyOn(methodObject2, 'getArgumentTypes').and.returnValue(['string', 'number']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'number']);
+			spyOn(methodObject2, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'number']);
 			expect(function(){
 				registry.register(methodObject2, classObject);
 			}).toThrow(expectedFatal);
@@ -518,14 +518,14 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers look up of class from type registry when calling', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue([]);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(methodObject, 'call').and.callFake(function(){});
 			registry.callMethod(classInstance, {}, 'myMethod', []);
 			expect(typeRegistry.getClass).toHaveBeenCalledWith(classInstance);
 		});
 		
 		it('is found and passed target, access instances and arguments when called', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string', 'string']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'string']);
 			spyOn(methodObject, 'call');
 			registry.callMethod(classInstance, accessInstance, 'myMethod', ['arg1', 'arg2']);
 			expect(methodObject.call).toHaveBeenCalledWith(
@@ -538,7 +538,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('returns value from', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue([]);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(methodObject, 'call').and.returnValue('Method return value');
 			expect(registry.callMethod(
 				classInstance,
@@ -549,8 +549,8 @@ describe('Registry.Member', function(){
 		});
 		
 		it('can be called when overloading other method', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string']);
-			spyOn(methodObject2, 'getArgumentTypes').and.returnValue(['number']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['string']);
+			spyOn(methodObject2, 'getArgumentTypeIdentifiers').and.returnValue(['number']);
 			spyOn(methodObject, 'call').and.returnValue('Type: string');
 			spyOn(methodObject2, 'call').and.returnValue('Type: number');
 			registry.register(methodObject2, classObject);
@@ -569,7 +569,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('can be called when it has optional argument', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string', 'string']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'string']);
 			spyOn(methodObject, 'argumentIsOptional').and.callFake(function(index){
 				return index === 1;
 			});
@@ -586,7 +586,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('replaces missing optional argument with default value if available', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string', 'string']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'string']);
 			spyOn(methodObject, 'argumentIsOptional').and.callFake(function(index){
 				return index === 1;
 			});
@@ -619,7 +619,7 @@ describe('Registry.Member', function(){
 			);
 			spyOn(staticMethodObject, 'getName').and.returnValue('myMethod');
 			spyOn(staticMethodObject, 'isStatic').and.returnValue(true);
-			spyOn(staticMethodObject, 'getArgumentTypes').and.returnValue([]);
+			spyOn(staticMethodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(staticMethodObject, 'call');
 			registry.register(staticMethodObject, classObject);
 			expect(function(){
@@ -666,14 +666,14 @@ describe('Registry.Member', function(){
 		});
 		
 		it('can be called against class constructor', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue([]);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(methodObject, 'call');
 			registry.callMethod(classConstructor, {}, 'myMethod', []);
 			expect(methodObject.call).toHaveBeenCalled();
 		});
 		
 		it('will pass arguments on call', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['number', 'number', 'number']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['number', 'number', 'number']);
 			spyOn(methodObject, 'call');
 			registry.callMethod(classConstructor, accessInstance, 'myMethod', [1, 2, 3]);
 			expect(methodObject.call).toHaveBeenCalledWith(
@@ -686,14 +686,14 @@ describe('Registry.Member', function(){
 		});
 		
 		it('returns value when called against class constructor', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue([]);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(methodObject, 'call').and.returnValue('Return value');
 			expect(registry.callMethod(classConstructor, {}, 'myMethod', [])).toBe('Return value');
 		});
 		
 		it('can be called when overloading other static method', function(){
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue(['string']);
-			spyOn(methodObject2, 'getArgumentTypes').and.returnValue(['number']);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue(['string']);
+			spyOn(methodObject2, 'getArgumentTypeIdentifiers').and.returnValue(['number']);
 			spyOn(methodObject, 'call').and.returnValue('Type: string');
 			spyOn(methodObject2, 'call').and.returnValue('Type: number');
 			registry.register(methodObject2, classObject);
@@ -726,7 +726,7 @@ describe('Registry.Member', function(){
 			);
 			spyOn(nonStaticMethodObject, 'getName').and.returnValue('myMethod');
 			spyOn(nonStaticMethodObject, 'isStatic').and.returnValue(false);
-			spyOn(nonStaticMethodObject, 'getArgumentTypes').and.returnValue([]);
+			spyOn(nonStaticMethodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(nonStaticMethodObject, 'call');
 			registry.register(nonStaticMethodObject, classObject);
 			expect(function(){
@@ -775,16 +775,16 @@ describe('Registry.Member', function(){
 			);
 			spyOn(eventObject, 'getName').and.returnValue('myEvent');
 			spyOn(eventObject2, 'getName').and.returnValue('myEvent');
-			spyOn(eventObject, 'getArgumentTypes').and.returnValue([]);
-			spyOn(eventObject2, 'getArgumentTypes').and.returnValue([]);
+			spyOn(eventObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
+			spyOn(eventObject2, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(typeRegistry, 'getClass').and.returnValue(classObject);
 			spyOn(targetMethodObject, 'getName').and.returnValue('targetMethod');
 			spyOn(targetMethodObject, 'isStatic').and.returnValue(false);
-			spyOn(targetMethodObject, 'getArgumentTypes').and.returnValue([]);
+			spyOn(targetMethodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			registry.register(targetMethodObject, classObject);
 			spyOn(targetMethodObject2, 'getName').and.returnValue('otherTargetMethod');
 			spyOn(targetMethodObject2, 'isStatic').and.returnValue(false);
-			spyOn(targetMethodObject2, 'getArgumentTypes').and.returnValue([]);
+			spyOn(targetMethodObject2, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			registry.register(targetMethodObject2, classObject);
 			registry.register(eventObject, classObject);
 		});
@@ -879,7 +879,7 @@ describe('Registry.Member', function(){
 			spyOn(eventObject, 'requestBind').and.returnValue(true);
 			spyOn(targetMethodObject3, 'getName').and.returnValue('differentArgsMethod');
 			spyOn(targetMethodObject3, 'isStatic').and.returnValue(false);
-			spyOn(targetMethodObject3, 'getArgumentTypes').and.returnValue(['number']);
+			spyOn(targetMethodObject3, 'getArgumentTypeIdentifiers').and.returnValue(['number']);
 			registry.register(targetMethodObject3, classObject);
 			expect(function(){
 				registry.bindEvent(classInstance, 'myEvent', targetObject3, 'differentArgsMethod');
@@ -965,7 +965,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -974,7 +974,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -1117,7 +1117,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -1126,7 +1126,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -1139,8 +1139,8 @@ describe('Registry.Member', function(){
 			);
 			spyOn(methodObject, 'getName').and.returnValue('myMethod');
 			spyOn(methodObject2, 'getName').and.returnValue('myMethod');
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue([]);
-			spyOn(methodObject2, 'getArgumentTypes').and.returnValue([]);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
+			spyOn(methodObject2, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(methodObject, 'isStatic').and.returnValue(false);
 			spyOn(methodObject2, 'isStatic').and.returnValue(false);
 			spyOn(typeRegistry, 'getClass').and.callFake(function(classInstance){
@@ -1299,7 +1299,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -1308,7 +1308,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -1321,8 +1321,8 @@ describe('Registry.Member', function(){
 			);
 			spyOn(methodObject, 'getName').and.returnValue('myMethod');
 			spyOn(methodObject2, 'getName').and.returnValue('myMethod');
-			spyOn(methodObject, 'getArgumentTypes').and.returnValue([]);
-			spyOn(methodObject2, 'getArgumentTypes').and.returnValue([]);
+			spyOn(methodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
+			spyOn(methodObject2, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			spyOn(methodObject, 'isStatic').and.returnValue(true);
 			spyOn(methodObject2, 'isStatic').and.returnValue(true);
 			spyOn(typeRegistry, 'getClass').and.callFake(function(classConstructor){
@@ -1432,7 +1432,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -1441,7 +1441,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -1469,15 +1469,15 @@ describe('Registry.Member', function(){
 			);
 			spyOn(eventObject, 'getName').and.returnValue('myEvent');
 			spyOn(eventObject2, 'getName').and.returnValue('myEvent');
-			spyOn(eventObject, 'getArgumentTypes').and.returnValue([]);
-			spyOn(eventObject2, 'getArgumentTypes').and.returnValue(['string']);
+			spyOn(eventObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
+			spyOn(eventObject2, 'getArgumentTypeIdentifiers').and.returnValue(['string']);
 			spyOn(targetMethodObject, 'getName').and.returnValue('targetMethod');
 			spyOn(targetMethodObject, 'isStatic').and.returnValue(false);
-			spyOn(targetMethodObject, 'getArgumentTypes').and.returnValue([]);
+			spyOn(targetMethodObject, 'getArgumentTypeIdentifiers').and.returnValue([]);
 			registry.register(targetMethodObject, classObject);
 			spyOn(targetMethodObject2, 'getName').and.returnValue('targetMethod');
 			spyOn(targetMethodObject2, 'isStatic').and.returnValue(false);
-			spyOn(targetMethodObject2, 'getArgumentTypes').and.returnValue(['string']);
+			spyOn(targetMethodObject2, 'getArgumentTypeIdentifiers').and.returnValue(['string']);
 			registry.register(targetMethodObject2, classObject);
 			spyOn(typeRegistry, 'getClass').and.callFake(function(classInstance){
 				if (classInstance === childClassInstance) return classObject;
@@ -1585,7 +1585,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);
@@ -1594,7 +1594,7 @@ describe('Registry.Member', function(){
 				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
 				new ClassyJS.Registry.Member(
 					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker()
+					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 				),
 				new ClassyJS.NamespaceManager()
 			);

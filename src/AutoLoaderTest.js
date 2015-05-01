@@ -21,7 +21,7 @@ describe('AutoLoader', function(){
 		namespaceManager = new ClassyJS.NamespaceManager();
 		memberRegistry = new ClassyJS.Registry.Member(
 			new ClassyJS.Registry.Type(namespaceManager),
-			new ClassyJS.TypeChecker()
+			new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 		);
 		autoloader = new ClassyJS.AutoLoader(
 			includer,

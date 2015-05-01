@@ -2,13 +2,25 @@ describe('TypeChecker', function(){
 	
 	// @todo Regex
 	
+	var mocker;
+	var reflectionFactory;
 	var checker;
 	
 	beforeEach(function(){
-		checker = new ClassyJS.TypeChecker();
+		mocker = new ClassyJS.Mocker();
+		reflectionFactory = mocker.getMock(ClassyJS.TypeChecker.ReflectionFactory);
+		checker = new ClassyJS.TypeChecker(reflectionFactory);
 		window.My = {};
 		window.My.Example = function(){};
 		window.My.Example.Nested = function(){};
+	});
+	
+	it('throws error if no reflection factory is provided', function(){
+		var expectedFatal = new ClassyJS.TypeChecker.Fatal(
+			'NO_REFLECTION_FACTORY_PROVIDED',
+			'Provided type: object'
+		);
+		expect(function(){ new ClassyJS.TypeChecker({}); }).toThrow(expectedFatal);
 	});
 	
 	it('throws error if second argument to isValidType is not a string', function(){
@@ -243,16 +255,23 @@ describe('TypeChecker', function(){
 	});
 	
 	it('will verify valid instance of interface', function(){
-		var spy = jasmine.createSpyObj('spy', ['conformsTo']);
-		spy.conformsTo.and.returnValue(true);
-		expect(checker.isValidType(spy, 'My.IInterface')).toBe(true);
-		expect(spy.conformsTo).toHaveBeenCalledWith('My.IInterface');
+		var reflectionClass = mocker.getMock(Reflection.Class);
+		spyOn(reflectionFactory, 'buildClass').and.returnValue(reflectionClass);
+		spyOn(reflectionClass, 'implementsInterface').and.returnValue(true);
+		var classInstance = {};
+		expect(checker.isValidType(classInstance, 'My.IInterface')).toBe(true);
+		expect(reflectionFactory.buildClass).toHaveBeenCalledWith(classInstance);
+		expect(reflectionClass.implementsInterface).toHaveBeenCalledWith('My.IInterface');
 	});
 	
 	it('will reject non instance of interface', function(){
-		var spy = jasmine.createSpyObj('spy', ['conformsTo']);
-		spy.conformsTo.and.returnValue(false);
-		expect(checker.isValidType(spy, 'My.IInterface')).toBe(false);
+		var reflectionClass = mocker.getMock(Reflection.Class);
+		spyOn(reflectionFactory, 'buildClass').and.returnValue(reflectionClass);
+		spyOn(reflectionClass, 'implementsInterface').and.returnValue(false);
+		var classInstance = {};
+		expect(checker.isValidType(classInstance, 'My.IInterface')).toBe(false);
+		expect(reflectionFactory.buildClass).toHaveBeenCalledWith(classInstance);
+		expect(reflectionClass.implementsInterface).toHaveBeenCalledWith('My.IInterface');
 	});
 	
 	it('allows mixed type which ignores type checking', function(){
