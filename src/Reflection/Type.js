@@ -1,57 +1,33 @@
-(function(_){
+(function(ClassyJS, _){
 	
-	_.Type = function(name)
+	_.Type = function(identifier)
 	{
-		this._name = name;
-	};
-	
-	_.Type.acceptClassDependencies = function(namespaceManager, typeRegistry, memberRegistry)
-	{
-		_.Type._namespaceManager = namespaceManager;
-		_.Type._typeRegistry = typeRegistry;
-		_.Type._memberRegistry = memberRegistry;
-	};
-	
-	_.Type.prototype.getMethods = function()
-	{
-		var members = _getMembers(this);
-		var methods = [];
-		for (var i in members) {
-			if (members[i] instanceof ClassyJS.Member.Method) {
-				methods.push(new Reflection.Method(members[i]));
-			}
-		}
-		return methods;
-	};
-	
-	_.Type.prototype.getProperties = function()
-	{
-		var members = _getMembers(this);
-		var properties = [];
-		for (var i in members) {
-			if (members[i] instanceof ClassyJS.Member.Property) {
-				properties.push(new Reflection.Property(members[i]));
-			}
-		}
-		return properties;
-	};
-	
-	var _getMembers = function(_this)
-	{
-		try {
-			return _.Type._memberRegistry.getMembers(
-				_.Type._typeRegistry.getClass(
-					_.Type._namespaceManager.getNamespaceObject(_this._name)
-				)
+		
+		if (typeof identifier != 'string') {
+			throw new _.Type.Fatal(
+				'NON_STRING_IDENTIFIER_PROVIDED',
+				'Provided type: ' + typeof identifier
 			);
-		} catch (error) {
-			if (error instanceof ClassyJS.Registry.Type.Fatal
-			&&  error.code == 'CLASS_NOT_REGISTERED') {
-				return [];
-			} else {
-				throw error;
-			}
 		}
+		
+		this._identifier = identifier;
+		
 	};
 	
-})(window.Reflection = window.Reflection || {});
+	_.Type.prototype.getIdentifier = function()
+	{
+		return this._identifier;
+	};
+	
+	_.Type.prototype.isValidValue = function(value)
+	{
+		return ClassyJS._instantiator.getTypeChecker().isValidType(value, this._identifier);
+	};
+	
+	window.Reflection = window.Reflection || {};
+	window.Reflection.Type = _.Type;
+	
+})(
+	window.ClassyJS = window.ClassyJS || {},
+	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+);

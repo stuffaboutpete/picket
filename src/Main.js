@@ -5,6 +5,12 @@
 	// are creating single instances of
 	// said classes
 	var instantiator = new ClassyJS.Instantiator();
+	
+	// We'll make this available to the
+	// various reflection classes by
+	// storing it 'globally'
+	ClassyJS._instantiator = instantiator;
+	
 	var namespaceManager = instantiator.getNamespaceManager();
 	
 	// Create one global function which
@@ -115,8 +121,6 @@
 			
 		}
 		
-		var changeEventFound = false;
-		
 		for (var i in members) {
 			
 			if (Object.prototype.toString.call(members) == '[object Array]') {
@@ -135,22 +139,8 @@
 				
 				constants.push(member.getName());
 				
-			} else if (member instanceof ClassyJS.Member.Event) {
-				
-				if (member.getName() == 'change') {
-					changeEventFound = true;
-				}
-				
 			}
 			
-		}
-		
-		if (!changeEventFound) {
-			var member = instantiator.getMemberFactory().build(
-				'public event change (string, object)',
-				false
-			);
-			instantiator.getMemberRegistry().register(member, typeObject);
 		}
 		
 		if (typeObject instanceof ClassyJS.Type.Class) {
@@ -174,9 +164,12 @@
 				
 				constructor[constants[i]] = (function(name){
 					return function(){
+						// Note that the '|| {}' below is due
+						// to a hack in ClassyJS.Member.Constant.
+						// It should go if possible.
 						return instantiator.getMemberRegistry().getConstant(
 							constructor,
-							arguments.callee.caller.$$localOwner,
+							arguments.callee.caller.$$localOwner || {},
 							name
 						);
 					};
@@ -264,13 +257,5 @@
 			}
 		}
 	};
-	
-	Reflection.Type.acceptClassDependencies(
-		instantiator.getNamespaceManager(),
-		instantiator.getTypeRegistry(),
-		instantiator.getMemberRegistry()
-	);
-	
-	Reflection.Member.acceptClassDependencies(instantiator.getMemberRegistry());
 	
 })();

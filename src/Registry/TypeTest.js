@@ -21,7 +21,7 @@ describe('Registry.Type', function(){
 			new ClassyJS.Registry.Type(namespaceManager),
 			new ClassyJS.Registry.Member(
 				new ClassyJS.Registry.Type(namespaceManager),
-				new ClassyJS.TypeChecker()
+				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 			),
 			new ClassyJS.NamespaceManager()
 		);
@@ -30,7 +30,7 @@ describe('Registry.Type', function(){
 			new ClassyJS.Registry.Type(namespaceManager),
 			new ClassyJS.Registry.Member(
 				new ClassyJS.Registry.Type(namespaceManager),
-				new ClassyJS.TypeChecker()
+				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 			),
 			new ClassyJS.NamespaceManager()
 		);
@@ -39,7 +39,7 @@ describe('Registry.Type', function(){
 			new ClassyJS.Registry.Type(namespaceManager),
 			new ClassyJS.Registry.Member(
 				new ClassyJS.Registry.Type(namespaceManager),
-				new ClassyJS.TypeChecker()
+				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
 			),
 			new ClassyJS.NamespaceManager()
 		);
@@ -621,6 +621,42 @@ describe('Registry.Type', function(){
 			interfaceObject,
 			interfaceObject2
 		]);
+	});
+	
+	it('allows mock class to be registered', function(){
+		var mock = {};
+		var classObject = new ClassyJS.Type.Class(
+			new ClassyJS.Type.Class.Definition('class My.MockClass'),
+			new ClassyJS.Registry.Type(namespaceManager),
+			new ClassyJS.Registry.Member(
+				new ClassyJS.Registry.Type(namespaceManager),
+				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			),
+			new ClassyJS.NamespaceManager()
+		);
+		registry.registerMock(mock, classObject);
+		expect(registry.classExists(mock)).toBe(true);
+		expect(registry.getClass(mock)).toBe(classObject);
+	});
+	
+	it('allows interfaces to be associated with mock class', function(){
+		var mock = {};
+		var classObject = new ClassyJS.Type.Class(
+			new ClassyJS.Type.Class.Definition('class My.MockClass'),
+			new ClassyJS.Registry.Type(namespaceManager),
+			new ClassyJS.Registry.Member(
+				new ClassyJS.Registry.Type(namespaceManager),
+				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			),
+			new ClassyJS.NamespaceManager()
+		);
+		registry.registerMock(mock, classObject);
+		var interfaces = [
+			'My.IInterfaceOne',
+			'My.IInterfaceTwo'
+		];
+		spyOn(classObject, 'getInterfaces').and.returnValue(interfaces);
+		expect(registry.getInterfacesFromClass(classObject)).toBe(interfaces);
 	});
 	
 });

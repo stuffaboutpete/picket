@@ -14,7 +14,10 @@ describe('Type.Class', function(){
 	beforeEach(function(){
 		definition = new ClassyJS.Type.Class.Definition('class MyClass');
 		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
-		memberRegistry = new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker());
+		memberRegistry = new ClassyJS.Registry.Member(
+			typeRegistry,
+			new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+		);
 		namespaceManager = new ClassyJS.NamespaceManager();
 		classObject = new ClassyJS.Type.Class(
 			definition,

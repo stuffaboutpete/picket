@@ -50,7 +50,7 @@
 		return this._definition.getName();
 	};
 	
-	_.Method.prototype.getArgumentTypes = function()
+	_.Method.prototype.getArgumentTypeIdentifiers = function()
 	{
 		return this._definition.getArgumentTypeIdentifiers();
 	};
@@ -81,6 +81,11 @@
 	_.Method.prototype.getDefaultArgumentValue = function(index)
 	{
 		return this._definition.getDefaultArgumentValue(index);
+	};
+	
+	_.Method.prototype.getAccessTypeIdentifier = function()
+	{
+		return this._definition.getAccessTypeIdentifier();
 	};
 	
 	_.Method.prototype.call = function(target, localTarget, accessInstance, args, scopeVariables)
@@ -116,7 +121,10 @@
 			this._definition.getAccessTypeIdentifier()
 		);
 		if (canAccess !== true) throw new _.Method.Fatal('ACCESS_NOT_ALLOWED');
-		var areValidTypes = this._typeChecker.areValidTypes(args, this.getArgumentTypes());
+		var areValidTypes = this._typeChecker.areValidTypes(
+			args,
+			this.getArgumentTypeIdentifiers()
+		);
 		if (scopeVariables) {
 			var originalScopeVariables = {};
 			for (var i in scopeVariables) {
@@ -126,11 +134,13 @@
 				window[i] = scopeVariables[i];
 			}
 		}
+		var currentOwner = this._value.$$owner;
+		var currentLocalOwner = this._value.$$localOwner;
 		this._value.$$owner = target;
 		this._value.$$localOwner = localTarget;
 		var returnValue = this._value.apply(target, args);
-		delete this._value.$$owner;
-		delete this._value.$$localOwner;
+		this._value.$$owner = currentOwner;
+		this._value.$$localOwner = currentLocalOwner;
 		if (scopeVariables) {
 			for (var i in scopeVariables) {
 				if (originalScopeVariables[i]) {

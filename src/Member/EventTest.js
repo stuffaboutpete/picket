@@ -13,7 +13,7 @@ describe('Member.Event', function(){
 	
 	beforeEach(function(){
 		definition = new ClassyJS.Member.Event.Definition('public event myEvent ()');
-		typeChecker = new ClassyJS.TypeChecker();
+		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
 		accessController = new ClassyJS.Access.Controller(
 			new ClassyJS.Registry.Type(
 				new ClassyJS.NamespaceManager()
@@ -206,7 +206,7 @@ describe('Member.Event', function(){
 	
 	it('can return argument types from definition', function(){
 		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue(['string', '[number]']);
-		expect(eventObject.getArgumentTypes()).toEqual(['string', '[number]']);
+		expect(eventObject.getArgumentTypeIdentifiers()).toEqual(['string', '[number]']);
 	});
 	
 	it('will check with access controller when requestBind is called', function(){

@@ -1,15 +1,26 @@
 describe('TypeChecker', function(){
 	
-	// @todo Match ClassyJS interfaces
 	// @todo Regex
 	
+	var mocker;
+	var reflectionFactory;
 	var checker;
 	
 	beforeEach(function(){
-		checker = new ClassyJS.TypeChecker();
+		mocker = new ClassyJS.Mocker();
+		reflectionFactory = mocker.getMock(ClassyJS.TypeChecker.ReflectionFactory);
+		checker = new ClassyJS.TypeChecker(reflectionFactory);
 		window.My = {};
 		window.My.Example = function(){};
 		window.My.Example.Nested = function(){};
+	});
+	
+	it('throws error if no reflection factory is provided', function(){
+		var expectedFatal = new ClassyJS.TypeChecker.Fatal(
+			'NO_REFLECTION_FACTORY_PROVIDED',
+			'Provided type: object'
+		);
+		expect(function(){ new ClassyJS.TypeChecker({}); }).toThrow(expectedFatal);
 	});
 	
 	it('throws error if second argument to isValidType is not a string', function(){
@@ -232,16 +243,23 @@ describe('TypeChecker', function(){
 	});
 	
 	it('will verify valid instance of interface', function(){
-		var spy = jasmine.createSpyObj('spy', ['conformsTo']);
-		spy.conformsTo.and.returnValue(true);
-		expect(checker.isValidType(spy, 'My.IInterface')).toBe(true);
-		expect(spy.conformsTo).toHaveBeenCalledWith('My.IInterface');
+		var reflectionClass = mocker.getMock(Reflection.Class);
+		spyOn(reflectionFactory, 'buildClass').and.returnValue(reflectionClass);
+		spyOn(reflectionClass, 'implementsInterface').and.returnValue(true);
+		var classInstance = {};
+		expect(checker.isValidType(classInstance, 'My.IInterface')).toBe(true);
+		expect(reflectionFactory.buildClass).toHaveBeenCalledWith(classInstance);
+		expect(reflectionClass.implementsInterface).toHaveBeenCalledWith('My.IInterface');
 	});
 	
 	it('will reject non instance of interface', function(){
-		var spy = jasmine.createSpyObj('spy', ['conformsTo']);
-		spy.conformsTo.and.returnValue(false);
-		expect(checker.isValidType(spy, 'My.IInterface')).toBe(false);
+		var reflectionClass = mocker.getMock(Reflection.Class);
+		spyOn(reflectionFactory, 'buildClass').and.returnValue(reflectionClass);
+		spyOn(reflectionClass, 'implementsInterface').and.returnValue(false);
+		var classInstance = {};
+		expect(checker.isValidType(classInstance, 'My.IInterface')).toBe(false);
+		expect(reflectionFactory.buildClass).toHaveBeenCalledWith(classInstance);
+		expect(reflectionClass.implementsInterface).toHaveBeenCalledWith('My.IInterface');
 	});
 	
 	it('allows mixed type which ignores type checking', function(){
@@ -253,6 +271,25 @@ describe('TypeChecker', function(){
 		expect(checker.isValidType([1, 2, 3], 'mixed')).toBe(true);
 		expect(checker.isValidType(function(){}, 'mixed')).toBe(true);
 		expect(checker.isValidType({}, 'mixed')).toBe(true);
+	});
+	
+	it('will verify multi-typed argument', function(){
+		expect(checker.isValidType('string', 'string|number')).toBe(true);
+		expect(checker.isValidType(123, 'string|number')).toBe(true);
+		expect(checker.isValidType({}, 'string|number|object')).toBe(true);
+		expect(checker.isValidType(new My.Example(), 'My.Example|boolean')).toBe(true);
+		expect(checker.isValidType(true, 'My.Example|boolean')).toBe(true);
+		expect(checker.isValidType(['1', '2', '3'], '[string]|[number]')).toBe(true);
+		expect(checker.isValidType([1, 2, 3], '[string]|[number]')).toBe(true);
+		expect(checker.isValidType([1, '2', 3], '[string|number]')).toBe(true);
+	});
+	
+	it('will reject invalid multi-typed argument', function(){
+		expect(checker.isValidType(true, 'string|number')).toBe(false);
+		expect(checker.isValidType({}, 'boolean|number')).toBe(false);
+		expect(checker.isValidType({}, 'My.Example|string')).toBe(false);
+		expect(checker.isValidType([1, '2', 3], '[string]|[number]')).toBe(false);
+		expect(checker.isValidType([1, '2', true], '[string|number]')).toBe(false);
 	});
 	
 	it('can accept multiple variables to type check in one call', function(){
