@@ -154,9 +154,12 @@
 		
 		var _get = function(name, object)
 		{
+			// Note that the '|| {}' below is due
+			// to a hack in ClassyJS.Member.Property.
+			// It should go if possible.
 			return memberRegistry.getPropertyValue(
 				object,
-				arguments.callee.caller.caller.$$localOwner,
+				arguments.callee.caller.caller.$$localOwner || {},
 				name
 			);
 		};
