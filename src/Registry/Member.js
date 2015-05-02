@@ -435,7 +435,9 @@
 					_this,
 					typeObject,
 					memberName,
-					memberObject.getArgumentTypeIdentifiers(),
+					memberObject.hasArgumentTypes()
+						? memberObject.getArgumentTypeIdentifiers()
+						: ['none'],
 					memberObject.isStatic()
 				);
 			} catch (error) {
@@ -654,12 +656,13 @@
 					var abstractMember = abstractMembers[j];
 					if (abstractMember.getName() === allMembers[i-1].getName()
 					&&	abstractMember.isStatic() === allMembers[i-1].isStatic()
-					&&	abstractMember.getReturnType() === allMembers[i-1].getReturnType()
-					&&	_arraysEqual(
-						abstractMember.getArgumentTypeIdentifiers(),
-						allMembers[i-1].getArgumentTypeIdentifiers()
-					)) {
-						abstractMembers.splice(j, 1);
+					&&	abstractMember.getReturnType() === allMembers[i-1].getReturnType()) {
+						if (!abstractMember.hasArgumentTypes() || _arraysEqual(
+							abstractMember.getArgumentTypeIdentifiers(),
+							allMembers[i-1].getArgumentTypeIdentifiers()
+						)) {
+							abstractMembers.splice(j, 1);
+						}
 					}
 				}
 			}

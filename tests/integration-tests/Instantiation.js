@@ -58,4 +58,15 @@ describe('Instantiation', function(){
 		expect(myChild.myMethod()).toBe('From Child');
 	});
 	
+	it('can be done if abstract method doesn\'t specify arg types and all else matches', function(){
+		define('class My.Parent', {
+			'public abstract myMethod -> string': undefined
+		});
+		define('class My.Child extends My.Parent', {
+			'public myMethod (string) -> string': function(string){ return string; }
+		});
+		var myChild = new My.Child();
+		expect(myChild.myMethod('Example')).toBe('Example');
+	});
+	
 });

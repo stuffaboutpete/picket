@@ -12,7 +12,7 @@
 			'^(?:\\s+)?(?:(static|abstract)(?:\\s+))?(?:(static|abstract)(?:\\s+))?' +
 			'(public|protected|private)\\s+(?:(static|abstract)(?:\\s+))?' +
 			'(?:(static|abstract)(?:\\s+))?([a-z][A-Za-z0-9.]*)(?:\\s+)?' +
-			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=|]*)\\)(?:\\s+->\\s+([A-Za-z0-9.[\\]|]+))?(?:\\s+)?$'
+			'(\\(([A-Za-z0-9,:.\\s\\[\\]{}?=|]*)\\))?(?:\\s+->\\s+([A-Za-z0-9.[\\]|]+))?(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -23,7 +23,7 @@
 		}
 		this._name = signatureMatch[6];
 		this._accessTypeIdentifier = signatureMatch[3];
-		this._returnTypeIdentifier = signatureMatch[8] || 'undefined';
+		this._returnTypeIdentifier = signatureMatch[9] || 'undefined';
 		var staticAbstracts = [
 			signatureMatch[1],
 			signatureMatch[2],
@@ -32,11 +32,14 @@
 		];
 		this._isStatic = staticAbstracts.indexOf('static') > -1 ? true : false;
 		this._isAbstract = staticAbstracts.indexOf('abstract') > -1 ? true : false;
-		if (signatureMatch[7] == '') {
+		if (signatureMatch[8] === undefined) {
+			this._argumentTypeIdentifiers = null;
+			this._argumentDefaultValues = null;
+		} else if (signatureMatch[8] == '') {
 			this._argumentTypeIdentifiers = [];
 			this._argumentDefaultValues = [];
 		} else {
-			var arguments = signatureMatch[7].replace(/\s+/g, '').split(',');
+			var arguments = signatureMatch[8].replace(/\s+/g, '').split(',');
 			this._argumentTypeIdentifiers = [];
 			this._argumentDefaultValues = [];
 			var optionalArgumentRegex = new RegExp(
@@ -131,8 +134,16 @@
 		return this._isAbstract;
 	};
 	
+	_.Definition.prototype.hasArgumentTypes = function()
+	{
+		return (this._argumentTypeIdentifiers === null) ? false : true;
+	};
+	
 	_.Definition.prototype.getArgumentTypeIdentifiers = function()
 	{
+		if (this._argumentTypeIdentifiers === null) {
+			throw new _.Definition.Fatal('UNDECLARED_ARGUMENT_TYPES_REQUESTED');
+		}
 		return this._argumentTypeIdentifiers;
 	};
 	

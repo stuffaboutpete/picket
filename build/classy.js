@@ -595,9 +595,12 @@ if (!Function.prototype.bind) {
 		
 		var _get = function(name, object)
 		{
+			// Note that the '|| {}' below is due
+			// to a hack in ClassyJS.Member.Property.
+			// It should go if possible.
 			return memberRegistry.getPropertyValue(
 				object,
-				arguments.callee.caller.caller.$$localOwner,
+				arguments.callee.caller.caller.$$localOwner || {},
 				name
 			);
 		};
@@ -1394,12 +1397,17 @@ if (!Function.prototype.bind) {
 					'Provided type: ' + typeof value
 				);
 			}
+			if (!definition.hasArgumentTypes()) {
+				throw new _.Method.Fatal('NON_ABSTRACT_METHOD_DECLARED_WITH_NO_ARGUMENT_TYPES');
+			}
 			this._isAbstract = false;
 		}
-		var types = definition.getArgumentTypeIdentifiers();
-		for (var i = 0; i < types.length; i++) {
-			if (types[i] === 'undefined') throw new _.Method.Fatal('UNDEFINED_ARGUMENT_TYPE');
-			if (types[i] === 'null') throw new _.Method.Fatal('NULL_ARGUMENT_TYPE');
+		if (definition.hasArgumentTypes()) {
+			var types = definition.getArgumentTypeIdentifiers();
+			for (var i = 0; i < types.length; i++) {
+				if (types[i] === 'undefined') throw new _.Method.Fatal('UNDEFINED_ARGUMENT_TYPE');
+				if (types[i] === 'null') throw new _.Method.Fatal('NULL_ARGUMENT_TYPE');
+			}
 		}
 		this._value = value;
 		this._definition = definition;
@@ -1410,6 +1418,12 @@ if (!Function.prototype.bind) {
 	_.Method.prototype.getName = function()
 	{
 		return this._definition.getName();
+	};
+	
+	_.Method.prototype.hasArgumentTypes = function()
+	{
+		// @todo Untested method
+		return (this._definition.hasArgumentTypes()) ? true : false;
 	};
 	
 	_.Method.prototype.getArgumentTypeIdentifiers = function()
@@ -1546,7 +1560,7 @@ if (!Function.prototype.bind) {
 			'^(?:\\s+)?(?:(static|abstract)(?:\\s+))?(?:(static|abstract)(?:\\s+))?' +
 			'(public|protected|private)\\s+(?:(static|abstract)(?:\\s+))?' +
 			'(?:(static|abstract)(?:\\s+))?([a-z][A-Za-z0-9.]*)(?:\\s+)?' +
-			'\\(([A-Za-z0-9,:.\\s\\[\\]{}?=|]*)\\)(?:\\s+->\\s+([A-Za-z0-9.[\\]|]+))?(?:\\s+)?$'
+			'(\\(([A-Za-z0-9,:.\\s\\[\\]{}?=|]*)\\))?(?:\\s+->\\s+([A-Za-z0-9.[\\]|]+))?(?:\\s+)?$'
 		);
 		var signatureMatch = signatureRegex.exec(signature);
 		if (!signatureMatch) {
@@ -1557,7 +1571,7 @@ if (!Function.prototype.bind) {
 		}
 		this._name = signatureMatch[6];
 		this._accessTypeIdentifier = signatureMatch[3];
-		this._returnTypeIdentifier = signatureMatch[8] || 'undefined';
+		this._returnTypeIdentifier = signatureMatch[9] || 'undefined';
 		var staticAbstracts = [
 			signatureMatch[1],
 			signatureMatch[2],
@@ -1566,11 +1580,14 @@ if (!Function.prototype.bind) {
 		];
 		this._isStatic = staticAbstracts.indexOf('static') > -1 ? true : false;
 		this._isAbstract = staticAbstracts.indexOf('abstract') > -1 ? true : false;
-		if (signatureMatch[7] == '') {
+		if (signatureMatch[8] === undefined) {
+			this._argumentTypeIdentifiers = null;
+			this._argumentDefaultValues = null;
+		} else if (signatureMatch[8] == '') {
 			this._argumentTypeIdentifiers = [];
 			this._argumentDefaultValues = [];
 		} else {
-			var arguments = signatureMatch[7].replace(/\s+/g, '').split(',');
+			var arguments = signatureMatch[8].replace(/\s+/g, '').split(',');
 			this._argumentTypeIdentifiers = [];
 			this._argumentDefaultValues = [];
 			var optionalArgumentRegex = new RegExp(
@@ -1665,8 +1682,16 @@ if (!Function.prototype.bind) {
 		return this._isAbstract;
 	};
 	
+	_.Definition.prototype.hasArgumentTypes = function()
+	{
+		return (this._argumentTypeIdentifiers === null) ? false : true;
+	};
+	
 	_.Definition.prototype.getArgumentTypeIdentifiers = function()
 	{
+		if (this._argumentTypeIdentifiers === null) {
+			throw new _.Definition.Fatal('UNDECLARED_ARGUMENT_TYPES_REQUESTED');
+		}
 		return this._argumentTypeIdentifiers;
 	};
 	
@@ -1699,7 +1724,8 @@ if (!Function.prototype.bind) {
 		INVALID_ARGUMENT_ORDER:
 			'Optional method arguments must be defined after non-optional arguments',
 		INVALID_ARGUMENT_DEFAULT:
-			'The provided default value for an optional argument is not valid'
+			'The provided default value for an optional argument is not valid',
+		UNDECLARED_ARGUMENT_TYPES_REQUESTED: 'No argument types have been provided'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Definition.Fatal', messages);
@@ -1770,7 +1796,9 @@ if (!Function.prototype.bind) {
 			'Abstract or interface method should not provide an implementation',
 		NON_FUNCTION_IMPLEMENTATION: 'implementation must be provided as a function',
 		INTERACTION_WITH_ABSTRACT: 'This instance cannot be called as it is abstract',
-		NON_OBJECT_SCOPE_VARIABLES: 'Provided scope variables must be object'
+		NON_OBJECT_SCOPE_VARIABLES: 'Provided scope variables must be object',
+		NON_ABSTRACT_METHOD_DECLARED_WITH_NO_ARGUMENT_TYPES:
+			'Any method declared without argument types must be abstract'
 	};
 	
 	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Fatal', messages);
@@ -3437,7 +3465,9 @@ if (!Function.prototype.bind) {
 					_this,
 					typeObject,
 					memberName,
-					memberObject.getArgumentTypeIdentifiers(),
+					memberObject.hasArgumentTypes()
+						? memberObject.getArgumentTypeIdentifiers()
+						: ['none'],
 					memberObject.isStatic()
 				);
 			} catch (error) {
@@ -3656,12 +3686,13 @@ if (!Function.prototype.bind) {
 					var abstractMember = abstractMembers[j];
 					if (abstractMember.getName() === allMembers[i-1].getName()
 					&&	abstractMember.isStatic() === allMembers[i-1].isStatic()
-					&&	abstractMember.getReturnType() === allMembers[i-1].getReturnType()
-					&&	_arraysEqual(
-						abstractMember.getArgumentTypeIdentifiers(),
-						allMembers[i-1].getArgumentTypeIdentifiers()
-					)) {
-						abstractMembers.splice(j, 1);
+					&&	abstractMember.getReturnType() === allMembers[i-1].getReturnType()) {
+						if (!abstractMember.hasArgumentTypes() || _arraysEqual(
+							abstractMember.getArgumentTypeIdentifiers(),
+							allMembers[i-1].getArgumentTypeIdentifiers()
+						)) {
+							abstractMembers.splice(j, 1);
+						}
 					}
 				}
 			}

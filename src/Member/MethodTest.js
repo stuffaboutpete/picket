@@ -425,4 +425,49 @@ describe('Member.Method', function(){
 		}).toThrow(expectedFatal);
 	});
 	
+	it('allows interface method to have no argument types', function(){
+		spyOn(definition, 'hasArgumentTypes');
+		spyOn(definition, 'getArgumentTypeIdentifiers');
+		var method = new ClassyJS.Member.Method(
+			definition,
+			true,
+			undefined,
+			typeChecker,
+			accessController
+		);
+		expect(definition.getArgumentTypeIdentifiers).not.toHaveBeenCalled();
+	});
+	
+	it('allows abstract method to have no argument types', function(){
+		spyOn(definition, 'isAbstract').and.returnValue(true);
+		spyOn(definition, 'hasArgumentTypes');
+		spyOn(definition, 'getArgumentTypeIdentifiers');
+		var method = new ClassyJS.Member.Method(
+			definition,
+			false,
+			undefined,
+			typeChecker,
+			accessController
+		);
+		expect(definition.getArgumentTypeIdentifiers).not.toHaveBeenCalled();
+	});
+	
+	it('throws error if non-interface and non-abstract does not declare argument types', function(){
+		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+			'NON_ABSTRACT_METHOD_DECLARED_WITH_NO_ARGUMENT_TYPES'
+		);
+		spyOn(definition, 'isAbstract').and.returnValue(false);
+		spyOn(definition, 'hasArgumentTypes').and.returnValue(false);
+		expect(function(){
+			var method = new ClassyJS.Member.Method(
+				definition,
+				false,
+				function(){},
+				typeChecker,
+				accessController
+			);
+		}).toThrow(expectedFatal);
+		expect(definition.hasArgumentTypes).toHaveBeenCalledWith();
+	});
+	
 });
