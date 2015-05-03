@@ -2425,7 +2425,7 @@ if (!Function.prototype.bind) {
 				'Provided type: ' + typeof isFromInterface
 			);
 		}
-		var definition = this._memberDefinitionFactory.build(signature);
+		var definition = this._memberDefinitionFactory.build(signature, typeof value == 'function');
 		if (definition instanceof _.Property.Definition) {
 			var propertyObject = this._propertyFactory.build(
 				definition,
@@ -2568,8 +2568,9 @@ if (!Function.prototype.bind) {
 		this._constantDefinitionFactory = constantDefinitionFactory;
 	};
 	
-	_.DefinitionFactory.prototype.build = function(signature)
+	_.DefinitionFactory.prototype.build = function(signature, isFunction)
 	{
+		isFunction = (isFunction === true) ? true : false;
 		if (typeof signature != 'string') {
 			throw new _.DefinitionFactory.Fatal(
 				'NON_STRING_SIGNATURE',
@@ -2578,6 +2579,7 @@ if (!Function.prototype.bind) {
 		}
 		var factories = ['Property', 'Method', 'Event', 'Constant'];
 		for (var i in factories) {
+			if (factories[i] == 'Property' && isFunction) continue;
 			try {
 				var factory = this['_' + factories[i].toLowerCase() + 'DefinitionFactory'];
 				var returnObject = factory.build(signature);

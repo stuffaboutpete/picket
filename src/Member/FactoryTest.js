@@ -235,7 +235,17 @@ describe('Member.Factory', function(){
 		spyOn(definitionFactory, 'build').and.returnValue(propertyDefinition);
 		spyOn(propertyFactory, 'build').and.returnValue(propertyObject);
 		factory.build('example signature', false);
-		expect(definitionFactory.build).toHaveBeenCalledWith('example signature');
+		expect(definitionFactory.build).toHaveBeenCalledWith('example signature', false);
+	});
+	
+	it('passes boolean to definition factory to describe if value is a function', function(){
+		spyOn(definitionFactory, 'build').and.returnValue(propertyDefinition);
+		spyOn(propertyFactory, 'build').and.returnValue(propertyObject);
+		factory.build('example signature', false, 123);
+		factory.build('example signature', false, function(){});
+		expect(definitionFactory.build.calls.count()).toBe(2);
+		expect(definitionFactory.build.calls.argsFor(0)[1]).toBe(false);
+		expect(definitionFactory.build.calls.argsFor(1)[1]).toBe(true);
 	});
 	
 	it('will pass relevent arguments to property factory', function(){

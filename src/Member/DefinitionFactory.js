@@ -25,8 +25,9 @@
 		this._constantDefinitionFactory = constantDefinitionFactory;
 	};
 	
-	_.DefinitionFactory.prototype.build = function(signature)
+	_.DefinitionFactory.prototype.build = function(signature, isFunction)
 	{
+		isFunction = (isFunction === true) ? true : false;
 		if (typeof signature != 'string') {
 			throw new _.DefinitionFactory.Fatal(
 				'NON_STRING_SIGNATURE',
@@ -35,6 +36,7 @@
 		}
 		var factories = ['Property', 'Method', 'Event', 'Constant'];
 		for (var i in factories) {
+			if (factories[i] == 'Property' && isFunction) continue;
 			try {
 				var factory = this['_' + factories[i].toLowerCase() + 'DefinitionFactory'];
 				var returnObject = factory.build(signature);

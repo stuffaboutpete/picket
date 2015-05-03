@@ -52,7 +52,7 @@ describe('Methods', function(){
 			'Returned type: string; Expected type: undefined'
 		);
 		define('class My.Class', {
-			'public getUndefined ()': function(){
+			'public getUndefined (string)': function(string){
 				// Doing nothing returns undefined
 			},
 			'public failToGetUndefined ()': function(){
@@ -60,7 +60,7 @@ describe('Methods', function(){
 			}
 		});
 		var myObject = new My.Class();
-		expect(myObject.getUndefined()).toBe(undefined);
+		expect(myObject.getUndefined('Example')).toBe(undefined);
 		expect(function(){ myObject.failToGetUndefined(); }).toThrow(expectedFatal);
 	});
 	

@@ -364,4 +364,17 @@ describe('Member.DefinitionFactory', function(){
 		expect(function(){ factory.build(signature); }).toThrow(expectedFatal);
 	});
 	
+	it('does not call property factory if isFunction argument is true', function(){
+		var signature = 'example signature';
+		spyOn(propertyDefinitionFactory, 'build');
+		spyOn(methodDefinitionFactory, 'build').and.returnValue({});
+		spyOn(eventDefinitionFactory, 'build');
+		spyOn(constantDefinitionFactory, 'build');
+		factory.build(signature, true);
+		expect(propertyDefinitionFactory.build).not.toHaveBeenCalled();
+		expect(methodDefinitionFactory.build).toHaveBeenCalledWith(signature);
+		expect(eventDefinitionFactory.build).not.toHaveBeenCalled();
+		expect(constantDefinitionFactory.build).not.toHaveBeenCalled();
+	});
+	
 });

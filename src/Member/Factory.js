@@ -78,7 +78,7 @@
 				'Provided type: ' + typeof isFromInterface
 			);
 		}
-		var definition = this._memberDefinitionFactory.build(signature);
+		var definition = this._memberDefinitionFactory.build(signature, typeof value == 'function');
 		if (definition instanceof _.Property.Definition) {
 			var propertyObject = this._propertyFactory.build(
 				definition,
