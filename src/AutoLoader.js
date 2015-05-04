@@ -2,25 +2,25 @@
 	
 	_.AutoLoader = function(includer, instantiator, namespaceManager, memberRegistry)
 	{
-		if (!(includer instanceof ClassyJS.AutoLoader.Includer.Script)) {
+		if (!(includer instanceof Picket.AutoLoader.Includer.Script)) {
 			throw new _.AutoLoader.Fatal(
 				'INCLUDER_NOT_PROVIDED',
 				'Provided type: ' + typeof includer
 			);
 		}
-		if (!(instantiator instanceof ClassyJS.AutoLoader.Instantiator)) {
+		if (!(instantiator instanceof Picket.AutoLoader.Instantiator)) {
 			throw new _.AutoLoader.Fatal(
 				'INSTANTIATOR_NOT_PROVIDED',
 				'Provided type: ' + typeof instantiator
 			);
 		}
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+		if (!(namespaceManager instanceof Picket.NamespaceManager)) {
 			throw new _.AutoLoader.Fatal(
 				'NAMESPACE_MANAGER_NOT_PROVIDED',
 				'Provided type: ' + typeof namespaceManager
 			);
 		}
-		if (!(memberRegistry instanceof ClassyJS.Registry.Member)) {
+		if (!(memberRegistry instanceof Picket.Registry.Member)) {
 			throw new _.AutoLoader.Fatal(
 				'MEMBER_REGISTRY_NOT_PROVIDED',
 				'Provided type: ' + typeof memberRegistry
@@ -148,7 +148,7 @@
 			_getClassConstructor(_this, className);
 			return true;
 		} catch (error) {
-			if (!(error instanceof ClassyJS.NamespaceManager.Fatal)
+			if (!(error instanceof Picket.NamespaceManager.Fatal)
 			||	error.code != 'NAMESPACE_OBJECT_DOES_NOT_EXIST') {
 				throw error;
 			}
@@ -258,4 +258,4 @@
 		_this._continueBuffer = [];
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});

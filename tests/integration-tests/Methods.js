@@ -23,7 +23,7 @@ describe('Methods', function(){
 	});
 	
 	it('will type check arguments', function(){
-		var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+		var expectedFatal = new Picket.Registry.Member.Fatal(
 			'METHOD_NOT_REGISTERED',
 			'Provided name: myMethod'
 		);
@@ -35,7 +35,7 @@ describe('Methods', function(){
 	});
 	
 	it('will type check return value', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'INVALID_RETURN_VALUE',
 			'Returned type: string; Expected type: undefined'
 		);
@@ -47,7 +47,7 @@ describe('Methods', function(){
 	});
 	
 	it('can omit return type and it is implicitly set to undefined', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'INVALID_RETURN_VALUE',
 			'Returned type: string; Expected type: undefined'
 		);
@@ -73,7 +73,7 @@ describe('Methods', function(){
 	});
 	
 	it('can specify \'this\' as a return type', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'INVALID_RETURN_VALUE',
 			'Returned type: object; Expected type: this'
 		);
@@ -157,7 +157,7 @@ describe('Methods', function(){
 	});
 	
 	it('a constructor must be used if at least one is defined', function(){
-		var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+		var expectedFatal = new Picket.Registry.Member.Fatal(
 			'METHOD_NOT_REGISTERED',
 			'Provided name: construct'
 		);
@@ -177,7 +177,7 @@ describe('Methods', function(){
 	});
 	
 	it('can be static but not called against class instance', function(){
-		var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+		var expectedFatal = new Picket.Registry.Member.Fatal(
 			'METHOD_NOT_REGISTERED',
 			'Provided name: myMethod'
 		);
@@ -221,7 +221,7 @@ describe('Methods', function(){
 	});
 	
 	it('throws error if optional argument is specified before non-optional argument', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Definition.Fatal(
+		var expectedFatal = new Picket.Member.Method.Definition.Fatal(
 			'INVALID_ARGUMENT_ORDER',
 			'Provided signature: public myMethod (string?, number) -> undefined'
 		);

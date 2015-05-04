@@ -1,4 +1,4 @@
-;(function(ClassyJS, Type, _){
+;(function(Picket, Type, _){
 	
 	var messages = {
 		CLASS_DEFINITION_FACTORY_NOT_PROVIDED:
@@ -10,10 +10,10 @@
 		FACTORY_RETURNED_NON_OBJECT:	'The selected downstream factory did not return an object'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Type.DefinitionFactory.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Type.DefinitionFactory.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.DefinitionFactory = window.ClassyJS.Type.DefinitionFactory || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.DefinitionFactory = window.Picket.Type.DefinitionFactory || {}
 );

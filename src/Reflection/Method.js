@@ -1,10 +1,10 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Method = function(classIdentifier, methodName)
 	{
 		
 		if (typeof classIdentifier == 'string') {
-			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			classIdentifier = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 				classIdentifier
 			);
 		}
@@ -23,17 +23,17 @@
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(classIdentifier)) {
 			throw new _.Method.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
-		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		this._classObject = Picket._instantiator.getTypeRegistry().getClass(classIdentifier);
 		
 		var members = _getMembers(this);
 		
 		for (var i = 0; i < members.length; i++) {
 			
-			if (members[i] instanceof ClassyJS.Member.Method
+			if (members[i] instanceof Picket.Member.Method
 			&&  members[i].getName() == methodName) {
 				this._methodObject = members[i];
 				return;
@@ -55,7 +55,7 @@
 	
 	_.Method.prototype.getAccessType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+		return Picket._instantiator.getReflectionFactory().buildAccessType(
 			this._methodObject.getAccessTypeIdentifier()
 		);
 	};
@@ -66,7 +66,7 @@
 		var reflectionArguments = [];
 		for (var i = 0; i < types.length; i++) {
 			var isOptional = this._methodObject.argumentIsOptional(i);
-			reflectionArguments.push(ClassyJS._instantiator.getReflectionFactory().buildArgument(
+			reflectionArguments.push(Picket._instantiator.getReflectionFactory().buildArgument(
 				types[i],
 				isOptional,
 				isOptional ? this._methodObject.getDefaultArgumentValue(i) : undefined,
@@ -78,20 +78,20 @@
 	
 	_.Method.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+		return Picket._instantiator.getReflectionFactory().buildClass(
 			this._classObject.getName()
 		);
 	};
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._classObject);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Method = _.Method;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

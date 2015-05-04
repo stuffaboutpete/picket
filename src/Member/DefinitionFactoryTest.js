@@ -7,11 +7,11 @@ describe('Member.DefinitionFactory', function(){
 	var constantDefinitionFactory;
 	
 	beforeEach(function(){
-		propertyDefinitionFactory = new ClassyJS.Member.Property.Definition.Factory();
-		methodDefinitionFactory = new ClassyJS.Member.Method.Definition.Factory();
-		eventDefinitionFactory = new ClassyJS.Member.Event.Definition.Factory();
-		constantDefinitionFactory = new ClassyJS.Member.Constant.Definition.Factory();
-		factory = new ClassyJS.Member.DefinitionFactory(
+		propertyDefinitionFactory = new Picket.Member.Property.Definition.Factory();
+		methodDefinitionFactory = new Picket.Member.Method.Definition.Factory();
+		eventDefinitionFactory = new Picket.Member.Event.Definition.Factory();
+		constantDefinitionFactory = new Picket.Member.Constant.Definition.Factory();
+		factory = new Picket.Member.DefinitionFactory(
 			propertyDefinitionFactory,
 			methodDefinitionFactory,
 			eventDefinitionFactory,
@@ -20,28 +20,28 @@ describe('Member.DefinitionFactory', function(){
 	});
 	
 	var getInvalidMemberFatal = function(memberType, signature){
-		return new ClassyJS.Member[memberType].Definition(
+		return new Picket.Member[memberType].Definition(
 			'SIGNATURE_NOT_RECOGNISED',
 			'Provided signature: ' + signature
 		);
 	};
 	
 	it('can be instantiated with property, method, event and constant factories', function(){
-		var factory = new ClassyJS.Member.DefinitionFactory(
+		var factory = new Picket.Member.DefinitionFactory(
 			propertyDefinitionFactory,
 			methodDefinitionFactory,
 			eventDefinitionFactory,
 			constantDefinitionFactory
 		);
-		expect(factory instanceof ClassyJS.Member.DefinitionFactory).toBe(true);
+		expect(factory instanceof Picket.Member.DefinitionFactory).toBe(true);
 	});
 	
 	it('throws error if property factory is not provided', function(){
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'PROPERTY_DEFINITION_FACTORY_NOT_PROVIDED'
 		);
 		expect(function(){
-			new ClassyJS.Member.DefinitionFactory(
+			new Picket.Member.DefinitionFactory(
 				undefined,
 				methodDefinitionFactory,
 				eventDefinitionFactory,
@@ -51,11 +51,11 @@ describe('Member.DefinitionFactory', function(){
 	});
 	
 	it('throws error if method factory is not provided', function(){
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'METHOD_DEFINITION_FACTORY_NOT_PROVIDED'
 		);
 		expect(function(){
-			new ClassyJS.Member.DefinitionFactory(
+			new Picket.Member.DefinitionFactory(
 				propertyDefinitionFactory,
 				undefined,
 				eventDefinitionFactory,
@@ -65,11 +65,11 @@ describe('Member.DefinitionFactory', function(){
 	});
 	
 	it('throws error if event factory is not provided', function(){
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'EVENT_DEFINITION_FACTORY_NOT_PROVIDED'
 		);
 		expect(function(){
-			new ClassyJS.Member.DefinitionFactory(
+			new Picket.Member.DefinitionFactory(
 				propertyDefinitionFactory,
 				methodDefinitionFactory,
 				undefined,
@@ -79,11 +79,11 @@ describe('Member.DefinitionFactory', function(){
 	});
 	
 	it('throws error if constant factory is not provided', function(){
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'CONSTANT_DEFINITION_FACTORY_NOT_PROVIDED'
 		);
 		expect(function(){
-			new ClassyJS.Member.DefinitionFactory(
+			new Picket.Member.DefinitionFactory(
 				propertyDefinitionFactory,
 				methodDefinitionFactory,
 				eventDefinitionFactory
@@ -92,7 +92,7 @@ describe('Member.DefinitionFactory', function(){
 	});
 	
 	it('throws error if build is called with no signature', function(){
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'NON_STRING_SIGNATURE',
 			'Provided type: undefined'
 		);
@@ -100,7 +100,7 @@ describe('Member.DefinitionFactory', function(){
 	});
 	
 	it('throws error if build is called with non string signature', function(){
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'NON_STRING_SIGNATURE',
 			'Provided type: object'
 		);
@@ -109,7 +109,7 @@ describe('Member.DefinitionFactory', function(){
 	
 	it('throws error error if no factory can recognise signature', function(){
 		var signature = 'example signature';
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'INVALID_SIGNATURE',
 			'Provided signature: ' + signature
 		);
@@ -290,7 +290,7 @@ describe('Member.DefinitionFactory', function(){
 	});
 	
 	it('throws error if property factory does not return an object', function(){
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'FACTORY_RETURNED_NON_OBJECT',
 			'Returned type: undefined'
 		);
@@ -300,7 +300,7 @@ describe('Member.DefinitionFactory', function(){
 	
 	it('throws error if method factory does not return an object', function(){
 		var signature = 'example signature';
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'FACTORY_RETURNED_NON_OBJECT',
 			'Returned type: number'
 		);
@@ -316,7 +316,7 @@ describe('Member.DefinitionFactory', function(){
 	
 	it('throws error if event factory does not return an object', function(){
 		var signature = 'example signature';
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'FACTORY_RETURNED_NON_OBJECT',
 			'Returned type: undefined'
 		);
@@ -338,7 +338,7 @@ describe('Member.DefinitionFactory', function(){
 	
 	it('throws error if constant factory does not return an object', function(){
 		var signature = 'example signature';
-		var expectedFatal = new ClassyJS.Member.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Member.DefinitionFactory.Fatal(
 			'FACTORY_RETURNED_NON_OBJECT',
 			'Returned type: string'
 		);

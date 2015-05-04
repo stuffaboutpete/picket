@@ -6,7 +6,7 @@ describe('Type declaration', function(){
 	});
 	
 	it('results in error if class members are provided as array', function(){
-		var expectedFatal = new ClassyJS.Main.Fatal(
+		var expectedFatal = new Picket.Main.Fatal(
 			'NON_OBJECT_CLASS_MEMBERS',
 			'Provided type: array'
 		);
@@ -14,7 +14,7 @@ describe('Type declaration', function(){
 	});
 	
 	it('results in error if class members are provided as non object', function(){
-		var expectedFatal = new ClassyJS.Main.Fatal(
+		var expectedFatal = new Picket.Main.Fatal(
 			'NON_OBJECT_CLASS_MEMBERS',
 			'Provided type: number'
 		);
@@ -22,7 +22,7 @@ describe('Type declaration', function(){
 	});
 	
 	it('results in error if interface members are provided as object', function(){
-		var expectedFatal = new ClassyJS.Main.Fatal(
+		var expectedFatal = new Picket.Main.Fatal(
 			'NON_ARRAY_INTERFACE_MEMBERS',
 			'Provided type: object'
 		);
@@ -30,7 +30,7 @@ describe('Type declaration', function(){
 	});
 	
 	it('results in error if interface members are provided as non object', function(){
-		var expectedFatal = new ClassyJS.Main.Fatal(
+		var expectedFatal = new Picket.Main.Fatal(
 			'NON_ARRAY_INTERFACE_MEMBERS',
 			'Provided type: number'
 		);

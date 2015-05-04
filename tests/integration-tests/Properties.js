@@ -26,7 +26,7 @@ describe('Properties', function(){
 		define('class My.Class', {
 			'public myProperty (number)': 123
 		});
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'INVALID_TYPE',
 			'Allowed type: number; Provided type: string'
 		);

@@ -1,4 +1,4 @@
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	_.DefinitionFactory = function(classDefinitionFactory, interfaceDefinitionFactory)
 	{
@@ -48,6 +48,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {}
 );

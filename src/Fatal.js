@@ -18,4 +18,4 @@
 		
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});

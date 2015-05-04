@@ -50,7 +50,7 @@ describe('Events', function(){
 	});
 	
 	it('throws error if target method argument types do not match event types', function(){
-		var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+		var expectedFatal = new Picket.Registry.Member.Fatal(
 			'EVENT_TARGET_METHOD_NOT_REGISTERED',
 			'Event name: myEvent; Method name: targetMethod'
 		);

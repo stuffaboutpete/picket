@@ -16,41 +16,41 @@ describe('AutoLoader', function(){
 	
 	beforeEach(function(){
 		delete window.My;
-		includer = new ClassyJS.AutoLoader.Includer.Script();
-		instantiator = new ClassyJS.AutoLoader.Instantiator();
-		namespaceManager = new ClassyJS.NamespaceManager();
-		memberRegistry = new ClassyJS.Registry.Member(
-			new ClassyJS.Registry.Type(namespaceManager),
-			new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+		includer = new Picket.AutoLoader.Includer.Script();
+		instantiator = new Picket.AutoLoader.Instantiator();
+		namespaceManager = new Picket.NamespaceManager();
+		memberRegistry = new Picket.Registry.Member(
+			new Picket.Registry.Type(namespaceManager),
+			new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 		);
-		autoloader = new ClassyJS.AutoLoader(
+		autoloader = new Picket.AutoLoader(
 			includer,
 			instantiator,
 			namespaceManager,
 			memberRegistry
 		);
-		namespaceObjectDoesNotExistError = new ClassyJS.NamespaceManager.Fatal(
+		namespaceObjectDoesNotExistError = new Picket.NamespaceManager.Fatal(
 			'NAMESPACE_OBJECT_DOES_NOT_EXIST'
 		);
 	});
 	
 	it('can be instantiated', function(){
-		var loader = new ClassyJS.AutoLoader(
+		var loader = new Picket.AutoLoader(
 			includer,
 			instantiator,
 			namespaceManager,
 			memberRegistry
 		);
-		expect(loader instanceof ClassyJS.AutoLoader).toBe(true);
+		expect(loader instanceof Picket.AutoLoader).toBe(true);
 	});
 	
 	it('throws error if script includer is not provided', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
+		var expectedFatal = new Picket.AutoLoader.Fatal(
 			'INCLUDER_NOT_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.AutoLoader(
+			new Picket.AutoLoader(
 				undefined,
 				instantiator,
 				namespaceManager,
@@ -60,12 +60,12 @@ describe('AutoLoader', function(){
 	});
 	
 	it('throws error if instantiator is not provided', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
+		var expectedFatal = new Picket.AutoLoader.Fatal(
 			'INSTANTIATOR_NOT_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.AutoLoader(
+			new Picket.AutoLoader(
 				includer,
 				undefined,
 				namespaceManager,
@@ -75,12 +75,12 @@ describe('AutoLoader', function(){
 	});
 	
 	it('throws error if namespace manager is not provided', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
+		var expectedFatal = new Picket.AutoLoader.Fatal(
 			'NAMESPACE_MANAGER_NOT_PROVIDED',
 			'Provided type: object'
 		);
 		expect(function(){
-			new ClassyJS.AutoLoader(
+			new Picket.AutoLoader(
 				includer,
 				instantiator,
 				{},
@@ -90,12 +90,12 @@ describe('AutoLoader', function(){
 	});
 	
 	it('throws error if member registry is not provided', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
+		var expectedFatal = new Picket.AutoLoader.Fatal(
 			'MEMBER_REGISTRY_NOT_PROVIDED',
 			'Provided type: object'
 		);
 		expect(function(){
-			new ClassyJS.AutoLoader(
+			new Picket.AutoLoader(
 				includer,
 				instantiator,
 				namespaceManager,
@@ -111,7 +111,7 @@ describe('AutoLoader', function(){
 	});
 	
 	it('throws error if starting class name is not string', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
+		var expectedFatal = new Picket.AutoLoader.Fatal(
 			'NON_STRING_CLASS_NAME',
 			'Provided type: undefined'
 		);
@@ -205,7 +205,7 @@ describe('AutoLoader', function(){
 	});
 	
 	it('throws error if continuing class name is not string', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
+		var expectedFatal = new Picket.AutoLoader.Fatal(
 			'NON_STRING_CLASS_NAME',
 			'Provided type: undefined'
 		);
@@ -218,7 +218,7 @@ describe('AutoLoader', function(){
 	});
 	
 	it('throws error if continue is called whilst not running', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal('NOT_RUNNING');
+		var expectedFatal = new Picket.AutoLoader.Fatal('NOT_RUNNING');
 		expect(function(){ autoloader.continue('Example.Class'); }).toThrow(expectedFatal);
 	});
 	
@@ -249,7 +249,7 @@ describe('AutoLoader', function(){
 	});
 	
 	it('throws error if any script is not loaded', function(){
-		var expectedFatal = new ClassyJS.AutoLoader.Fatal(
+		var expectedFatal = new Picket.AutoLoader.Fatal(
 			'SCRIPT_NOT_LOADED',
 			'Provided class name: Other.Class; ' +
 			'Included script: /Other/Class.js'

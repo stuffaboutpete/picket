@@ -1,4 +1,4 @@
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	_.DefinitionFactory = function(
 		propertyDefinitionFactory,
@@ -48,7 +48,7 @@
 				}
 				break;
 			} catch (error) {
-				if (!(error instanceof ClassyJS.Member[factories[i]].Definition.Fatal)
+				if (!(error instanceof Picket.Member[factories[i]].Definition.Fatal)
 				||	error.code != 'SIGNATURE_NOT_RECOGNISED') {
 					throw error;
 				}
@@ -63,6 +63,6 @@
 		return returnObject;
 	};
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );

@@ -15,37 +15,37 @@ describe('Registry.Type', function(){
 		classConstructor = function(){};
 		parentClassConstructor = function(){};
 		grandParentClassConstructor = function(){};
-		namespaceManager = new ClassyJS.NamespaceManager();
-		classObject = new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition('class My.Class'),
-			new ClassyJS.Registry.Type(namespaceManager),
-			new ClassyJS.Registry.Member(
-				new ClassyJS.Registry.Type(namespaceManager),
-				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+		namespaceManager = new Picket.NamespaceManager();
+		classObject = new Picket.Type.Class(
+			new Picket.Type.Class.Definition('class My.Class'),
+			new Picket.Registry.Type(namespaceManager),
+			new Picket.Registry.Member(
+				new Picket.Registry.Type(namespaceManager),
+				new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 			),
-			new ClassyJS.NamespaceManager()
+			new Picket.NamespaceManager()
 		);
-		parentClassObject = new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition('class My.ParentClass'),
-			new ClassyJS.Registry.Type(namespaceManager),
-			new ClassyJS.Registry.Member(
-				new ClassyJS.Registry.Type(namespaceManager),
-				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+		parentClassObject = new Picket.Type.Class(
+			new Picket.Type.Class.Definition('class My.ParentClass'),
+			new Picket.Registry.Type(namespaceManager),
+			new Picket.Registry.Member(
+				new Picket.Registry.Type(namespaceManager),
+				new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 			),
-			new ClassyJS.NamespaceManager()
+			new Picket.NamespaceManager()
 		);
-		grandParentClassObject = new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition('class MyClass'),
-			new ClassyJS.Registry.Type(namespaceManager),
-			new ClassyJS.Registry.Member(
-				new ClassyJS.Registry.Type(namespaceManager),
-				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+		grandParentClassObject = new Picket.Type.Class(
+			new Picket.Type.Class.Definition('class MyClass'),
+			new Picket.Registry.Type(namespaceManager),
+			new Picket.Registry.Member(
+				new Picket.Registry.Type(namespaceManager),
+				new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 			),
-			new ClassyJS.NamespaceManager()
+			new Picket.NamespaceManager()
 		);
-		interfaceObject = new ClassyJS.Type.Interface();
-		interfaceObject2 = new ClassyJS.Type.Interface();
-		registry = new ClassyJS.Registry.Type(namespaceManager);
+		interfaceObject = new Picket.Type.Interface();
+		interfaceObject2 = new Picket.Type.Interface();
+		registry = new Picket.Registry.Type(namespaceManager);
 		spyOn(namespaceManager, 'getNamespaceObject').and.callFake(function(className){
 			if (className == 'My.ParentClass') return parentClassConstructor;
 			if (className == 'My.GrandParentClass') return grandParentClassConstructor;
@@ -53,16 +53,16 @@ describe('Registry.Type', function(){
 	});
 	
 	it('can be instantiated', function(){
-		var registry = new ClassyJS.Registry.Type(namespaceManager);
-		expect(registry instanceof ClassyJS.Registry.Type).toBe(true);
+		var registry = new Picket.Registry.Type(namespaceManager);
+		expect(registry instanceof Picket.Registry.Type).toBe(true);
 	});
 	
 	it('requires namespace manager', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_NAMESPACE_MANAGER_PROVIDED',
 			'Provided type: undefined'
 		);
-		expect(function(){ new ClassyJS.Registry.Type(); }).toThrow(expectedFatal);
+		expect(function(){ new Picket.Registry.Type(); }).toThrow(expectedFatal);
 	});
 	
 	it('can register class constructor against class object', function(){
@@ -70,7 +70,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if non class object is registered', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_CLASS_OBJECT_PROVIDED',
 			'Provided type: object'
 		);
@@ -78,7 +78,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if non function is registered as constructor', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_CLASS_CONSTRUCTOR_PROVIDED',
 			'Provided type: object'
 		);
@@ -86,7 +86,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if class is re-registered', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_ALREADY_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_ALREADY_REGISTERED');
 		registry.registerClass(classObject, classConstructor);
 		expect(function(){
 			registry.registerClass(classObject, classConstructor);
@@ -104,7 +104,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if getClass is called with non object or function', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'INVALID_CLASS_LOOKUP',
 			'Provided type: string'
 		);
@@ -113,12 +113,12 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if getClass is called with unregistered constructor', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		expect(function(){ registry.getClass(classConstructor); }).toThrow(expectedFatal);
 	});
 	
 	it('throws error if getClass is called with unregistered constructor instance', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		expect(function(){ registry.getClass(new classConstructor()); }).toThrow(expectedFatal);
 	});
 	
@@ -129,7 +129,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if parent class object is non string', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_STRING_PARENT_PROVIDED',
 			'Provided type: object'
 		);
@@ -139,7 +139,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if child class object is non class object', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_CLASS_OBJECT_PROVIDED',
 			'Provided type: object'
 		);
@@ -149,7 +149,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if child class object is not already registered', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CHILD_CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CHILD_CLASS_NOT_REGISTERED');
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		expect(function(){
 			registry.registerClassChild('My.ParentClass', classObject);
@@ -183,14 +183,14 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error when non registered class object is provided to hasParent', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		expect(function(){
 			registry.hasParent(classObject);
 		}).toThrow(expectedFatal);
 	});
 	
 	it('throws error if getParent is called on object with no parent', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('NON_EXISTENT_PARENT_REQUESTED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('NON_EXISTENT_PARENT_REQUESTED');
 		registry.registerClass(classObject, classConstructor);
 		expect(function(){
 			registry.getParent(classObject);
@@ -198,14 +198,14 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error when non registered class constructor is provided to hasParent', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		expect(function(){
 			registry.hasParent(classConstructor);
 		}).toThrow(expectedFatal);
 	});
 	
 	it('throws error if getParent is called on constructor with no parent', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('NON_EXISTENT_PARENT_REQUESTED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('NON_EXISTENT_PARENT_REQUESTED');
 		registry.registerClass(classObject, classConstructor);
 		expect(function(){
 			registry.getParent(classConstructor);
@@ -260,7 +260,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if non array is registered as class instance', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_ARRAY_CLASS_INSTANCE_PROVIDED',
 			'Provided type: object'
 		);
@@ -270,7 +270,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if single instance of registered class is registered', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('SINGLE_CLASS_INSTANCE_PROVIDED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('SINGLE_CLASS_INSTANCE_PROVIDED');
 		registry.registerClass(classObject, classConstructor);
 		expect(function(){
 			registry.registerClassInstance([new classConstructor()]);
@@ -278,7 +278,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if array containing non object is registered as class instance', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_OBJECT_CLASS_INSTANCE_PROVIDED',
 			'Provided type: string'
 		);
@@ -289,7 +289,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if class instance contains instance of an unregistered class', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		registry.registerClass(classObject, classConstructor);
 		expect(function(){
 			registry.registerClassInstance([new classConstructor(), new parentClassConstructor()]);
@@ -297,7 +297,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if class instance array does not correspond with class hierarchy', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'INVALID_CLASS_HIERARCHY_INSTANCE_REGISTERED'
 		);
 		registry.registerClass(classObject, classConstructor);
@@ -313,7 +313,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if class instance array is incomplete class hierarchy', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'INCOMPLETE_CLASS_HIERARCHY_INSTANCE_REGISTERED'
 		);
 		registry.registerClass(classObject, classConstructor);
@@ -327,7 +327,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if class instance array contains more than class hierarchy', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'INVALID_CLASS_HIERARCHY_INSTANCE_REGISTERED'
 		);
 		registry.registerClass(classObject, classConstructor);
@@ -344,7 +344,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if class instance is already registered', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_INSTANCE_ALREADY_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_INSTANCE_ALREADY_REGISTERED');
 		var classInstance = [
 			new classConstructor(),
 			new parentClassConstructor()
@@ -389,7 +389,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error if getParent is called on instance with no parent', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('NON_EXISTENT_PARENT_REQUESTED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('NON_EXISTENT_PARENT_REQUESTED');
 		registry.registerClass(classObject, classConstructor);
 		registry.registerClass(parentClassObject, parentClassConstructor);
 		expect(function(){
@@ -422,7 +422,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error when non class, constructor or instance is provided to hasParent', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_CLASS_CONSTRUCTOR_OR_INSTANCE_PROVIDED',
 			'Provided type: string'
 		);
@@ -432,7 +432,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('throws error when non class, constructor or instance is provided to getParent', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_CLASS_CONSTRUCTOR_OR_INSTANCE_PROVIDED',
 			'Provided type: number'
 		);
@@ -517,7 +517,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('will throw error if non object is provided to getInstantiatedInstance', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_CLASS_INSTANCE_PROVIDED',
 			'Provided type: function'
 		);
@@ -527,7 +527,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('will throw if instance of non registered class to getInstantiatedInstance', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		expect(function(){
 			registry.getInstantiatedInstance(new classConstructor());
 		}).toThrow(expectedFatal);
@@ -539,7 +539,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('will throw error if non interface is provided to registerInterfaceAgainstClass', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_STRING_INTERFACE_NAME_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -549,7 +549,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('will throw error if non class is provided to registerInterfaceAgainstClass', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_CLASS_OBJECT_PROVIDED',
 			'Provided type: object'
 		);
@@ -579,7 +579,7 @@ describe('Registry.Type', function(){
 	});
 	
 	it('will throw error if non class object is provided to getInterface', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal(
+		var expectedFatal = new Picket.Registry.Type.Fatal(
 			'NON_CLASS_OBJECT_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -594,14 +594,14 @@ describe('Registry.Type', function(){
 	});
 	
 	it('will throw error if class provided to register interface does not exist', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		expect(function(){
 			registry.registerInterfaceAgainstClass('My.IInterface', classObject);
 		}).toThrow(expectedFatal);
 	});
 	
 	it('will throw error if class provided to retrieve interfaces does not exist', function(){
-		var expectedFatal = new ClassyJS.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
+		var expectedFatal = new Picket.Registry.Type.Fatal('CLASS_NOT_REGISTERED');
 		expect(function(){
 			registry.getInterfacesFromClass(classObject);
 		}).toThrow(expectedFatal);
@@ -625,14 +625,14 @@ describe('Registry.Type', function(){
 	
 	it('allows mock class to be registered', function(){
 		var mock = {};
-		var classObject = new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition('class My.MockClass'),
-			new ClassyJS.Registry.Type(namespaceManager),
-			new ClassyJS.Registry.Member(
-				new ClassyJS.Registry.Type(namespaceManager),
-				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+		var classObject = new Picket.Type.Class(
+			new Picket.Type.Class.Definition('class My.MockClass'),
+			new Picket.Registry.Type(namespaceManager),
+			new Picket.Registry.Member(
+				new Picket.Registry.Type(namespaceManager),
+				new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 			),
-			new ClassyJS.NamespaceManager()
+			new Picket.NamespaceManager()
 		);
 		registry.registerMock(mock, classObject);
 		expect(registry.classExists(mock)).toBe(true);
@@ -641,14 +641,14 @@ describe('Registry.Type', function(){
 	
 	it('allows interfaces to be associated with mock class', function(){
 		var mock = {};
-		var classObject = new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition('class My.MockClass'),
-			new ClassyJS.Registry.Type(namespaceManager),
-			new ClassyJS.Registry.Member(
-				new ClassyJS.Registry.Type(namespaceManager),
-				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+		var classObject = new Picket.Type.Class(
+			new Picket.Type.Class.Definition('class My.MockClass'),
+			new Picket.Registry.Type(namespaceManager),
+			new Picket.Registry.Member(
+				new Picket.Registry.Type(namespaceManager),
+				new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 			),
-			new ClassyJS.NamespaceManager()
+			new Picket.NamespaceManager()
 		);
 		registry.registerMock(mock, classObject);
 		var interfaces = [

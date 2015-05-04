@@ -1,4 +1,4 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Instantiator = function(){};
 	
@@ -8,6 +8,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.AutoLoader = window.ClassyJS.AutoLoader || {}
+	window.Picket = window.Picket || {},
+	window.Picket.AutoLoader = window.Picket.AutoLoader || {}
 );

@@ -1,4 +1,4 @@
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	var messages = {
 		PROPERTY_DEFINITION_FACTORY_NOT_PROVIDED:
@@ -15,10 +15,10 @@
 			'the available member definition classes' 
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.DefinitionFactory.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.DefinitionFactory.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.DefinitionFactory = window.ClassyJS.Member.DefinitionFactory || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.DefinitionFactory = window.Picket.Member.DefinitionFactory || {}
 );

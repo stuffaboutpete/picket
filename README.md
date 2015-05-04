@@ -1,6 +1,6 @@
-# ClassyJS
+# Picket
 
-Hi, thanks for stopping by. ClassyJS is a library which allows you to create object-orientated architectures in JavaScript. Whilst there is an extensive number of features, the project is very much in an early stage - there are bugs, there is no documentation, at least one significant feature is missing that stops it being production ready (info in the road map).
+Hi, thanks for stopping by. Picket is a library which allows you to create object-orientated architectures in JavaScript. Whilst there is an extensive number of features, the project is very much in an early stage - there are bugs, there is no documentation, at least one significant feature is missing that stops it being production ready (info in the road map).
 
 I am keen to hear from anyone who is interested in contributing, whether that be actual pull requests or simply using the code and/or filing issues.
 
@@ -98,7 +98,7 @@ describe('Pig', function(){
 In order to run the code, download one of the files from the build directory and include the following in your HTML.
 
 ```html
-<script type="text/javascript" src="path/to/classy.js"></script>
+<script type="text/javascript" src="path/to/picket.js"></script>
 <script>
     
     start.addAutoLoadPattern(
@@ -148,18 +148,18 @@ To run the tests, use node.js and npm to install the dependencies. Then type `gu
 
 ## Roadmap
 
-The following describes the likely features ahead for ClassyJS.
+The following describes the likely features ahead for Picket.
 
 * Documentation / website / tutorials
 * Ability to compile many classes into one library file and not have the autoload system attempt to load each individually. This is currently a blocker to production usage as loading each class individually is not acceptable beyond development.
-* Compilation to vanilla JavaScript - there is a performance hit because of all the work ClassyJS has to do in type checking and such. The ideal workflow would be to develop using all features and then compile the code down to a lighter version which does not do as much work.
+* Compilation to vanilla JavaScript - there is a performance hit because of all the work Picket has to do in type checking and such. The ideal workflow would be to develop using all features and then compile the code down to a lighter version which does not do as much work.
 * New language features - currently being considered features include variadic methods, enums, generics and more.
 * Node.js compatability
 * Registration with common package managers such as npm and Bower.
-* Facility to write code without the limitations imposed by the nature of class declarations being valid JavaScript literals. This code would be identical but without quotes around signatures, commas after class members etc and would then be compilable to valid ClassyJS.
+* Facility to write code without the limitations imposed by the nature of class declarations being valid JavaScript literals. This code would be identical but without quotes around signatures, commas after class members etc and would then be compilable to valid Picket.
 * Possible integration with an established autoloading system such as AMD or Require.js.
 * Name change - there are a few libraries with the same name (https://www.google.co.uk/webhp?ion=1&espv=2&ie=UTF-8#q=classy%20js)
-* Debugger (such as Chrome Developer Tools) extension to allow stepping into and out of ClassyJS methods (bypassing the inner workings of the library).
+* Debugger (such as Chrome Developer Tools) extension to allow stepping into and out of Picket methods (bypassing the inner workings of the library).
 * Comments!
 
 ## Contact

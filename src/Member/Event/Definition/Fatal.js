@@ -1,15 +1,15 @@
-;(function(ClassyJS, Member, Event, _){
+;(function(Picket, Member, Event, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
 		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood' 
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Event.Definition.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Event.Definition.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Event = window.ClassyJS.Member.Event || {},
-	window.ClassyJS.Member.Event.Definition = window.ClassyJS.Member.Event.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Event = window.Picket.Member.Event || {},
+	window.Picket.Member.Event.Definition = window.Picket.Member.Event.Definition || {}
 );

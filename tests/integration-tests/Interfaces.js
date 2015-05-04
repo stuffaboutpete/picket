@@ -19,7 +19,7 @@ describe('Interfaces', function(){
 	});
 	
 	it('can define abstract members which must be implemented before instantiation', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS'
 		);
 		define('interface My.IInterface', [
@@ -35,7 +35,7 @@ describe('Interfaces', function(){
 	});
 	
 	it('multiple can be assigned to class', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS'
 		);
 		define('interface My.IInterface', [
@@ -58,7 +58,7 @@ describe('Interfaces', function(){
 	});
 	
 	it('are deemed not implemented if method name is wrong', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS'
 		);
 		define('interface My.IInterface', [
@@ -71,7 +71,7 @@ describe('Interfaces', function(){
 	});
 	
 	it('are deemed not implemented if argument type is wrong', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS'
 		);
 		define('interface My.IInterface', [
@@ -84,7 +84,7 @@ describe('Interfaces', function(){
 	});
 	
 	it('are deemed not implemented if any argument type is wrong', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS'
 		);
 		define('interface My.IInterface', [
@@ -97,7 +97,7 @@ describe('Interfaces', function(){
 	});
 	
 	it('are deemed not implemented if return type is wrong', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS'
 		);
 		define('interface My.IInterface', [
@@ -122,7 +122,7 @@ describe('Interfaces', function(){
 	});
 	
 	it('can be used to type check method calls', function(){
-		var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+		var expectedFatal = new Picket.Registry.Member.Fatal(
 			'METHOD_NOT_REGISTERED',
 			'Provided name: myMethod'
 		);

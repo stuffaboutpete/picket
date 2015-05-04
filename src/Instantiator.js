@@ -32,7 +32,7 @@
 	_.Instantiator.prototype.getTypeFactory = function()
 	{
 		if (!this._typeFactory) {
-			this._typeFactory = new ClassyJS.Type.Factory(
+			this._typeFactory = new Picket.Type.Factory(
 				this.getTypeDefinitionFactory(),
 				this.getClassFactory(),
 				this.getInterfaceFactory(),
@@ -47,7 +47,7 @@
 	_.Instantiator.prototype.getClassFactory = function()
 	{
 		if (!this._classFactory) {
-			this._classFactory = new ClassyJS.Type.Class.Factory();
+			this._classFactory = new Picket.Type.Class.Factory();
 		}
 		return this._classFactory;
 	};
@@ -55,7 +55,7 @@
 	_.Instantiator.prototype.getInterfaceFactory = function()
 	{
 		if (!this._interfaceFactory) {
-			this._interfaceFactory = new ClassyJS.Type.Interface.Factory();
+			this._interfaceFactory = new Picket.Type.Interface.Factory();
 		}
 		return this._interfaceFactory;
 	};
@@ -63,7 +63,7 @@
 	_.Instantiator.prototype.getTypeDefinitionFactory = function()
 	{
 		if (!this._typeDefinitionFactory) {
-			this._typeDefinitionFactory = new ClassyJS.Type.DefinitionFactory(
+			this._typeDefinitionFactory = new Picket.Type.DefinitionFactory(
 				this.getClassDefinitionFactory(),
 				this.getInterfaceDefinitionFactory()
 			);
@@ -74,7 +74,7 @@
 	_.Instantiator.prototype.getClassDefinitionFactory = function()
 	{
 		if (!this._classDefinitionFactory) {
-			this._classDefinitionFactory = new ClassyJS.Type.Class.Definition.Factory();
+			this._classDefinitionFactory = new Picket.Type.Class.Definition.Factory();
 		}
 		return this._classDefinitionFactory;
 	};
@@ -82,7 +82,7 @@
 	_.Instantiator.prototype.getInterfaceDefinitionFactory = function()
 	{
 		if (!this._interfaceDefinitionFactory) {
-			this._interfaceDefinitionFactory = new ClassyJS.Type.Interface.Definition.Factory();
+			this._interfaceDefinitionFactory = new Picket.Type.Interface.Definition.Factory();
 		}
 		return this._interfaceDefinitionFactory;
 	};
@@ -90,7 +90,7 @@
 	_.Instantiator.prototype.getMemberFactory = function()
 	{
 		if (!this._memberFactory) {
-			this._memberFactory = new ClassyJS.Member.Factory(
+			this._memberFactory = new Picket.Member.Factory(
 				this.getMemberDefinitionFactory(),
 				this.getPropertyFactory(),
 				this.getMethodFactory(),
@@ -106,7 +106,7 @@
 	_.Instantiator.prototype.getPropertyFactory = function()
 	{
 		if (!this._propertyFactory) {
-			this._propertyFactory = new ClassyJS.Member.Property.Factory();
+			this._propertyFactory = new Picket.Member.Property.Factory();
 		}
 		return this._propertyFactory;
 	};
@@ -114,7 +114,7 @@
 	_.Instantiator.prototype.getMethodFactory = function()
 	{
 		if (!this._methodFactory) {
-			this._methodFactory = new ClassyJS.Member.Method.Factory();
+			this._methodFactory = new Picket.Member.Method.Factory();
 		}
 		return this._methodFactory;
 	};
@@ -122,7 +122,7 @@
 	_.Instantiator.prototype.getEventFactory = function()
 	{
 		if (!this._eventFactory) {
-			this._eventFactory = new ClassyJS.Member.Event.Factory();
+			this._eventFactory = new Picket.Member.Event.Factory();
 		}
 		return this._eventFactory;
 	};
@@ -130,7 +130,7 @@
 	_.Instantiator.prototype.getConstantFactory = function()
 	{
 		if (!this._constantFactory) {
-			this._constantFactory = new ClassyJS.Member.Constant.Factory();
+			this._constantFactory = new Picket.Member.Constant.Factory();
 		}
 		return this._constantFactory;
 	};
@@ -138,7 +138,7 @@
 	_.Instantiator.prototype.getMemberDefinitionFactory = function()
 	{
 		if (!this._memberDefinitionFactory) {
-			this._memberDefinitionFactory = new ClassyJS.Member.DefinitionFactory(
+			this._memberDefinitionFactory = new Picket.Member.DefinitionFactory(
 				this.getPropertyDefinitionFactory(),
 				this.getMethodDefinitionFactory(),
 				this.getEventDefinitionFactory(),
@@ -151,7 +151,7 @@
 	_.Instantiator.prototype.getPropertyDefinitionFactory = function()
 	{
 		if (!this._propertyDefinitionFactory) {
-			this._propertyDefinitionFactory = new ClassyJS.Member.Property.Definition.Factory();
+			this._propertyDefinitionFactory = new Picket.Member.Property.Definition.Factory();
 		}
 		return this._propertyDefinitionFactory;
 	};
@@ -159,7 +159,7 @@
 	_.Instantiator.prototype.getMethodDefinitionFactory = function()
 	{
 		if (!this._methodDefinitionFactory) {
-			this._methodDefinitionFactory = new ClassyJS.Member.Method.Definition.Factory();
+			this._methodDefinitionFactory = new Picket.Member.Method.Definition.Factory();
 		}
 		return this._methodDefinitionFactory;
 	};
@@ -167,7 +167,7 @@
 	_.Instantiator.prototype.getEventDefinitionFactory = function()
 	{
 		if (!this._eventDefinitionFactory) {
-			this._eventDefinitionFactory = new ClassyJS.Member.Event.Definition.Factory();
+			this._eventDefinitionFactory = new Picket.Member.Event.Definition.Factory();
 		}
 		return this._eventDefinitionFactory;
 	};
@@ -175,7 +175,7 @@
 	_.Instantiator.prototype.getConstantDefinitionFactory = function()
 	{
 		if (!this._constantDefinitionFactory) {
-			this._constantDefinitionFactory = new ClassyJS.Member.Constant.Definition.Factory();
+			this._constantDefinitionFactory = new Picket.Member.Constant.Definition.Factory();
 		}
 		return this._constantDefinitionFactory;
 	};
@@ -183,7 +183,7 @@
 	_.Instantiator.prototype.getNamespaceManager = function()
 	{
 		if (!this._namespaceManager) {
-			this._namespaceManager = new ClassyJS.NamespaceManager();
+			this._namespaceManager = new Picket.NamespaceManager();
 		}
 		return this._namespaceManager;
 	};
@@ -191,7 +191,7 @@
 	_.Instantiator.prototype.getTypeRegistry = function()
 	{
 		if (!this._typeRegistry) {
-			this._typeRegistry = new ClassyJS.Registry.Type(
+			this._typeRegistry = new Picket.Registry.Type(
 				this.getNamespaceManager()
 			);
 		}
@@ -201,7 +201,7 @@
 	_.Instantiator.prototype.getMemberRegistry = function()
 	{
 		if (!this._memberRegistry) {
-			this._memberRegistry = new ClassyJS.Registry.Member(
+			this._memberRegistry = new Picket.Registry.Member(
 				this.getTypeRegistry(),
 				this.getTypeChecker()
 			);
@@ -212,8 +212,8 @@
 	_.Instantiator.prototype.getTypeChecker = function()
 	{
 		if (!this._typeChecker) {
-			this._typeChecker = new ClassyJS.TypeChecker(
-				new ClassyJS.TypeChecker.ReflectionFactory()
+			this._typeChecker = new Picket.TypeChecker(
+				new Picket.TypeChecker.ReflectionFactory()
 			);
 		}
 		return this._typeChecker;
@@ -222,7 +222,7 @@
 	_.Instantiator.prototype.getAccessController = function()
 	{
 		if (!this._accessController) {
-			this._accessController = new ClassyJS.Access.Controller(
+			this._accessController = new Picket.Access.Controller(
 				this.getTypeRegistry()
 			);
 		}
@@ -232,7 +232,7 @@
 	_.Instantiator.prototype.getAutoLoader = function()
 	{
 		if (!this._autoLoader) {
-			this._autoLoader = new ClassyJS.AutoLoader(
+			this._autoLoader = new Picket.AutoLoader(
 				this.getIncluder(),
 				this.getAutoLoadInstantiator(),
 				this.getNamespaceManager(),
@@ -245,7 +245,7 @@
 	_.Instantiator.prototype.getIncluder = function()
 	{
 		if (!this._includer) {
-			this._includer = new ClassyJS.AutoLoader.Includer.Script();
+			this._includer = new Picket.AutoLoader.Includer.Script();
 		}
 		return this._includer;
 	};
@@ -253,7 +253,7 @@
 	_.Instantiator.prototype.getAutoLoadInstantiator = function()
 	{
 		if (!this._autoLoadInstantiator) {
-			this._autoLoadInstantiator = new ClassyJS.AutoLoader.Instantiator();
+			this._autoLoadInstantiator = new Picket.AutoLoader.Instantiator();
 		}
 		return this._autoLoadInstantiator;
 	};
@@ -261,9 +261,9 @@
 	_.Instantiator.prototype.getReflectionFactory = function()
 	{
 		if (!this._reflectionFactory) {
-			this._reflectionFactory = new ClassyJS.Reflection.Factory();
+			this._reflectionFactory = new Picket.Reflection.Factory();
 		}
 		return this._reflectionFactory;
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});

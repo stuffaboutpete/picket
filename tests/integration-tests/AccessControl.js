@@ -10,19 +10,19 @@ describe('Access control', function(){
 	
 	beforeEach(function(){
 		delete window.My;
-		protectedPropertyFatal = new ClassyJS.Member.Property.Fatal(
+		protectedPropertyFatal = new Picket.Member.Property.Fatal(
 			'ACCESS_NOT_ALLOWED',
 			'Access type: protected'
 		);
-		privatePropertyFatal = new ClassyJS.Member.Property.Fatal(
+		privatePropertyFatal = new Picket.Member.Property.Fatal(
 			'ACCESS_NOT_ALLOWED',
 			'Access type: private'
 		);
-		protectedMethodFatal = new ClassyJS.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
-		privateMethodFatal = new ClassyJS.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
-		protectedConstantFatal = new ClassyJS.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
-		privateConstantFatal = new ClassyJS.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
-		protectedEventFatal = new ClassyJS.Member.Event.Fatal(
+		protectedMethodFatal = new Picket.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
+		privateMethodFatal = new Picket.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
+		protectedConstantFatal = new Picket.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
+		privateConstantFatal = new Picket.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
+		protectedEventFatal = new Picket.Member.Event.Fatal(
 			'ACCESS_NOT_ALLOWED',
 			'Access type: protected'
 		);

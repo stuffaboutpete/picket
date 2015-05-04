@@ -11,26 +11,26 @@ describe('Reflection.Constant', function(){
 	var classConstructor;
 	
 	beforeEach(function(){
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		namespaceManager = mocker.getMock(ClassyJS.NamespaceManager);
-		typeRegistry = mocker.getMock(ClassyJS.Registry.Type);
-		memberRegistry = mocker.getMock(ClassyJS.Registry.Member);
-		classObject = mocker.getMock(ClassyJS.Type.Class);
-		constantObject = mocker.getMock(ClassyJS.Member.Constant);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		namespaceManager = mocker.getMock(Picket.NamespaceManager);
+		typeRegistry = mocker.getMock(Picket.Registry.Type);
+		memberRegistry = mocker.getMock(Picket.Registry.Member);
+		classObject = mocker.getMock(Picket.Type.Class);
+		constantObject = mocker.getMock(Picket.Member.Constant);
 		classConstructor = function(){};
 		spyOn(namespaceManager, 'getNamespaceObject').and.returnValue(classConstructor);
 		spyOn(typeRegistry, 'getClass').and.returnValue(classObject);
-		spyOn(ClassyJS._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
-		spyOn(ClassyJS._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
-		spyOn(ClassyJS._instantiator, 'getNamespaceManager').and.returnValue(namespaceManager);
+		spyOn(Picket._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
+		spyOn(Picket._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		spyOn(Picket._instantiator, 'getNamespaceManager').and.returnValue(namespaceManager);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('instantiation with a string class looks up namespace and gets class object', function(){
@@ -62,7 +62,7 @@ describe('Reflection.Constant', function(){
 	});
 	
 	it('throws error if type registry indicates class does not exist', function(){
-		var expectedFatal = new ClassyJS.Reflection.Constant.Fatal('CLASS_DOES_NOT_EXIST');
+		var expectedFatal = new Picket.Reflection.Constant.Fatal('CLASS_DOES_NOT_EXIST');
 		spyOn(typeRegistry, 'classExists').and.returnValue(false);
 		expect(function(){
 			new Reflection.Constant('NonClass', 'CONSTANT_NAME');
@@ -70,7 +70,7 @@ describe('Reflection.Constant', function(){
 	});
 	
 	it('throws error if non string, object or function is provided', function(){
-		var expectedFatal = new ClassyJS.Reflection.Constant.Fatal(
+		var expectedFatal = new Picket.Reflection.Constant.Fatal(
 			'INVALID_IDENTIFIER_PROVIDED',
 			'Provided type: number'
 		);
@@ -79,7 +79,7 @@ describe('Reflection.Constant', function(){
 	});
 	
 	it('throws error if non-string constant name is provided', function(){
-		var expectedFatal = new ClassyJS.Reflection.Constant.Fatal(
+		var expectedFatal = new Picket.Reflection.Constant.Fatal(
 			'NON_STRING_CONSTANT_NAME_PROVIDED',
 			'Provided type: number'
 		);
@@ -88,7 +88,7 @@ describe('Reflection.Constant', function(){
 	});
 	
 	it('throws error if no constant of given name is found', function(){
-		var expectedFatal = new ClassyJS.Reflection.Constant.Fatal(
+		var expectedFatal = new Picket.Reflection.Constant.Fatal(
 			'CONSTANT_DOES_NOT_EXIST',
 			'Constant name: CONSTANT_NAME'
 		);

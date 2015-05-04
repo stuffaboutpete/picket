@@ -1,4 +1,4 @@
-;(function(ClassyJS, Type, Interface, _){
+;(function(Picket, Type, Interface, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
@@ -6,11 +6,11 @@
 		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Type.Interface.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Type.Interface.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Interface = window.ClassyJS.Type.Interface || {},
-	window.ClassyJS.Type.Interface.Definition = window.ClassyJS.Type.Interface.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Interface = window.Picket.Type.Interface || {},
+	window.Picket.Type.Interface.Definition = window.Picket.Type.Interface.Definition || {}
 );

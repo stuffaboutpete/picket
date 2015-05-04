@@ -1,10 +1,10 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Event = function(classIdentifier, eventName)
 	{
 		
 		if (typeof classIdentifier == 'string') {
-			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			classIdentifier = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 				classIdentifier
 			);
 		}
@@ -23,17 +23,17 @@
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(classIdentifier)) {
 			throw new _.Event.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
-		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		this._classObject = Picket._instantiator.getTypeRegistry().getClass(classIdentifier);
 		
 		var members = _getMembers(this);
 		
 		for (var i = 0; i < members.length; i++) {
 			
-			if (members[i] instanceof ClassyJS.Member.Event
+			if (members[i] instanceof Picket.Member.Event
 			&&  members[i].getName() == eventName) {
 				this._eventObject = members[i];
 				return;
@@ -58,7 +58,7 @@
 		var types = this._eventObject.getArgumentTypeIdentifiers();
 		var reflectionArguments = [];
 		for (var i = 0; i < types.length; i++) {
-			reflectionArguments.push(ClassyJS._instantiator.getReflectionFactory().buildArgument(
+			reflectionArguments.push(Picket._instantiator.getReflectionFactory().buildArgument(
 				types[i],
 				false,
 				undefined,
@@ -70,27 +70,27 @@
 	
 	_.Event.prototype.getAccessType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+		return Picket._instantiator.getReflectionFactory().buildAccessType(
 			this._eventObject.getAccessTypeIdentifier()
 		);
 	};
 	
 	_.Event.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+		return Picket._instantiator.getReflectionFactory().buildClass(
 			this._classObject.getName()
 		);
 	};
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._classObject);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Event = _.Event;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

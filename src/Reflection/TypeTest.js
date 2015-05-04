@@ -7,19 +7,19 @@ describe('Reflection.Type', function(){
 	var reflectionClass;
 	
 	beforeEach(function(){
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		typeChecker = mocker.getMock(ClassyJS.TypeChecker);
-		spyOn(ClassyJS._instantiator, 'getTypeChecker').and.returnValue(typeChecker);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		typeChecker = mocker.getMock(Picket.TypeChecker);
+		spyOn(Picket._instantiator, 'getTypeChecker').and.returnValue(typeChecker);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('throws error if non-string identifier is provided', function(){
-		var expectedFatal = new ClassyJS.Reflection.Type.Fatal(
+		var expectedFatal = new Picket.Reflection.Type.Fatal(
 			'NON_STRING_IDENTIFIER_PROVIDED',
 			'Provided type: number'
 		);

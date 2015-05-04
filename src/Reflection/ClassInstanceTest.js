@@ -20,25 +20,25 @@ describe('Reflection.ClassInstance', function(){
 	beforeEach(function(){
 		define('class My.Class');
 		objectInstance = new My.Class();
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		typeRegistry = mocker.getMock(ClassyJS.Registry.Type);
-		memberRegistry = mocker.getMock(ClassyJS.Registry.Member);
-		classObject = mocker.getMock(ClassyJS.Type.Class);
-		propertyObject = mocker.getMock(ClassyJS.Member.Property);
-		methodObject = mocker.getMock(ClassyJS.Member.Method);
-		eventObject = mocker.getMock(ClassyJS.Member.Event);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		typeRegistry = mocker.getMock(Picket.Registry.Type);
+		memberRegistry = mocker.getMock(Picket.Registry.Member);
+		classObject = mocker.getMock(Picket.Type.Class);
+		propertyObject = mocker.getMock(Picket.Member.Property);
+		methodObject = mocker.getMock(Picket.Member.Method);
+		eventObject = mocker.getMock(Picket.Member.Event);
 		reflectionPropertyInstance = mocker.getMock(Reflection.PropertyInstance);
 		reflectionMethodInstance = mocker.getMock(Reflection.MethodInstance);
 		reflectionEventInstance = mocker.getMock(Reflection.EventInstance);
-		spyOn(ClassyJS._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
-		spyOn(ClassyJS._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		spyOn(Picket._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
+		spyOn(Picket._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('can be instantiated with an object', function(){
@@ -47,7 +47,7 @@ describe('Reflection.ClassInstance', function(){
 	});
 	
 	it('throws error if provided instance is not an object', function(){
-		var expectedFatal = new ClassyJS.Reflection.ClassInstance.Fatal(
+		var expectedFatal = new Picket.Reflection.ClassInstance.Fatal(
 			'INVALID_IDENTIFIER_PROVIDED',
 			'Provided type: function'
 		);
@@ -61,7 +61,7 @@ describe('Reflection.ClassInstance', function(){
 	});
 	
 	it('throws error if type registry indicates a non-valid class', function(){
-		var expectedFatal = new ClassyJS.Reflection.ClassInstance.Fatal('CLASS_DOES_NOT_EXIST');
+		var expectedFatal = new Picket.Reflection.ClassInstance.Fatal('CLASS_DOES_NOT_EXIST');
 		spyOn(typeRegistry, 'classExists').and.returnValue(false);
 		expect(function(){ new Reflection.ClassInstance({}); }).toThrow(expectedFatal);
 		expect(typeRegistry.classExists).toHaveBeenCalled();

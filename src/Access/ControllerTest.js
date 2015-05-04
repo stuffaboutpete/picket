@@ -5,23 +5,23 @@ describe('Access.Controller', function(){
 	var accessController;
 	
 	beforeEach(function(){
-		namespaceManager = new ClassyJS.NamespaceManager();
-		typeRegistry = new ClassyJS.Registry.Type(namespaceManager);
-		accessController = new ClassyJS.Access.Controller(typeRegistry);
+		namespaceManager = new Picket.NamespaceManager();
+		typeRegistry = new Picket.Registry.Type(namespaceManager);
+		accessController = new Picket.Access.Controller(typeRegistry);
 	});
 	
 	it('requires type registry', function(){
-		var expectedFatal = new ClassyJS.Access.Controller.Fatal(
+		var expectedFatal = new Picket.Access.Controller.Fatal(
 			'NO_TYPE_REGISTRY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Access.Controller();
+			new Picket.Access.Controller();
 		}).toThrow(expectedFatal);
 	});
 	
 	it('throws error if target is non-instance and non-constructor', function(){
-		var expectedFatal = new ClassyJS.Access.Controller.Fatal(
+		var expectedFatal = new Picket.Access.Controller.Fatal(
 			'TARGET_NOT_INSTANCE_OR_CONSTRUCTOR',
 			'Provided type: string'
 		);
@@ -35,7 +35,7 @@ describe('Access.Controller', function(){
 	});
 	
 	it('throws error if accesser is non-instance and non-constructor and not undefined', function(){
-		var expectedFatal = new ClassyJS.Access.Controller.Fatal(
+		var expectedFatal = new Picket.Access.Controller.Fatal(
 			'ACCESS_OBJECT_NOT_INSTANCE_OR_CONSTRUCTOR_OR_UNDEFINED',
 			'Provided type: string'
 		);
@@ -49,7 +49,7 @@ describe('Access.Controller', function(){
 	});
 	
 	it('throws error if access instance is not a string', function(){
-		var expectedFatal = new ClassyJS.Access.Controller.Fatal(
+		var expectedFatal = new Picket.Access.Controller.Fatal(
 			'ACCESS_IDENTIFIER_NOT_STRING',
 			'Provided type: number'
 		);
@@ -63,7 +63,7 @@ describe('Access.Controller', function(){
 	});
 	
 	it('throws error if access instance is public, private or protected', function(){
-		var expectedFatal = new ClassyJS.Access.Controller.Fatal(
+		var expectedFatal = new Picket.Access.Controller.Fatal(
 			'ACCESS_IDENTIFIER_NOT_VALID_STRING',
 			'Provided identifier: invalid'
 		);

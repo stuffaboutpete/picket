@@ -1,8 +1,8 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Property = function(definition, isFromInterface, value, typeChecker, accessController)
 	{
-		if (!(definition instanceof ClassyJS.Member.Property.Definition)) {
+		if (!(definition instanceof Picket.Member.Property.Definition)) {
 			throw new _.Property.Fatal(
 				'NO_DEFINITION_PROVIDED',
 				'Provided type: ' + typeof definition
@@ -12,13 +12,13 @@
 			throw new _.Property.Fatal('PROPERTY_CANNOT_BE_DEFINED_BY_INTERFACE');
 		}
 		if (typeof value == 'undefined') throw new _.Property.Fatal('NO_DEFAULT_VALUE_PROVIDED');
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Property.Fatal(
 				'NO_TYPE_CHECKER_PROVIDED',
 				'Provided type: ' + typeof typeChecker
 			);
 		}
-		if (!(accessController instanceof ClassyJS.Access.Controller)) {
+		if (!(accessController instanceof Picket.Access.Controller)) {
 			throw new _.Property.Fatal(
 				'NO_ACCESS_CONTROLLER_PROVIDED',
 				'Provided type: ' + typeof accessController
@@ -131,6 +131,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );

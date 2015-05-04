@@ -1,10 +1,10 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Property = function(classIdentifier, propertyName)
 	{
 		
 		if (typeof classIdentifier == 'string') {
-			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			classIdentifier = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 				classIdentifier
 			);
 		}
@@ -23,17 +23,17 @@
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(classIdentifier)) {
 			throw new _.Property.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
-		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		this._classObject = Picket._instantiator.getTypeRegistry().getClass(classIdentifier);
 		
 		var members = _getMembers(this);
 		
 		for (var i = 0; i < members.length; i++) {
 			
-			if (members[i] instanceof ClassyJS.Member.Property
+			if (members[i] instanceof Picket.Member.Property
 			&&  members[i].getName() == propertyName) {
 				this._propertyObject = members[i];
 				return;
@@ -55,14 +55,14 @@
 	
 	_.Property.prototype.getType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildType(
+		return Picket._instantiator.getReflectionFactory().buildType(
 			this._propertyObject.getTypeIdentifier()
 		);
 	};
 	
 	_.Property.prototype.getAccessType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+		return Picket._instantiator.getReflectionFactory().buildAccessType(
 			this._propertyObject.getAccessTypeIdentifier()
 		);
 	};
@@ -90,20 +90,20 @@
 	
 	_.Property.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+		return Picket._instantiator.getReflectionFactory().buildClass(
 			this._classObject.getName()
 		);
 	};
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._classObject);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Property = _.Property;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

@@ -19,13 +19,13 @@ describe('Instantiation', function(){
 	});
 	
 	it('cannot be done with explicitly abstract class', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal('CANNOT_INSTANTIATE_ABSTRACT_CLASS');
+		var expectedFatal = new Picket.Type.Class.Fatal('CANNOT_INSTANTIATE_ABSTRACT_CLASS');
 		define('abstract class MyClass');
 		expect(function(){ new MyClass(); }).toThrow(expectedFatal);
 	});
 	
 	it('cannot be done with class containing abstract method', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS'
 		);
 		define('class MyClass', {
@@ -35,7 +35,7 @@ describe('Instantiation', function(){
 	});
 	
 	it('cannot be done if parent class contains abstract members', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS'
 		);
 		define('class My.Parent', {

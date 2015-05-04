@@ -1,12 +1,12 @@
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	var messages = {
 		NAMESPACE_OBJECT_DOES_NOT_EXIST: 'No object exists at the requested namespace location'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('NamespaceManager.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('NamespaceManager.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.NamespaceManager = window.ClassyJS.NamespaceManager || {}
+	window.Picket = window.Picket || {},
+	window.Picket.NamespaceManager = window.Picket.NamespaceManager || {}
 );

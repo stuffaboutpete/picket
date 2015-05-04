@@ -14,10 +14,10 @@ gulp.task('default', ['test'], function(){
 
 gulp.task('build', function(){
 	gulp.src(require('./tests/configs/support/files-core'))
-		.pipe(concat('classy.js'))
+		.pipe(concat('picket.js'))
 		.pipe(gulp.dest('./build/'))
 		.pipe(uglify())
-		.pipe(rename('classy.min.js'))
+		.pipe(rename('picket.min.js'))
 		.pipe(gulp.dest('./build/'))
 		.pipe(gzip())
 		.pipe(gulp.dest('./build/'));

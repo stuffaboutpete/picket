@@ -1,4 +1,4 @@
-(function(ClassyJS, AutoLoader, _){
+(function(Picket, AutoLoader, _){
 	
 	_.Script = function(){};
 	
@@ -21,7 +21,7 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.AutoLoader = window.ClassyJS.AutoLoader || {},
-	window.ClassyJS.AutoLoader.Includer = window.ClassyJS.AutoLoader.Includer || {}
+	window.Picket = window.Picket || {},
+	window.Picket.AutoLoader = window.Picket.AutoLoader || {},
+	window.Picket.AutoLoader.Includer = window.Picket.AutoLoader.Includer || {}
 );

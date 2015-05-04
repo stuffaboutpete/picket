@@ -1,4 +1,4 @@
-;(function(ClassyJS, Member, Method, _){
+;(function(Picket, Member, Method, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
@@ -10,11 +10,11 @@
 		UNDECLARED_ARGUMENT_TYPES_REQUESTED: 'No argument types have been provided'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Definition.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Method.Definition.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Method = window.ClassyJS.Member.Method || {},
-	window.ClassyJS.Member.Method.Definition = window.ClassyJS.Member.Method.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Method = window.Picket.Member.Method || {},
+	window.Picket.Member.Method.Definition = window.Picket.Member.Method.Definition || {}
 );

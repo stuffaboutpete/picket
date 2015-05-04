@@ -14,23 +14,23 @@ describe('Reflection.MethodInstance', function(){
 	beforeEach(function(){
 		define('class My.Class');
 		objectInstance = new My.Class();
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		typeRegistry = mocker.getMock(ClassyJS.Registry.Type);
-		memberRegistry = mocker.getMock(ClassyJS.Registry.Member);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		typeRegistry = mocker.getMock(Picket.Registry.Type);
+		memberRegistry = mocker.getMock(Picket.Registry.Member);
 		reflectionMethod = mocker.getMock(Reflection.Method);
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		methodObject = mocker.getMock(ClassyJS.Member.Method);
-		methodObject2 = mocker.getMock(ClassyJS.Member.Method);
-		classObject = mocker.getMock(ClassyJS.Type.Class);
-		spyOn(ClassyJS._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
-		spyOn(ClassyJS._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		methodObject = mocker.getMock(Picket.Member.Method);
+		methodObject2 = mocker.getMock(Picket.Member.Method);
+		classObject = mocker.getMock(Picket.Type.Class);
+		spyOn(Picket._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
+		spyOn(Picket._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('can be instantiated with an object instance and method name', function(){
@@ -42,7 +42,7 @@ describe('Reflection.MethodInstance', function(){
 	});
 	
 	it('throws error if method does not exist', function(){
-		var expectedFatal = new ClassyJS.Reflection.MethodInstance.Fatal(
+		var expectedFatal = new Picket.Reflection.MethodInstance.Fatal(
 			'METHOD_DOES_NOT_EXIST',
 			'Method name: myMethod'
 		);

@@ -1,4 +1,4 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Factory = function(
 		typeDefinitionFactory,
@@ -9,37 +9,37 @@
 		namespaceManager
 	)
 	{
-		if (!(typeDefinitionFactory instanceof ClassyJS.Type.DefinitionFactory)) {
+		if (!(typeDefinitionFactory instanceof Picket.Type.DefinitionFactory)) {
 			throw new _.Factory.Fatal(
 				'NO_DEFINITION_FACTORY_PROVIDED',
 				'Provided type: ' + typeof typeDefinitionFactory
 			);
 		}
-		if (!(classFactory instanceof ClassyJS.Type.Class.Factory)) {
+		if (!(classFactory instanceof Picket.Type.Class.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_CLASS_FACTORY_PROVIDED',
 				'Provided type: ' + typeof classFactory
 			);
 		}
-		if (!(interfaceFactory instanceof ClassyJS.Type.Interface.Factory)) {
+		if (!(interfaceFactory instanceof Picket.Type.Interface.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_INTERFACE_FACTORY_PROVIDED',
 				'Provided type: ' + typeof interfaceFactory
 			);
 		}
-		if (!(typeRegistry instanceof ClassyJS.Registry.Type)) {
+		if (!(typeRegistry instanceof Picket.Registry.Type)) {
 			throw new _.Factory.Fatal(
 				'NO_TYPE_REGISTRY_PROVIDED',
 				'Provided type: ' + typeof typeRegistry
 			);
 		}
-		if (!(memberRegistry instanceof ClassyJS.Registry.Member)) {
+		if (!(memberRegistry instanceof Picket.Registry.Member)) {
 			throw new _.Factory.Fatal(
 				'NO_MEMBER_REGISTRY_PROVIDED',
 				'Provided type: ' + typeof memberRegistry
 			);
 		}
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+		if (!(namespaceManager instanceof Picket.NamespaceManager)) {
 			throw new _.Factory.Fatal(
 				'NO_NAMESPACE_MANAGER_PROVIDED',
 				'Provided type: ' + typeof namespaceManager
@@ -72,7 +72,7 @@
 				this._memberRegistry,
 				this._namespaceManager
 			);
-			if (!(classObject instanceof ClassyJS.Type.Class)) {
+			if (!(classObject instanceof Picket.Type.Class)) {
 				throw new _.Factory.Fatal(
 					'NON_CLASS_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof classObject
@@ -81,7 +81,7 @@
 			return classObject;
 		} else if (definition instanceof _.Interface.Definition) {
 			var interfaceObject = this._interfaceFactory.build(definition);
-			if (!(interfaceObject instanceof ClassyJS.Type.Interface)) {
+			if (!(interfaceObject instanceof Picket.Type.Interface)) {
 				throw new _.Factory.Fatal(
 					'NON_INTERFACE_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof interfaceObject
@@ -97,6 +97,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {}
 );

@@ -1,11 +1,11 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.PropertyInstance = function(objectInstance, propertyName)
 	{
 		
 		// Force an error if the
 		// property is not valid
-		ClassyJS._instantiator.getMemberRegistry().getPropertyValue(
+		Picket._instantiator.getMemberRegistry().getPropertyValue(
 			objectInstance,
 			objectInstance,
 			propertyName
@@ -18,7 +18,7 @@
 	
 	_.PropertyInstance.prototype.getProperty = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildProperty(
+		return Picket._instantiator.getReflectionFactory().buildProperty(
 			this._objectInstance,
 			this._name
 		);
@@ -26,7 +26,7 @@
 	
 	_.PropertyInstance.prototype.getValue = function()
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getPropertyValue(
+		return Picket._instantiator.getMemberRegistry().getPropertyValue(
 			this._objectInstance,
 			this._objectInstance,
 			this._name
@@ -35,7 +35,7 @@
 	
 	_.PropertyInstance.prototype.setValue = function(value)
 	{
-		ClassyJS._instantiator.getMemberRegistry().setPropertyValue(
+		Picket._instantiator.getMemberRegistry().setPropertyValue(
 			this._objectInstance,
 			this._objectInstance,
 			this._name,
@@ -47,6 +47,6 @@
 	window.Reflection.PropertyInstance = _.PropertyInstance;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

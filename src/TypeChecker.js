@@ -2,7 +2,7 @@
 	
 	_.TypeChecker = function(reflectionFactory)
 	{
-		if (!(reflectionFactory instanceof ClassyJS.TypeChecker.ReflectionFactory)) {
+		if (!(reflectionFactory instanceof Picket.TypeChecker.ReflectionFactory)) {
 			throw new _.TypeChecker.Fatal(
 				'NO_REFLECTION_FACTORY_PROVIDED',
 				'Provided type: ' + typeof reflectionFactory
@@ -82,4 +82,4 @@
 		return true;
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});

@@ -7,24 +7,24 @@ describe('TypeChecker', function(){
 	var checker;
 	
 	beforeEach(function(){
-		mocker = new ClassyJS.Mocker();
-		reflectionFactory = mocker.getMock(ClassyJS.TypeChecker.ReflectionFactory);
-		checker = new ClassyJS.TypeChecker(reflectionFactory);
+		mocker = new Picket.Mocker();
+		reflectionFactory = mocker.getMock(Picket.TypeChecker.ReflectionFactory);
+		checker = new Picket.TypeChecker(reflectionFactory);
 		window.My = {};
 		window.My.Example = function(){};
 		window.My.Example.Nested = function(){};
 	});
 	
 	it('throws error if no reflection factory is provided', function(){
-		var expectedFatal = new ClassyJS.TypeChecker.Fatal(
+		var expectedFatal = new Picket.TypeChecker.Fatal(
 			'NO_REFLECTION_FACTORY_PROVIDED',
 			'Provided type: object'
 		);
-		expect(function(){ new ClassyJS.TypeChecker({}); }).toThrow(expectedFatal);
+		expect(function(){ new Picket.TypeChecker({}); }).toThrow(expectedFatal);
 	});
 	
 	it('throws error if second argument to isValidType is not a string', function(){
-		var expectedFatal = new ClassyJS.TypeChecker.Fatal('NON_STRING_TYPE_IDENTIFIER');
+		var expectedFatal = new Picket.TypeChecker.Fatal('NON_STRING_TYPE_IDENTIFIER');
 		expect(function(){ checker.isValidType('example'); }).toThrow(expectedFatal);
 		expect(function(){ checker.isValidType('example', {}); }).toThrow(expectedFatal);
 		expect(function(){ checker.isValidType('example', true); }).toThrow(expectedFatal);
@@ -317,7 +317,7 @@ describe('TypeChecker', function(){
 	});
 	
 	it('throws error if non array values are provided for multi type checking', function(){
-		var expectedFatal = new ClassyJS.TypeChecker.Fatal(
+		var expectedFatal = new Picket.TypeChecker.Fatal(
 			'NON_ARRAY_VALUES',
 			'Provided type: string'
 		);
@@ -325,7 +325,7 @@ describe('TypeChecker', function(){
 	});
 	
 	it('throws if non array type identifiers are provided for multi type checking', function(){
-		var expectedFatal = new ClassyJS.TypeChecker.Fatal(
+		var expectedFatal = new Picket.TypeChecker.Fatal(
 			'NON_ARRAY_TYPES',
 			'Provided type: string'
 		);
@@ -333,7 +333,7 @@ describe('TypeChecker', function(){
 	});
 	
 	it('throws if number of variables does not match type identifiers', function(){
-		var expectedFatal = new ClassyJS.TypeChecker.Fatal(
+		var expectedFatal = new Picket.TypeChecker.Fatal(
 			'VALUE_TYPE_MISMATCH',
 			'Values length: 3, Types length: 2'
 		);

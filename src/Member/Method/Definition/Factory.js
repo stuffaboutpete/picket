@@ -1,4 +1,4 @@
-;(function(ClassyJS, Member, Method, _){
+;(function(Picket, Member, Method, _){
 	
 	_.Factory = function(){};
 	
@@ -8,8 +8,8 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Method = window.ClassyJS.Member.Method || {},
-	window.ClassyJS.Member.Method.Definition = window.ClassyJS.Member.Method.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Method = window.Picket.Member.Method || {},
+	window.Picket.Member.Method.Definition = window.Picket.Member.Method.Definition || {}
 );

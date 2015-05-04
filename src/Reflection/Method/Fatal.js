@@ -1,4 +1,4 @@
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
@@ -11,10 +11,10 @@
 			'Provided method name and class identifier do not describe a valid method'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Method.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Method.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Method = window.ClassyJS.Reflection.Method || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Method = window.Picket.Reflection.Method || {}
 );

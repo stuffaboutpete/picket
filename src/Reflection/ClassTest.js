@@ -25,21 +25,21 @@ describe('Reflection.Class', function(){
 	var interfaceObject;
 	
 	beforeEach(function(){
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		namespaceManager = mocker.getMock(ClassyJS.NamespaceManager);
-		typeRegistry = mocker.getMock(ClassyJS.Registry.Type);
-		memberRegistry = mocker.getMock(ClassyJS.Registry.Member);
-		classObject = mocker.getMock(ClassyJS.Type.Class);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		namespaceManager = mocker.getMock(Picket.NamespaceManager);
+		typeRegistry = mocker.getMock(Picket.Registry.Type);
+		memberRegistry = mocker.getMock(Picket.Registry.Member);
+		classObject = mocker.getMock(Picket.Type.Class);
 		classConstructor = function(){ this.arguments = arguments; };
 		spyOn(namespaceManager, 'getNamespaceObject').and.returnValue(classConstructor);
 		spyOn(typeRegistry, 'getClass').and.returnValue(classObject);
-		propertyObject = mocker.getMock(ClassyJS.Member.Property);
-		methodObject = mocker.getMock(ClassyJS.Member.Method);
-		eventObject = mocker.getMock(ClassyJS.Member.Event);
-		constantObject = mocker.getMock(ClassyJS.Member.Constant);
+		propertyObject = mocker.getMock(Picket.Member.Property);
+		methodObject = mocker.getMock(Picket.Member.Method);
+		eventObject = mocker.getMock(Picket.Member.Event);
+		constantObject = mocker.getMock(Picket.Member.Constant);
 		reflectionProperty = mocker.getMock(Reflection.Property);
 		reflectionMethod = mocker.getMock(Reflection.Method);
 		reflectionEvent = mocker.getMock(Reflection.Event);
@@ -48,15 +48,15 @@ describe('Reflection.Class', function(){
 		reflectionMethod2 = mocker.getMock(Reflection.Method);
 		reflectionEvent2 = mocker.getMock(Reflection.Event);
 		reflectionConstant2 = mocker.getMock(Reflection.Constant);
-		interfaceObject = mocker.getMock(ClassyJS.Type.Interface);
-		spyOn(ClassyJS._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
-		spyOn(ClassyJS._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
-		spyOn(ClassyJS._instantiator, 'getNamespaceManager').and.returnValue(namespaceManager);
+		interfaceObject = mocker.getMock(Picket.Type.Interface);
+		spyOn(Picket._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
+		spyOn(Picket._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		spyOn(Picket._instantiator, 'getNamespaceManager').and.returnValue(namespaceManager);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('instantiation with a string looks up namespace and gets class object', function(){
@@ -79,13 +79,13 @@ describe('Reflection.Class', function(){
 	});
 	
 	it('throws error if type registry indicates class does not exist', function(){
-		var expectedFatal = new ClassyJS.Reflection.Class.Fatal('CLASS_DOES_NOT_EXIST');
+		var expectedFatal = new Picket.Reflection.Class.Fatal('CLASS_DOES_NOT_EXIST');
 		spyOn(typeRegistry, 'classExists').and.returnValue(false);
 		expect(function(){ new Reflection.Class('NonClass'); }).toThrow(expectedFatal);
 	});
 	
 	it('throws error if non string, object or function is provided', function(){
-		var expectedFatal = new ClassyJS.Reflection.Class.Fatal(
+		var expectedFatal = new Picket.Reflection.Class.Fatal(
 			'INVALID_IDENTIFIER_PROVIDED',
 			'Provided type: number'
 		);
@@ -489,8 +489,8 @@ describe('Reflection.Class', function(){
 	
 	it('determines if a class implements an interface', function(){
 		spyOn(typeRegistry, 'classExists').and.returnValue(true);
-		var interfaceObject1 = mocker.getMock(ClassyJS.Type.Interface);
-		var interfaceObject2 = mocker.getMock(ClassyJS.Type.Interface);
+		var interfaceObject1 = mocker.getMock(Picket.Type.Interface);
+		var interfaceObject2 = mocker.getMock(Picket.Type.Interface);
 		spyOn(typeRegistry, 'getInterfacesFromClass').and.returnValue([
 			interfaceObject1,
 			interfaceObject2
@@ -508,7 +508,7 @@ describe('Reflection.Class', function(){
 		spyOn(typeRegistry, 'classExists').and.returnValue(true);
 		var reflectionClass = new Reflection.Class('My.Class');
 		spyOn(classObject, 'requestInstantiation').and.throwError(
-			new ClassyJS.Type.Class.Fatal('CANNOT_INSTANTIATE_ABSTRACT_CLASS')
+			new Picket.Type.Class.Fatal('CANNOT_INSTANTIATE_ABSTRACT_CLASS')
 		);
 		expect(reflectionClass.isAbstract()).toBe(true);
 		expect(reflectionClass.isExplicitAbstract()).toBe(true);
@@ -519,7 +519,7 @@ describe('Reflection.Class', function(){
 		spyOn(typeRegistry, 'classExists').and.returnValue(true);
 		var reflectionClass = new Reflection.Class('My.Class');
 		spyOn(classObject, 'requestInstantiation').and.throwError(
-			new ClassyJS.Type.Class.Fatal('CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS')
+			new Picket.Type.Class.Fatal('CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS')
 		);
 		expect(reflectionClass.isAbstract()).toBe(true);
 		expect(reflectionClass.isExplicitAbstract()).toBe(false);

@@ -1,4 +1,4 @@
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be a string, function or object',
@@ -10,10 +10,10 @@
 			'A call was made to \'getDefaultValue\' when no default value exists'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Property.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Property.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Property = window.ClassyJS.Reflection.Property || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Property = window.Picket.Reflection.Property || {}
 );

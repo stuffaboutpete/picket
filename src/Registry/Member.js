@@ -1,4 +1,4 @@
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	// @todo Ensure all public method args are type checked
 	
@@ -10,7 +10,7 @@
 				'Provided type: ' + typeof typeRegistry
 			);
 		}
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Member.Fatal(
 				'TYPE_CHECKER_REQUIRED',
 				'Provided type: ' + typeof typeChecker
@@ -25,8 +25,8 @@
 	_.Member.prototype.register = function(memberObject, typeObject)
 	{
 		// @todo Type check first arg
-		if (!(typeObject instanceof ClassyJS.Type.Class)
-		&&	!(typeObject instanceof ClassyJS.Type.Interface)) {
+		if (!(typeObject instanceof Picket.Type.Class)
+		&&	!(typeObject instanceof Picket.Type.Interface)) {
 			throw new _.Member.Fatal(
 				'TARGET_NOT_CLASS_OR_INTERFACE',
 				'Provided type: ' + typeof typeObject
@@ -38,8 +38,8 @@
 	
 	_.Member.prototype.getMembers = function(typeObject)
 	{
-		if (!(typeObject instanceof ClassyJS.Type.Class)
-		&&	!(typeObject instanceof ClassyJS.Type.Interface)) {
+		if (!(typeObject instanceof Picket.Type.Class)
+		&&	!(typeObject instanceof Picket.Type.Interface)) {
 			throw new _.Member.Fatal(
 				'TARGET_NOT_CLASS_OR_INTERFACE',
 				'Provided type: ' + typeof typeObject
@@ -406,7 +406,7 @@
 	var _storeMember = function(_this, memberObject, typeObject)
 	{
 		var memberName = memberObject.getName();
-		if (memberObject instanceof ClassyJS.Member.Property) {
+		if (memberObject instanceof Picket.Member.Property) {
 			var propertyExists = true;
 			try {
 				_getPropertyByName(_this, typeObject, memberName);
@@ -428,7 +428,7 @@
 				typeObject
 			);
 			typeMemberData.members.properties.push(memberObject);
-		} else if (memberObject instanceof ClassyJS.Member.Method) {
+		} else if (memberObject instanceof Picket.Member.Method) {
 			var methodExists = true;
 			try {
 				_getMethodByNameArgumentTypesAndStaticState(
@@ -461,7 +461,7 @@
 				typeObject
 			);
 			typeMemberData.members.methods.push(memberObject);
-		} else if (memberObject instanceof ClassyJS.Member.Event) {
+		} else if (memberObject instanceof Picket.Member.Event) {
 			var eventExists = true;
 			try {
 				_getEventByName(_this, typeObject, memberName);
@@ -483,7 +483,7 @@
 				typeObject
 			);
 			typeMemberData.members.events.push(memberObject);
-		} else if (memberObject instanceof ClassyJS.Member.Constant) {
+		} else if (memberObject instanceof Picket.Member.Constant) {
 			var constantExists = true;
 			try {
 				_getConstantByName(_this, typeObject, memberName);
@@ -617,7 +617,7 @@
 	{
 		// @todo Check instance is object
 		var typeObject = _this._typeRegistry.getClass(instance);
-		// @todo Check return is instance of ClassyJS.Type.Class
+		// @todo Check return is instance of Picket.Type.Class
 		return typeObject;
 	};
 	
@@ -672,6 +672,6 @@
 	
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Registry = window.ClassyJS.Registry || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Registry = window.Picket.Registry || {}
 );

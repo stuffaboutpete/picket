@@ -48,7 +48,7 @@ if (!Function.prototype.bind) {
 		
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});
 
 (function(_){
 	
@@ -67,7 +67,7 @@ if (!Function.prototype.bind) {
 		return new F();
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});
 
 (function(_){
 	
@@ -89,7 +89,7 @@ if (!Function.prototype.bind) {
 		
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});
 
 (function(_){
 	
@@ -150,26 +150,26 @@ if (!Function.prototype.bind) {
 		}
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	var messages = {
 		NAMESPACE_OBJECT_DOES_NOT_EXIST: 'No object exists at the requested namespace location'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('NamespaceManager.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('NamespaceManager.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.NamespaceManager = window.ClassyJS.NamespaceManager || {}
+	window.Picket = window.Picket || {},
+	window.Picket.NamespaceManager = window.Picket.NamespaceManager || {}
 );
 
 (function(_){
 	
 	_.TypeChecker = function(reflectionFactory)
 	{
-		if (!(reflectionFactory instanceof ClassyJS.TypeChecker.ReflectionFactory)) {
+		if (!(reflectionFactory instanceof Picket.TypeChecker.ReflectionFactory)) {
 			throw new _.TypeChecker.Fatal(
 				'NO_REFLECTION_FACTORY_PROVIDED',
 				'Provided type: ' + typeof reflectionFactory
@@ -249,9 +249,9 @@ if (!Function.prototype.bind) {
 		return true;
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.ReflectionFactory = function(){};
 	
@@ -261,33 +261,33 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.TypeChecker = window.ClassyJS.TypeChecker || {}
+	window.Picket = window.Picket || {},
+	window.Picket.TypeChecker = window.Picket.TypeChecker || {}
 );
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	var messages = {
 		NO_REFLECTION_FACTORY_PROVIDED:
-			'An instance of ClassyJS.TypeChecker.ReflectionFactory must be provided',
+			'An instance of Picket.TypeChecker.ReflectionFactory must be provided',
 		NON_STRING_TYPE_IDENTIFIER: 'Provided type identifier must be a string',
 		NON_ARRAY_VALUES: 'Provided values must be within an array',
 		NON_ARRAY_TYPES: 'Provided type identifiers must be within an array',
 		VALUE_TYPE_MISMATCH: 'Provided values must match length of provided type identifiers'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('TypeChecker.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('TypeChecker.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.TypeChecker = window.ClassyJS.TypeChecker || {}
+	window.Picket = window.Picket || {},
+	window.Picket.TypeChecker = window.Picket.TypeChecker || {}
 );
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	_.Controller = function(typeRegistry)
 	{
-		if (!(typeRegistry instanceof ClassyJS.Registry.Type)) {
+		if (!(typeRegistry instanceof Picket.Registry.Type)) {
 			throw new _.Controller.Fatal(
 				'NO_TYPE_REGISTRY_PROVIDED',
 				'Provided type: ' + typeof typeRegistry
@@ -336,15 +336,15 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Access = window.ClassyJS.Access || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Access = window.Picket.Access || {}
 );
 
-;(function(ClassyJS, Access, _){
+;(function(Picket, Access, _){
 	
 	var messages = {
 		NO_TYPE_REGISTRY_PROVIDED:
-			'An instance of ClassyJS.Registry.Type must be provided to the constructor',
+			'An instance of Picket.Registry.Type must be provided to the constructor',
 		TARGET_NOT_INSTANCE_OR_CONSTRUCTOR:
 			'Provided target object should either be an object instance or constructor function',
 		ACCESS_OBJECT_NOT_INSTANCE_OR_CONSTRUCTOR_OR_UNDEFINED:
@@ -355,37 +355,37 @@ if (!Function.prototype.bind) {
 			'strings \'public\', \'private\' or \'protected\''
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Access.Controller.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Access.Controller.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Access = window.ClassyJS.Access || {},
-	window.ClassyJS.Access.Controller = window.ClassyJS.Access.Controller || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Access = window.Picket.Access || {},
+	window.Picket.Access.Controller = window.Picket.Access.Controller || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Class = function(definition, typeRegistry, memberRegistry, namespaceManager)
 	{
-		if (!(definition instanceof ClassyJS.Type.Class.Definition)) {
+		if (!(definition instanceof Picket.Type.Class.Definition)) {
 			throw new _.Class.Fatal(
 				'NO_DEFINITION_PROVIDED',
 				'Provided type: ' + typeof definition
 			);
 		}
-		if (!(typeRegistry instanceof ClassyJS.Registry.Type)) {
+		if (!(typeRegistry instanceof Picket.Registry.Type)) {
 			throw new _.Class.Fatal(
 				'NO_TYPE_REGISTRY_PROVIDED',
 				'Provided type: ' + typeof typeRegistry
 			);
 		}
-		if (!(memberRegistry instanceof ClassyJS.Registry.Member)) {
+		if (!(memberRegistry instanceof Picket.Registry.Member)) {
 			throw new _.Class.Fatal(
 				'NO_MEMBER_REGISTRY_PROVIDED',
 				'Provided type: ' + typeof memberRegistry
 			);
 		}
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+		if (!(namespaceManager instanceof Picket.NamespaceManager)) {
 			throw new _.Class.Fatal(
 				'NO_NAMESPACE_MANAGER_PROVIDED',
 				'Provided type: ' + typeof namespaceManager
@@ -422,24 +422,24 @@ if (!Function.prototype.bind) {
 	_.Class.prototype.requestInstantiation = function()
 	{
 		if (this._definition.isAbstract()) {
-			throw new ClassyJS.Type.Class.Fatal('CANNOT_INSTANTIATE_ABSTRACT_CLASS');
+			throw new Picket.Type.Class.Fatal('CANNOT_INSTANTIATE_ABSTRACT_CLASS');
 		}
 		if (this._memberRegistry.hasAbstractMembers(this)) {
-			throw new ClassyJS.Type.Class.Fatal('CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS');
+			throw new Picket.Type.Class.Fatal('CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS');
 		}
 		if (this._memberRegistry.hasUnimplementedInterfaceMembers(this)) {
-			throw new ClassyJS.Type.Class.Fatal(
+			throw new Picket.Type.Class.Fatal(
 				'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS'
 			);
 		}
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {}
 );
 
-;(function(ClassyJS, Type, _){
+;(function(Picket, Type, _){
 	
 	_.Constructor = function(typeRegistry, memberRegistry, fullClassName)
 	{
@@ -596,7 +596,7 @@ if (!Function.prototype.bind) {
 		var _get = function(name, object)
 		{
 			// Note that the '|| {}' below is due
-			// to a hack in ClassyJS.Member.Property.
+			// to a hack in Picket.Member.Property.
 			// It should go if possible.
 			return memberRegistry.getPropertyValue(
 				object,
@@ -619,9 +619,9 @@ if (!Function.prototype.bind) {
 		{
 			var members = memberRegistry.getMembers(classObject);
 			for (var i in members) {
-				if (members[i] instanceof ClassyJS.Member.Property) {
+				if (members[i] instanceof Picket.Member.Property) {
 					properties.push(members[i]);
-				} else if (members[i] instanceof ClassyJS.Member.Method) {
+				} else if (members[i] instanceof Picket.Member.Method) {
 					methods.push(members[i]);
 				}
 			}
@@ -632,27 +632,27 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Class = window.ClassyJS.Type.Class || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Class = window.Picket.Type.Class || {}
 );
 
-;(function(ClassyJS, Type, Class, _){
+;(function(Picket, Type, Class, _){
 	
 	var messages = {
 		ABSTRACT_CLASS_CANNOT_BE_INSTANTIATED: 'Abstract class cannot be instantiated'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Type.Class.Constructor.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Type.Class.Constructor.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Class = window.ClassyJS.Type.Class || {},
-	window.ClassyJS.Type.Class.Constructor = window.ClassyJS.Type.Class.Constructor || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Class = window.Picket.Type.Class || {},
+	window.Picket.Type.Class.Constructor = window.Picket.Type.Class.Constructor || {}
 );
 
-;(function(ClassyJS, Type, _){
+;(function(Picket, Type, _){
 	
 	_.Definition = function(signature)
 	{
@@ -704,12 +704,12 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Class = window.ClassyJS.Type.Class || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Class = window.Picket.Type.Class || {}
 );
 
-;(function(ClassyJS, Type, Class, _){
+;(function(Picket, Type, Class, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
@@ -717,16 +717,16 @@ if (!Function.prototype.bind) {
 		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Type.Class.Definition.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Type.Class.Definition.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Class = window.ClassyJS.Type.Class || {},
-	window.ClassyJS.Type.Class.Definition = window.ClassyJS.Type.Class.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Class = window.Picket.Type.Class || {},
+	window.Picket.Type.Class.Definition = window.Picket.Type.Class.Definition || {}
 );
 
-;(function(ClassyJS, Type, Class, _){
+;(function(Picket, Type, Class, _){
 	
 	_.Factory = function(){};
 	
@@ -736,13 +736,13 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Class = window.ClassyJS.Type.Class || {},
-	window.ClassyJS.Type.Class.Definition = window.ClassyJS.Type.Class.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Class = window.Picket.Type.Class || {},
+	window.Picket.Type.Class.Definition = window.Picket.Type.Class.Definition || {}
 );
 
-(function(ClassyJS, Type, _){
+(function(Picket, Type, _){
 	
 	_.Factory = function(){};
 	
@@ -752,22 +752,22 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Class = window.ClassyJS.Type.Class || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Class = window.Picket.Type.Class || {}
 );
 
-;(function(ClassyJS, Type, _){
+;(function(Picket, Type, _){
 	
 	var messages = {
 		NO_DEFINITION_PROVIDED:
-			'An instance of ClassyJS.Type.Class.Definition must be provided to the constructor',
+			'An instance of Picket.Type.Class.Definition must be provided to the constructor',
 		NO_TYPE_REGISTRY_PROVIDED:
-			'An instance of ClassyJS.Registry.Type must be provided to the constructor',
+			'An instance of Picket.Registry.Type must be provided to the constructor',
 		NO_MEMBER_REGISTRY_PROVIDED:
-			'An instance of ClassyJS.Registry.Member must be provided to the constructor',
+			'An instance of Picket.Registry.Member must be provided to the constructor',
 		NO_NAMESPACE_MANAGER_PROVIDED:
-			'An instance of ClassyJS.NamespaceManager must be provided to the constructor',
+			'An instance of Picket.NamespaceManager must be provided to the constructor',
 		NO_PARENT_CLASS_RELATIONSHIP:
 			'Parent class was requested when no parent relationship exists',
 		CANNOT_INSTANTIATE_ABSTRACT_CLASS:
@@ -778,15 +778,15 @@ if (!Function.prototype.bind) {
 			'Cannot instantiate a class with unimplemented interface members'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Type.Class.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Type.Class.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Class = window.ClassyJS.Type.Class || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Class = window.Picket.Type.Class || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Interface = function(definition)
 	{
@@ -799,8 +799,8 @@ if (!Function.prototype.bind) {
 	}
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {}
 );
 
 ;(function(TypeDefinition, Type, _){
@@ -832,12 +832,12 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Interface = window.ClassyJS.Type.Interface || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Interface = window.Picket.Type.Interface || {}
 );
 
-;(function(ClassyJS, Type, Interface, _){
+;(function(Picket, Type, Interface, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
@@ -845,16 +845,16 @@ if (!Function.prototype.bind) {
 		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Type.Interface.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Type.Interface.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Interface = window.ClassyJS.Type.Interface || {},
-	window.ClassyJS.Type.Interface.Definition = window.ClassyJS.Type.Interface.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Interface = window.Picket.Type.Interface || {},
+	window.Picket.Type.Interface.Definition = window.Picket.Type.Interface.Definition || {}
 );
 
-;(function(ClassyJS, Type, Interface, _){
+;(function(Picket, Type, Interface, _){
 	
 	_.Factory = function(){};
 	
@@ -864,13 +864,13 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Interface = window.ClassyJS.Type.Interface || {},
-	window.ClassyJS.Type.Interface.Definition = window.ClassyJS.Type.Interface.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Interface = window.Picket.Type.Interface || {},
+	window.Picket.Type.Interface.Definition = window.Picket.Type.Interface.Definition || {}
 );
 
-(function(ClassyJS, Type, _){
+(function(Picket, Type, _){
 	
 	_.Factory = function(){};
 	
@@ -880,12 +880,12 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Interface = window.ClassyJS.Type.Interface || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Interface = window.Picket.Type.Interface || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Factory = function(
 		typeDefinitionFactory,
@@ -896,37 +896,37 @@ if (!Function.prototype.bind) {
 		namespaceManager
 	)
 	{
-		if (!(typeDefinitionFactory instanceof ClassyJS.Type.DefinitionFactory)) {
+		if (!(typeDefinitionFactory instanceof Picket.Type.DefinitionFactory)) {
 			throw new _.Factory.Fatal(
 				'NO_DEFINITION_FACTORY_PROVIDED',
 				'Provided type: ' + typeof typeDefinitionFactory
 			);
 		}
-		if (!(classFactory instanceof ClassyJS.Type.Class.Factory)) {
+		if (!(classFactory instanceof Picket.Type.Class.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_CLASS_FACTORY_PROVIDED',
 				'Provided type: ' + typeof classFactory
 			);
 		}
-		if (!(interfaceFactory instanceof ClassyJS.Type.Interface.Factory)) {
+		if (!(interfaceFactory instanceof Picket.Type.Interface.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_INTERFACE_FACTORY_PROVIDED',
 				'Provided type: ' + typeof interfaceFactory
 			);
 		}
-		if (!(typeRegistry instanceof ClassyJS.Registry.Type)) {
+		if (!(typeRegistry instanceof Picket.Registry.Type)) {
 			throw new _.Factory.Fatal(
 				'NO_TYPE_REGISTRY_PROVIDED',
 				'Provided type: ' + typeof typeRegistry
 			);
 		}
-		if (!(memberRegistry instanceof ClassyJS.Registry.Member)) {
+		if (!(memberRegistry instanceof Picket.Registry.Member)) {
 			throw new _.Factory.Fatal(
 				'NO_MEMBER_REGISTRY_PROVIDED',
 				'Provided type: ' + typeof memberRegistry
 			);
 		}
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+		if (!(namespaceManager instanceof Picket.NamespaceManager)) {
 			throw new _.Factory.Fatal(
 				'NO_NAMESPACE_MANAGER_PROVIDED',
 				'Provided type: ' + typeof namespaceManager
@@ -959,7 +959,7 @@ if (!Function.prototype.bind) {
 				this._memberRegistry,
 				this._namespaceManager
 			);
-			if (!(classObject instanceof ClassyJS.Type.Class)) {
+			if (!(classObject instanceof Picket.Type.Class)) {
 				throw new _.Factory.Fatal(
 					'NON_CLASS_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof classObject
@@ -968,7 +968,7 @@ if (!Function.prototype.bind) {
 			return classObject;
 		} else if (definition instanceof _.Interface.Definition) {
 			var interfaceObject = this._interfaceFactory.build(definition);
-			if (!(interfaceObject instanceof ClassyJS.Type.Interface)) {
+			if (!(interfaceObject instanceof Picket.Type.Interface)) {
 				throw new _.Factory.Fatal(
 					'NON_INTERFACE_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof interfaceObject
@@ -984,45 +984,45 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {}
 );
 
-;(function(ClassyJS, Type, _){
+;(function(Picket, Type, _){
 	
 	var messages = {
 		NO_DEFINITION_FACTORY_PROVIDED:
-			'No instance of ClassyJS.Type.DefinitionFactory was provided to the constructor',
+			'No instance of Picket.Type.DefinitionFactory was provided to the constructor',
 		NO_CLASS_FACTORY_PROVIDED:
-			'No instance of ClassyJS.Type.Class.Factory was provided to the constructor',
+			'No instance of Picket.Type.Class.Factory was provided to the constructor',
 		NO_INTERFACE_FACTORY_PROVIDED:
-			'No instance of ClassyJS.Type.Interface.Factory was provided to the constructor',
+			'No instance of Picket.Type.Interface.Factory was provided to the constructor',
 		NO_TYPE_REGISTRY_PROVIDED:
-			'No instance of ClassyJS.Registry.Type was provided to the constructor',
+			'No instance of Picket.Registry.Type was provided to the constructor',
 		NO_MEMBER_REGISTRY_PROVIDED:
-			'No instance of ClassyJS.Registry.Member was provided to the constructor',
+			'No instance of Picket.Registry.Member was provided to the constructor',
 		NO_NAMESPACE_MANAGER_PROVIDED:
-			'No instance of ClassyJS.NamespaceManager was provided to the constructor',
+			'No instance of Picket.NamespaceManager was provided to the constructor',
 		NON_STRING_SIGNATURE_PROVIDED: 'Provided signature must be a string',
 		EMPTY_STRING_SIGNATURE_PROVIDED: 'Provided signature must not be an empty string',
 		NON_DEFINITION_RETURNED_FROM_FACTORY:
 			'Provided definition factory did not return an instance of ' +
-			'ClassyJS.Type.Class.Definition or ClassyJS.Type.Interface.Definition',
+			'Picket.Type.Class.Definition or Picket.Type.Interface.Definition',
 		NON_CLASS_RETURNED_FROM_FACTORY:
-			'Provided class factory did not return an instance of ClassyJS.Type.Class',
+			'Provided class factory did not return an instance of Picket.Type.Class',
 		NON_INTERFACE_RETURNED_FROM_FACTORY:
-			'Provided interface factory did not return an instance of ClassyJS.Type.Interface'
+			'Provided interface factory did not return an instance of Picket.Type.Interface'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Type.Factory.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Type.Factory.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Factory = window.ClassyJS.Type.Factory || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Factory = window.Picket.Type.Factory || {}
 );
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	_.DefinitionFactory = function(classDefinitionFactory, interfaceDefinitionFactory)
 	{
@@ -1072,11 +1072,11 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {}
 );
 
-;(function(ClassyJS, Type, _){
+;(function(Picket, Type, _){
 	
 	var messages = {
 		CLASS_DEFINITION_FACTORY_NOT_PROVIDED:
@@ -1088,19 +1088,19 @@ if (!Function.prototype.bind) {
 		FACTORY_RETURNED_NON_OBJECT:	'The selected downstream factory did not return an object'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Type.DefinitionFactory.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Type.DefinitionFactory.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.DefinitionFactory = window.ClassyJS.Type.DefinitionFactory || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.DefinitionFactory = window.Picket.Type.DefinitionFactory || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Property = function(definition, isFromInterface, value, typeChecker, accessController)
 	{
-		if (!(definition instanceof ClassyJS.Member.Property.Definition)) {
+		if (!(definition instanceof Picket.Member.Property.Definition)) {
 			throw new _.Property.Fatal(
 				'NO_DEFINITION_PROVIDED',
 				'Provided type: ' + typeof definition
@@ -1110,13 +1110,13 @@ if (!Function.prototype.bind) {
 			throw new _.Property.Fatal('PROPERTY_CANNOT_BE_DEFINED_BY_INTERFACE');
 		}
 		if (typeof value == 'undefined') throw new _.Property.Fatal('NO_DEFAULT_VALUE_PROVIDED');
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Property.Fatal(
 				'NO_TYPE_CHECKER_PROVIDED',
 				'Provided type: ' + typeof typeChecker
 			);
 		}
-		if (!(accessController instanceof ClassyJS.Access.Controller)) {
+		if (!(accessController instanceof Picket.Access.Controller)) {
 			throw new _.Property.Fatal(
 				'NO_ACCESS_CONTROLLER_PROVIDED',
 				'Provided type: ' + typeof accessController
@@ -1229,11 +1229,11 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	_.Definition = function(signature)
 	{
@@ -1275,28 +1275,28 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Property = window.ClassyJS.Member.Property || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Property = window.Picket.Member.Property || {}
 );
 
-;(function(ClassyJS, Member, Property, _){
+;(function(Picket, Member, Property, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
 		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood' 
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Property.Definition.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Property.Definition.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Property = window.ClassyJS.Member.Property || {},
-	window.ClassyJS.Member.Property.Definition = window.ClassyJS.Member.Property.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Property = window.Picket.Member.Property || {},
+	window.Picket.Member.Property.Definition = window.Picket.Member.Property.Definition || {}
 );
 
-;(function(ClassyJS, Member, Property, _){
+;(function(Picket, Member, Property, _){
 	
 	_.Factory = function(){};
 	
@@ -1306,13 +1306,13 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Property = window.ClassyJS.Member.Property || {},
-	window.ClassyJS.Member.Property.Definition = window.ClassyJS.Member.Property.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Property = window.Picket.Member.Property || {},
+	window.Picket.Member.Property.Definition = window.Picket.Member.Property.Definition || {}
 );
 
-(function(ClassyJS, Member, _){
+(function(Picket, Member, _){
 	
 	_.Factory = function(){};
 	
@@ -1328,20 +1328,20 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Property = window.ClassyJS.Member.Property || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Property = window.Picket.Member.Property || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	var messages = {
-		NO_DEFINITION_PROVIDED: 'Instance of ClassyJS.Member.Property.Definition must be provided',
+		NO_DEFINITION_PROVIDED: 'Instance of Picket.Member.Property.Definition must be provided',
 		PROPERTY_CANNOT_BE_DEFINED_BY_INTERFACE:
 			'Constructor argument indicated that this property was defined ' +
 			'within an interface. Properties cannot be defined within interfaces',
-		NO_TYPE_CHECKER_PROVIDED: 'Instance of ClassyJS.TypeChecker must be provided',
-		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of ClassyJS.Access.Controller must be provided',
+		NO_TYPE_CHECKER_PROVIDED: 'Instance of Picket.TypeChecker must be provided',
+		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of Picket.Access.Controller must be provided',
 		INVALID_DEFAULT_VALUE:
 			'Value provided as default does not match type specified in the property signature',
 		NO_DEFAULT_VALUE_PROVIDED:
@@ -1355,31 +1355,31 @@ if (!Function.prototype.bind) {
 		INVALID_TYPE: 'Property cannot be set to the provided type'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Property.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Property.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Property = window.ClassyJS.Member.Property || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Property = window.Picket.Member.Property || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Method = function(definition, isFromInterface, value, typeChecker, accessController)
 	{
-		if (!(definition instanceof ClassyJS.Member.Method.Definition)) {
+		if (!(definition instanceof Picket.Member.Method.Definition)) {
 			throw new _.Method.Fatal(
 				'NO_DEFINITION_PROVIDED',
 				'Provided type: ' + typeof definition
 			);
 		}
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Method.Fatal(
 				'NO_TYPE_CHECKER_PROVIDED',
 				'Provided type: ' + typeof typeChecker
 			);
 		}
-		if (!(accessController instanceof ClassyJS.Access.Controller)) {
+		if (!(accessController instanceof Picket.Access.Controller)) {
 			throw new _.Method.Fatal(
 				'NO_ACCESS_CONTROLLER_PROVIDED',
 				'Provided type: ' + typeof accessController
@@ -1542,11 +1542,11 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	_.Definition = function(signature)
 	{
@@ -1711,12 +1711,12 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Method = window.ClassyJS.Member.Method || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Method = window.Picket.Member.Method || {}
 );
 
-;(function(ClassyJS, Member, Method, _){
+;(function(Picket, Member, Method, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
@@ -1728,16 +1728,16 @@ if (!Function.prototype.bind) {
 		UNDECLARED_ARGUMENT_TYPES_REQUESTED: 'No argument types have been provided'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Definition.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Method.Definition.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Method = window.ClassyJS.Member.Method || {},
-	window.ClassyJS.Member.Method.Definition = window.ClassyJS.Member.Method.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Method = window.Picket.Member.Method || {},
+	window.Picket.Member.Method.Definition = window.Picket.Member.Method.Definition || {}
 );
 
-;(function(ClassyJS, Member, Method, _){
+;(function(Picket, Member, Method, _){
 	
 	_.Factory = function(){};
 	
@@ -1747,13 +1747,13 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Method = window.ClassyJS.Member.Method || {},
-	window.ClassyJS.Member.Method.Definition = window.ClassyJS.Member.Method.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Method = window.Picket.Member.Method || {},
+	window.Picket.Member.Method.Definition = window.Picket.Member.Method.Definition || {}
 );
 
-(function(ClassyJS, Member, _){
+(function(Picket, Member, _){
 	
 	_.Factory = function(){};
 	
@@ -1769,17 +1769,17 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Method = window.ClassyJS.Member.Method || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Method = window.Picket.Member.Method || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	var messages = {
-		NO_DEFINITION_PROVIDED: 'Instance of ClassyJS.Member.Method.Definition must be provided',
-		NO_TYPE_CHECKER_PROVIDED: 'Instance of ClassyJS.TypeChecker must be provided',
-		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of ClassyJS.Access.Controller must be provided',
+		NO_DEFINITION_PROVIDED: 'Instance of Picket.Member.Method.Definition must be provided',
+		NO_TYPE_CHECKER_PROVIDED: 'Instance of Picket.TypeChecker must be provided',
+		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of Picket.Access.Controller must be provided',
 		UNDEFINED_ARGUMENT_TYPE: 'Arguments cannot be defined as type undefined',
 		NULL_ARGUMENT_TYPE: 'Arguments cannot be defined as type null',
 		NON_OBJECT_OR_CONSTRUCTOR_TARGET_PROVIDED:
@@ -1801,31 +1801,31 @@ if (!Function.prototype.bind) {
 			'Any method declared without argument types must be abstract'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Method.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Method.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Method = window.ClassyJS.Member.Method || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Method = window.Picket.Member.Method || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Event = function(definition, isFromInterface, value, typeChecker, accessController)
 	{
-		if (!(definition instanceof ClassyJS.Member.Event.Definition)) {
+		if (!(definition instanceof Picket.Member.Event.Definition)) {
 			throw new _.Event.Fatal(
 				'NO_DEFINITION_PROVIDED',
 				'Provided type: ' + typeof definition
 			);
 		}
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Event.Fatal(
 				'NO_TYPE_CHECKER_PROVIDED',
 				'Provided type: ' + typeof typeChecker
 			);
 		}
-		if (!(accessController instanceof ClassyJS.Access.Controller)) {
+		if (!(accessController instanceof Picket.Access.Controller)) {
 			throw new _.Event.Fatal(
 				'NO_ACCESS_CONTROLLER_PROVIDED',
 				'Provided type: ' + typeof accessController
@@ -1921,7 +1921,7 @@ if (!Function.prototype.bind) {
 					'Provided type: ' + typeof callbacks[i][0]
 				);
 			}
-			if (!(callbacks[i][1] instanceof ClassyJS.Member.Method)) {
+			if (!(callbacks[i][1] instanceof Picket.Member.Method)) {
 				throw new _.Event.Fatal(
 					'INVALID_CALLBACK_METHOD',
 					'Provided type: ' + typeof callbacks[i][1]
@@ -1948,11 +1948,11 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	_.Definition = function(signature)
 	{
@@ -2005,28 +2005,28 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Event = window.ClassyJS.Member.Event || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Event = window.Picket.Member.Event || {}
 );
 
-;(function(ClassyJS, Member, Event, _){
+;(function(Picket, Member, Event, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
 		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood' 
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Event.Definition.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Event.Definition.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Event = window.ClassyJS.Member.Event || {},
-	window.ClassyJS.Member.Event.Definition = window.ClassyJS.Member.Event.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Event = window.Picket.Member.Event || {},
+	window.Picket.Member.Event.Definition = window.Picket.Member.Event.Definition || {}
 );
 
-;(function(ClassyJS, Member, Event, _){
+;(function(Picket, Member, Event, _){
 	
 	_.Factory = function(){};
 	
@@ -2036,13 +2036,13 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Event = window.ClassyJS.Member.Event || {},
-	window.ClassyJS.Member.Event.Definition = window.ClassyJS.Member.Event.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Event = window.Picket.Member.Event || {},
+	window.Picket.Member.Event.Definition = window.Picket.Member.Event.Definition || {}
 );
 
-(function(ClassyJS, Member, _){
+(function(Picket, Member, _){
 	
 	_.Factory = function(){};
 	
@@ -2058,17 +2058,17 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Event = window.ClassyJS.Member.Event || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Event = window.Picket.Member.Event || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	var messages = {
-		NO_DEFINITION_PROVIDED: 'Instance of ClassyJS.Member.Event.Definition must be provided',
-		NO_TYPE_CHECKER_PROVIDED: 'Instance of ClassyJS.TypeChecker must be provided',
-		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of ClassyJS.Access.Controller must be provided',
+		NO_DEFINITION_PROVIDED: 'Instance of Picket.Member.Event.Definition must be provided',
+		NO_TYPE_CHECKER_PROVIDED: 'Instance of Picket.TypeChecker must be provided',
+		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of Picket.Access.Controller must be provided',
 		INVALID_VALUE_PROVIDED: 'Event value must be undefined, null or empty string',
 		UNDEFINED_ARGUMENT_TYPE: 'Arguments cannot be defined as type undefined',
 		NULL_ARGUMENT_TYPE: 'Arguments cannot be defined as type null',
@@ -2082,25 +2082,25 @@ if (!Function.prototype.bind) {
 		NON_ARRAY_CALLBACK_PROVIDED: 'Provided method callback is not provided as an array',
 		NON_OBJECT_CALLBACK_INSTANCE: 'Provided callback object instance is not an object',
 		INVALID_CALLBACK_METHOD:
-			'Provided callback method is not instance of ClassyJS.Member.Method',
+			'Provided callback method is not instance of Picket.Member.Method',
 		NON_ARRAY_ARGUMENTS_PROVIDED: 'Provided arguments are not provided within an array',
 		INVALID_ARGUMENTS: 'The method arguments provided to trigger are not valid',
 		INTERACTION_WITH_ABSTRACT: 'This instance cannot be bound or triggered as it is abstract'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Event.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Event.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Event = window.ClassyJS.Member.Event || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Event = window.Picket.Member.Event || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Constant = function(definition, isFromInterface, value, typeChecker, accessController)
 	{
-		if (!(definition instanceof ClassyJS.Member.Constant.Definition)) {
+		if (!(definition instanceof Picket.Member.Constant.Definition)) {
 			throw new _.Constant.Fatal(
 				'NO_DEFINITION_PROVIDED',
 				'Provided type: ' + typeof definition
@@ -2109,13 +2109,13 @@ if (!Function.prototype.bind) {
 		if (isFromInterface !== false) {
 			throw new _.Constant.Fatal('IS_FROM_INTERFACE');
 		}
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Constant.Fatal(
 				'NO_TYPE_CHECKER_PROVIDED',
 				'Provided type: ' + typeof typeChecker
 			);
 		}
-		if (!(accessController instanceof ClassyJS.Access.Controller)) {
+		if (!(accessController instanceof Picket.Access.Controller)) {
 			throw new _.Constant.Fatal(
 				'NO_ACCESS_CONTROLLER_PROVIDED',
 				'Provided type: ' + typeof accessController
@@ -2215,11 +2215,11 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	_.Definition = function(signature)
 	{
@@ -2261,28 +2261,28 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Constant = window.ClassyJS.Member.Constant || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Constant = window.Picket.Member.Constant || {}
 );
 
-;(function(ClassyJS, Member, Constant, _){
+;(function(Picket, Member, Constant, _){
 	
 	var messages = {
 		// NON_STRING_SIGNATURE:		'Signature must be provided as a string',
 		// SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood' 
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Constant.Definition.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Constant.Definition.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Constant = window.ClassyJS.Member.Constant || {},
-	window.ClassyJS.Member.Constant.Definition = window.ClassyJS.Member.Constant.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Constant = window.Picket.Member.Constant || {},
+	window.Picket.Member.Constant.Definition = window.Picket.Member.Constant.Definition || {}
 );
 
-;(function(ClassyJS, Member, Constant, _){
+;(function(Picket, Member, Constant, _){
 	
 	_.Factory = function(){};
 	
@@ -2292,13 +2292,13 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Constant = window.ClassyJS.Member.Constant || {},
-	window.ClassyJS.Member.Constant.Definition = window.ClassyJS.Member.Constant.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Constant = window.Picket.Member.Constant || {},
+	window.Picket.Member.Constant.Definition = window.Picket.Member.Constant.Definition || {}
 );
 
-(function(ClassyJS, Member, _){
+(function(Picket, Member, _){
 	
 	_.Factory = function(){};
 	
@@ -2314,19 +2314,19 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Constant = window.ClassyJS.Member.Constant || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Constant = window.Picket.Member.Constant || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	var messages = {
-		NO_DEFINITION_PROVIDED: 'Instance of ClassyJS.Member.Constant.Definition must be provided',
+		NO_DEFINITION_PROVIDED: 'Instance of Picket.Member.Constant.Definition must be provided',
 		IS_FROM_INTERFACE:
 			'Constants cannot be abstract and therefore cannot be declared within an interface',
-		NO_TYPE_CHECKER_PROVIDED: 'Instance of ClassyJS.TypeChecker must be provided',
-		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of ClassyJS.Access.Controller must be provided',
+		NO_TYPE_CHECKER_PROVIDED: 'Instance of Picket.TypeChecker must be provided',
+		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of Picket.Access.Controller must be provided',
 		INVALID_VALUE_TYPE: 'Value must be string, number or undefined',
 		INVALID_VALUE: 'Provided value did not match constant type',
 		NON_FUNCTION_TARGET_CONSTRUCTOR_PROVIDED:
@@ -2337,15 +2337,15 @@ if (!Function.prototype.bind) {
 		ACCESS_NOT_ALLOWED: 'Provided object instance is not permitted to access the constant value'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Constant.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Constant.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Constant = window.ClassyJS.Member.Constant || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Constant = window.Picket.Member.Constant || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Factory = function(
 		memberDefinitionFactory,
@@ -2357,43 +2357,43 @@ if (!Function.prototype.bind) {
 		accessController
 	)
 	{
-		if (!(memberDefinitionFactory instanceof ClassyJS.Member.DefinitionFactory)) {
+		if (!(memberDefinitionFactory instanceof Picket.Member.DefinitionFactory)) {
 			throw new _.Factory.Fatal(
 				'NO_DEFINITION_FACTORY_PROVIDED',
 				'Provided type: ' + typeof memberDefinitionFactory
 			);
 		}
-		if (!(propertyFactory instanceof ClassyJS.Member.Property.Factory)) {
+		if (!(propertyFactory instanceof Picket.Member.Property.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_PROPERTY_FACTORY_PROVIDED',
 				'Provided type: ' + typeof propertyFactory
 			);
 		}
-		if (!(methodFactory instanceof ClassyJS.Member.Method.Factory)) {
+		if (!(methodFactory instanceof Picket.Member.Method.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_METHOD_FACTORY_PROVIDED',
 				'Provided type: ' + typeof methodFactory
 			);
 		}
-		if (!(eventFactory instanceof ClassyJS.Member.Event.Factory)) {
+		if (!(eventFactory instanceof Picket.Member.Event.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_EVENT_FACTORY_PROVIDED',
 				'Provided type: ' + typeof eventFactory
 			);
 		}
-		if (!(constantFactory instanceof ClassyJS.Member.Constant.Factory)) {
+		if (!(constantFactory instanceof Picket.Member.Constant.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_CONSTANT_FACTORY_PROVIDED',
 				'Provided type: ' + typeof constantFactory
 			);
 		}
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Factory.Fatal(
 				'NO_TYPE_CHECKER_PROVIDED',
 				'Provided type: ' + typeof typeChecker
 			);
 		}
-		if (!(accessController instanceof ClassyJS.Access.Controller)) {
+		if (!(accessController instanceof Picket.Access.Controller)) {
 			throw new _.Factory.Fatal(
 				'NO_ACCESS_CONTROLLER_PROVIDED',
 				'Provided type: ' + typeof accessController
@@ -2434,7 +2434,7 @@ if (!Function.prototype.bind) {
 				this._typeChecker,
 				this._accessController
 			);
-			if (!(propertyObject instanceof ClassyJS.Member.Property)) {
+			if (!(propertyObject instanceof Picket.Member.Property)) {
 				throw new _.Factory.Fatal(
 					'NON_PROPERTY_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof propertyObject
@@ -2449,7 +2449,7 @@ if (!Function.prototype.bind) {
 				this._typeChecker,
 				this._accessController
 			);
-			if (!(methodObject instanceof ClassyJS.Member.Method)) {
+			if (!(methodObject instanceof Picket.Member.Method)) {
 				throw new _.Factory.Fatal(
 					'NON_METHOD_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof methodObject
@@ -2464,7 +2464,7 @@ if (!Function.prototype.bind) {
 				this._typeChecker,
 				this._accessController
 			);
-			if (!(eventObject instanceof ClassyJS.Member.Event)) {
+			if (!(eventObject instanceof Picket.Member.Event)) {
 				throw new _.Factory.Fatal(
 					'NON_EVENT_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof eventObject
@@ -2479,7 +2479,7 @@ if (!Function.prototype.bind) {
 				this._typeChecker,
 				this._accessController
 			);
-			if (!(constantObject instanceof ClassyJS.Member.Constant)) {
+			if (!(constantObject instanceof Picket.Member.Constant)) {
 				throw new _.Factory.Fatal(
 					'NON_CONSTANT_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof constantObject
@@ -2495,27 +2495,27 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	var messages = {
 		NO_DEFINITION_FACTORY_PROVIDED:
-			'No instance of ClassyJS.Member.DefinitionFactory was provided to the constructor',
+			'No instance of Picket.Member.DefinitionFactory was provided to the constructor',
 		NO_PROPERTY_FACTORY_PROVIDED:
-			'No instance of ClassyJS.Member.Property.Factory was provided to the constructor',
+			'No instance of Picket.Member.Property.Factory was provided to the constructor',
 		NO_METHOD_FACTORY_PROVIDED:
-			'No instance of ClassyJS.Member.Method.Factory was provided to the constructor',
+			'No instance of Picket.Member.Method.Factory was provided to the constructor',
 		NO_EVENT_FACTORY_PROVIDED:
-			'No instance of ClassyJS.Member.Event.Factory was provided to the constructor',
+			'No instance of Picket.Member.Event.Factory was provided to the constructor',
 		NO_CONSTANT_FACTORY_PROVIDED:
-			'No instance of ClassyJS.Member.Constant.Factory was provided to the constructor',
+			'No instance of Picket.Member.Constant.Factory was provided to the constructor',
 		NO_TYPE_CHECKER_PROVIDED:
-			'No instance of ClassyJS.TypeChecker was provided to the constructor',
+			'No instance of Picket.TypeChecker was provided to the constructor',
 		NO_ACCESS_CONTROLLER_PROVIDED:
-			'No instance of ClassyJS.Access.Controller was provided to the constructor',
+			'No instance of Picket.Access.Controller was provided to the constructor',
 		NON_STRING_SIGNATURE_PROVIDED: 'Provided signature must be a string',
 		EMPTY_STRING_SIGNATURE_PROVIDED: 'Provided signature must not be an empty string',
 		NON_BOOLEAN_INTERFACE_INDICATOR_PROVIDED:
@@ -2524,24 +2524,24 @@ if (!Function.prototype.bind) {
 		NON_DEFINITION_RETURNED_FROM_FACTORY:
 			'Provided definition factory did not return a member definition object',
 		NON_PROPERTY_RETURNED_FROM_FACTORY:
-			'Provided property factory did not return an instance of ClassyJS.Member.Property',
+			'Provided property factory did not return an instance of Picket.Member.Property',
 		NON_METHOD_RETURNED_FROM_FACTORY:
-			'Provided method factory did not return an instance of ClassyJS.Member.Method',
+			'Provided method factory did not return an instance of Picket.Member.Method',
 		NON_EVENT_RETURNED_FROM_FACTORY:
-			'Provided event factory did not return an instance of ClassyJS.Member.Event',
+			'Provided event factory did not return an instance of Picket.Member.Event',
 		NON_CONSTANT_RETURNED_FROM_FACTORY:
-			'Provided constant factory did not return an instance of ClassyJS.Member.Constant'
+			'Provided constant factory did not return an instance of Picket.Member.Constant'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Factory.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Factory.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Factory = window.ClassyJS.Member.Factory || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Factory = window.Picket.Member.Factory || {}
 );
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	_.DefinitionFactory = function(
 		propertyDefinitionFactory,
@@ -2591,7 +2591,7 @@ if (!Function.prototype.bind) {
 				}
 				break;
 			} catch (error) {
-				if (!(error instanceof ClassyJS.Member[factories[i]].Definition.Fatal)
+				if (!(error instanceof Picket.Member[factories[i]].Definition.Fatal)
 				||	error.code != 'SIGNATURE_NOT_RECOGNISED') {
 					throw error;
 				}
@@ -2606,11 +2606,11 @@ if (!Function.prototype.bind) {
 		return returnObject;
 	};
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );
 
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	var messages = {
 		PROPERTY_DEFINITION_FACTORY_NOT_PROVIDED:
@@ -2627,19 +2627,19 @@ if (!Function.prototype.bind) {
 			'the available member definition classes' 
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.DefinitionFactory.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.DefinitionFactory.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.DefinitionFactory = window.ClassyJS.Member.DefinitionFactory || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.DefinitionFactory = window.Picket.Member.DefinitionFactory || {}
 );
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	_.Type = function(namespaceManager)
 	{
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+		if (!(namespaceManager instanceof Picket.NamespaceManager)) {
 			throw new _.Type.Fatal(
 				'NON_NAMESPACE_MANAGER_PROVIDED',
 				'Provided type: ' + typeof namespaceManager
@@ -2654,7 +2654,7 @@ if (!Function.prototype.bind) {
 	
 	_.Type.prototype.registerClass = function(classObject, classConstructor)
 	{
-		if (!(classObject instanceof ClassyJS.Type.Class)) {
+		if (!(classObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_OBJECT_PROVIDED',
 				'Provided type: ' + typeof classObject
@@ -2685,7 +2685,7 @@ if (!Function.prototype.bind) {
 				'Provided type: ' + typeof parentClassName
 			);
 		}
-		if (!(childClassObject instanceof ClassyJS.Type.Class)) {
+		if (!(childClassObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_OBJECT_PROVIDED',
 				'Provided type: ' + typeof childClassObject
@@ -2748,7 +2748,7 @@ if (!Function.prototype.bind) {
 				'Provided type: ' + typeof interfaceName
 			);
 		}
-		if (!(classObject instanceof ClassyJS.Type.Class)) {
+		if (!(classObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_OBJECT_PROVIDED',
 				'Provided type: ' + typeof classObject
@@ -2820,7 +2820,7 @@ if (!Function.prototype.bind) {
 	
 	_.Type.prototype.getInterfacesFromClass = function(classObject)
 	{
-		if (!(classObject instanceof ClassyJS.Type.Class)) {
+		if (!(classObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_OBJECT_PROVIDED',
 				'Provided type: ' + typeof classObject
@@ -2862,13 +2862,13 @@ if (!Function.prototype.bind) {
 	{
 		var originalClassObject = classObject;
 		var returnType = (typeof classObject == 'object')
-			? ((classObject instanceof ClassyJS.Type.Class) ? 'classObject' : 'instance')
+			? ((classObject instanceof Picket.Type.Class) ? 'classObject' : 'instance')
 			: 'constructor';
-		if (typeof classObject == 'object' && !(classObject instanceof ClassyJS.Type.Class)) {
+		if (typeof classObject == 'object' && !(classObject instanceof Picket.Type.Class)) {
 			classObject = classObject.constructor;
 		}
 		if (typeof classObject == 'function') classObject = this.getClass(classObject);
-		if (!(classObject instanceof ClassyJS.Type.Class)) {
+		if (!(classObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_CONSTRUCTOR_OR_INSTANCE_PROVIDED',
 				'Provided type: ' + typeof originalClassObject
@@ -2980,17 +2980,17 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Registry = window.ClassyJS.Registry || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Registry = window.Picket.Registry || {}
 );
 
-;(function(ClassyJS, Registry, _){
+;(function(Picket, Registry, _){
 	
 	var messages = {
 		NON_NAMESPACE_MANAGER_PROVIDED:
-			'Instance of ClassyJS.NamespaceManager must be provided to the constructor',
+			'Instance of Picket.NamespaceManager must be provided to the constructor',
 		NON_CLASS_OBJECT_PROVIDED:
-			'Provided class object is not an instance of ClassyJS.Type.Class',
+			'Provided class object is not an instance of Picket.Type.Class',
 		NON_STRING_INTERFACE_NAME_PROVIDED: 'Provided interface name is not a string',
 		NON_CLASS_CONSTRUCTOR_PROVIDED: 'Provided class constructor is not a function',
 		INVALID_CLASS_LOOKUP: 'Class object was looked up using a non instance or constructor',
@@ -3022,15 +3022,15 @@ if (!Function.prototype.bind) {
 		NON_STRING_PARENT_PROVIDED: 'The provided parent class name must be a string'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Registry.Type.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Registry.Type.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Registry = window.ClassyJS.Registry || {},
-	window.ClassyJS.Registry.Type = window.ClassyJS.Registry.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Registry = window.Picket.Registry || {},
+	window.Picket.Registry.Type = window.Picket.Registry.Type || {}
 );
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	// @todo Ensure all public method args are type checked
 	
@@ -3042,7 +3042,7 @@ if (!Function.prototype.bind) {
 				'Provided type: ' + typeof typeRegistry
 			);
 		}
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Member.Fatal(
 				'TYPE_CHECKER_REQUIRED',
 				'Provided type: ' + typeof typeChecker
@@ -3057,8 +3057,8 @@ if (!Function.prototype.bind) {
 	_.Member.prototype.register = function(memberObject, typeObject)
 	{
 		// @todo Type check first arg
-		if (!(typeObject instanceof ClassyJS.Type.Class)
-		&&	!(typeObject instanceof ClassyJS.Type.Interface)) {
+		if (!(typeObject instanceof Picket.Type.Class)
+		&&	!(typeObject instanceof Picket.Type.Interface)) {
 			throw new _.Member.Fatal(
 				'TARGET_NOT_CLASS_OR_INTERFACE',
 				'Provided type: ' + typeof typeObject
@@ -3070,8 +3070,8 @@ if (!Function.prototype.bind) {
 	
 	_.Member.prototype.getMembers = function(typeObject)
 	{
-		if (!(typeObject instanceof ClassyJS.Type.Class)
-		&&	!(typeObject instanceof ClassyJS.Type.Interface)) {
+		if (!(typeObject instanceof Picket.Type.Class)
+		&&	!(typeObject instanceof Picket.Type.Interface)) {
 			throw new _.Member.Fatal(
 				'TARGET_NOT_CLASS_OR_INTERFACE',
 				'Provided type: ' + typeof typeObject
@@ -3438,7 +3438,7 @@ if (!Function.prototype.bind) {
 	var _storeMember = function(_this, memberObject, typeObject)
 	{
 		var memberName = memberObject.getName();
-		if (memberObject instanceof ClassyJS.Member.Property) {
+		if (memberObject instanceof Picket.Member.Property) {
 			var propertyExists = true;
 			try {
 				_getPropertyByName(_this, typeObject, memberName);
@@ -3460,7 +3460,7 @@ if (!Function.prototype.bind) {
 				typeObject
 			);
 			typeMemberData.members.properties.push(memberObject);
-		} else if (memberObject instanceof ClassyJS.Member.Method) {
+		} else if (memberObject instanceof Picket.Member.Method) {
 			var methodExists = true;
 			try {
 				_getMethodByNameArgumentTypesAndStaticState(
@@ -3493,7 +3493,7 @@ if (!Function.prototype.bind) {
 				typeObject
 			);
 			typeMemberData.members.methods.push(memberObject);
-		} else if (memberObject instanceof ClassyJS.Member.Event) {
+		} else if (memberObject instanceof Picket.Member.Event) {
 			var eventExists = true;
 			try {
 				_getEventByName(_this, typeObject, memberName);
@@ -3515,7 +3515,7 @@ if (!Function.prototype.bind) {
 				typeObject
 			);
 			typeMemberData.members.events.push(memberObject);
-		} else if (memberObject instanceof ClassyJS.Member.Constant) {
+		} else if (memberObject instanceof Picket.Member.Constant) {
 			var constantExists = true;
 			try {
 				_getConstantByName(_this, typeObject, memberName);
@@ -3649,7 +3649,7 @@ if (!Function.prototype.bind) {
 	{
 		// @todo Check instance is object
 		var typeObject = _this._typeRegistry.getClass(instance);
-		// @todo Check return is instance of ClassyJS.Type.Class
+		// @todo Check return is instance of Picket.Type.Class
 		return typeObject;
 	};
 	
@@ -3704,15 +3704,15 @@ if (!Function.prototype.bind) {
 	
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Registry = window.ClassyJS.Registry || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Registry = window.Picket.Registry || {}
 );
 
-;(function(ClassyJS, Registry, _){
+;(function(Picket, Registry, _){
 	
 	var messages = {
-		TYPE_REGISTRY_REQUIRED: 'Instance of ClassyJS.Registry.Type is required by constructor',
-		TYPE_CHECKER_REQUIRED: 'Instance of ClassyJS.TypeChecker is required by constructor',
+		TYPE_REGISTRY_REQUIRED: 'Instance of Picket.Registry.Type is required by constructor',
+		TYPE_CHECKER_REQUIRED: 'Instance of Picket.TypeChecker is required by constructor',
 		NON_CLASS_INSTANCE_OR_CONSTRUCTOR_PROVIDED:
 			'The provided call target was not an object instance or constructor',
 		NON_STRING_METHOD_NAME_PROVIDED: 'The provided method name is not a string',
@@ -3744,12 +3744,12 @@ if (!Function.prototype.bind) {
 			'A constant was requested using an instance of a class instead of its constructor'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Registry.Member.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Registry.Member.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Registry = window.ClassyJS.Registry || {},
-	window.ClassyJS.Registry.Member = window.ClassyJS.Registry.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Registry = window.Picket.Registry || {},
+	window.Picket.Registry.Member = window.Picket.Registry.Member || {}
 );
 
 (function(_){
@@ -3786,7 +3786,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getTypeFactory = function()
 	{
 		if (!this._typeFactory) {
-			this._typeFactory = new ClassyJS.Type.Factory(
+			this._typeFactory = new Picket.Type.Factory(
 				this.getTypeDefinitionFactory(),
 				this.getClassFactory(),
 				this.getInterfaceFactory(),
@@ -3801,7 +3801,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getClassFactory = function()
 	{
 		if (!this._classFactory) {
-			this._classFactory = new ClassyJS.Type.Class.Factory();
+			this._classFactory = new Picket.Type.Class.Factory();
 		}
 		return this._classFactory;
 	};
@@ -3809,7 +3809,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getInterfaceFactory = function()
 	{
 		if (!this._interfaceFactory) {
-			this._interfaceFactory = new ClassyJS.Type.Interface.Factory();
+			this._interfaceFactory = new Picket.Type.Interface.Factory();
 		}
 		return this._interfaceFactory;
 	};
@@ -3817,7 +3817,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getTypeDefinitionFactory = function()
 	{
 		if (!this._typeDefinitionFactory) {
-			this._typeDefinitionFactory = new ClassyJS.Type.DefinitionFactory(
+			this._typeDefinitionFactory = new Picket.Type.DefinitionFactory(
 				this.getClassDefinitionFactory(),
 				this.getInterfaceDefinitionFactory()
 			);
@@ -3828,7 +3828,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getClassDefinitionFactory = function()
 	{
 		if (!this._classDefinitionFactory) {
-			this._classDefinitionFactory = new ClassyJS.Type.Class.Definition.Factory();
+			this._classDefinitionFactory = new Picket.Type.Class.Definition.Factory();
 		}
 		return this._classDefinitionFactory;
 	};
@@ -3836,7 +3836,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getInterfaceDefinitionFactory = function()
 	{
 		if (!this._interfaceDefinitionFactory) {
-			this._interfaceDefinitionFactory = new ClassyJS.Type.Interface.Definition.Factory();
+			this._interfaceDefinitionFactory = new Picket.Type.Interface.Definition.Factory();
 		}
 		return this._interfaceDefinitionFactory;
 	};
@@ -3844,7 +3844,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getMemberFactory = function()
 	{
 		if (!this._memberFactory) {
-			this._memberFactory = new ClassyJS.Member.Factory(
+			this._memberFactory = new Picket.Member.Factory(
 				this.getMemberDefinitionFactory(),
 				this.getPropertyFactory(),
 				this.getMethodFactory(),
@@ -3860,7 +3860,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getPropertyFactory = function()
 	{
 		if (!this._propertyFactory) {
-			this._propertyFactory = new ClassyJS.Member.Property.Factory();
+			this._propertyFactory = new Picket.Member.Property.Factory();
 		}
 		return this._propertyFactory;
 	};
@@ -3868,7 +3868,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getMethodFactory = function()
 	{
 		if (!this._methodFactory) {
-			this._methodFactory = new ClassyJS.Member.Method.Factory();
+			this._methodFactory = new Picket.Member.Method.Factory();
 		}
 		return this._methodFactory;
 	};
@@ -3876,7 +3876,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getEventFactory = function()
 	{
 		if (!this._eventFactory) {
-			this._eventFactory = new ClassyJS.Member.Event.Factory();
+			this._eventFactory = new Picket.Member.Event.Factory();
 		}
 		return this._eventFactory;
 	};
@@ -3884,7 +3884,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getConstantFactory = function()
 	{
 		if (!this._constantFactory) {
-			this._constantFactory = new ClassyJS.Member.Constant.Factory();
+			this._constantFactory = new Picket.Member.Constant.Factory();
 		}
 		return this._constantFactory;
 	};
@@ -3892,7 +3892,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getMemberDefinitionFactory = function()
 	{
 		if (!this._memberDefinitionFactory) {
-			this._memberDefinitionFactory = new ClassyJS.Member.DefinitionFactory(
+			this._memberDefinitionFactory = new Picket.Member.DefinitionFactory(
 				this.getPropertyDefinitionFactory(),
 				this.getMethodDefinitionFactory(),
 				this.getEventDefinitionFactory(),
@@ -3905,7 +3905,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getPropertyDefinitionFactory = function()
 	{
 		if (!this._propertyDefinitionFactory) {
-			this._propertyDefinitionFactory = new ClassyJS.Member.Property.Definition.Factory();
+			this._propertyDefinitionFactory = new Picket.Member.Property.Definition.Factory();
 		}
 		return this._propertyDefinitionFactory;
 	};
@@ -3913,7 +3913,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getMethodDefinitionFactory = function()
 	{
 		if (!this._methodDefinitionFactory) {
-			this._methodDefinitionFactory = new ClassyJS.Member.Method.Definition.Factory();
+			this._methodDefinitionFactory = new Picket.Member.Method.Definition.Factory();
 		}
 		return this._methodDefinitionFactory;
 	};
@@ -3921,7 +3921,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getEventDefinitionFactory = function()
 	{
 		if (!this._eventDefinitionFactory) {
-			this._eventDefinitionFactory = new ClassyJS.Member.Event.Definition.Factory();
+			this._eventDefinitionFactory = new Picket.Member.Event.Definition.Factory();
 		}
 		return this._eventDefinitionFactory;
 	};
@@ -3929,7 +3929,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getConstantDefinitionFactory = function()
 	{
 		if (!this._constantDefinitionFactory) {
-			this._constantDefinitionFactory = new ClassyJS.Member.Constant.Definition.Factory();
+			this._constantDefinitionFactory = new Picket.Member.Constant.Definition.Factory();
 		}
 		return this._constantDefinitionFactory;
 	};
@@ -3937,7 +3937,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getNamespaceManager = function()
 	{
 		if (!this._namespaceManager) {
-			this._namespaceManager = new ClassyJS.NamespaceManager();
+			this._namespaceManager = new Picket.NamespaceManager();
 		}
 		return this._namespaceManager;
 	};
@@ -3945,7 +3945,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getTypeRegistry = function()
 	{
 		if (!this._typeRegistry) {
-			this._typeRegistry = new ClassyJS.Registry.Type(
+			this._typeRegistry = new Picket.Registry.Type(
 				this.getNamespaceManager()
 			);
 		}
@@ -3955,7 +3955,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getMemberRegistry = function()
 	{
 		if (!this._memberRegistry) {
-			this._memberRegistry = new ClassyJS.Registry.Member(
+			this._memberRegistry = new Picket.Registry.Member(
 				this.getTypeRegistry(),
 				this.getTypeChecker()
 			);
@@ -3966,8 +3966,8 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getTypeChecker = function()
 	{
 		if (!this._typeChecker) {
-			this._typeChecker = new ClassyJS.TypeChecker(
-				new ClassyJS.TypeChecker.ReflectionFactory()
+			this._typeChecker = new Picket.TypeChecker(
+				new Picket.TypeChecker.ReflectionFactory()
 			);
 		}
 		return this._typeChecker;
@@ -3976,7 +3976,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getAccessController = function()
 	{
 		if (!this._accessController) {
-			this._accessController = new ClassyJS.Access.Controller(
+			this._accessController = new Picket.Access.Controller(
 				this.getTypeRegistry()
 			);
 		}
@@ -3986,7 +3986,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getAutoLoader = function()
 	{
 		if (!this._autoLoader) {
-			this._autoLoader = new ClassyJS.AutoLoader(
+			this._autoLoader = new Picket.AutoLoader(
 				this.getIncluder(),
 				this.getAutoLoadInstantiator(),
 				this.getNamespaceManager(),
@@ -3999,7 +3999,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getIncluder = function()
 	{
 		if (!this._includer) {
-			this._includer = new ClassyJS.AutoLoader.Includer.Script();
+			this._includer = new Picket.AutoLoader.Includer.Script();
 		}
 		return this._includer;
 	};
@@ -4007,7 +4007,7 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getAutoLoadInstantiator = function()
 	{
 		if (!this._autoLoadInstantiator) {
-			this._autoLoadInstantiator = new ClassyJS.AutoLoader.Instantiator();
+			this._autoLoadInstantiator = new Picket.AutoLoader.Instantiator();
 		}
 		return this._autoLoadInstantiator;
 	};
@@ -4015,36 +4015,36 @@ if (!Function.prototype.bind) {
 	_.Instantiator.prototype.getReflectionFactory = function()
 	{
 		if (!this._reflectionFactory) {
-			this._reflectionFactory = new ClassyJS.Reflection.Factory();
+			this._reflectionFactory = new Picket.Reflection.Factory();
 		}
 		return this._reflectionFactory;
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});
 
 (function(_){
 	
 	_.AutoLoader = function(includer, instantiator, namespaceManager, memberRegistry)
 	{
-		if (!(includer instanceof ClassyJS.AutoLoader.Includer.Script)) {
+		if (!(includer instanceof Picket.AutoLoader.Includer.Script)) {
 			throw new _.AutoLoader.Fatal(
 				'INCLUDER_NOT_PROVIDED',
 				'Provided type: ' + typeof includer
 			);
 		}
-		if (!(instantiator instanceof ClassyJS.AutoLoader.Instantiator)) {
+		if (!(instantiator instanceof Picket.AutoLoader.Instantiator)) {
 			throw new _.AutoLoader.Fatal(
 				'INSTANTIATOR_NOT_PROVIDED',
 				'Provided type: ' + typeof instantiator
 			);
 		}
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+		if (!(namespaceManager instanceof Picket.NamespaceManager)) {
 			throw new _.AutoLoader.Fatal(
 				'NAMESPACE_MANAGER_NOT_PROVIDED',
 				'Provided type: ' + typeof namespaceManager
 			);
 		}
-		if (!(memberRegistry instanceof ClassyJS.Registry.Member)) {
+		if (!(memberRegistry instanceof Picket.Registry.Member)) {
 			throw new _.AutoLoader.Fatal(
 				'MEMBER_REGISTRY_NOT_PROVIDED',
 				'Provided type: ' + typeof memberRegistry
@@ -4172,7 +4172,7 @@ if (!Function.prototype.bind) {
 			_getClassConstructor(_this, className);
 			return true;
 		} catch (error) {
-			if (!(error instanceof ClassyJS.NamespaceManager.Fatal)
+			if (!(error instanceof Picket.NamespaceManager.Fatal)
 			||	error.code != 'NAMESPACE_OBJECT_DOES_NOT_EXIST') {
 				throw error;
 			}
@@ -4282,16 +4282,16 @@ if (!Function.prototype.bind) {
 		_this._continueBuffer = [];
 	};
 	
-})(window.ClassyJS = window.ClassyJS || {});
+})(window.Picket = window.Picket || {});
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	var messages = {
 		INCLUDER_NOT_PROVIDED: 'An includer must be provided',
 		INSTANTIATOR_NOT_PROVIDED:
-			'Instance of ClassyJS.AutoLoader.Instantiator must be provided',
-		NAMESPACE_MANAGER_NOT_PROVIDED: 'Instance of ClassyJS.NamespaceManager must be provided',
-		MEMBER_REGISTRY_NOT_PROVIDED: 'Instance of ClassyJS.Registry.Member must be provided',
+			'Instance of Picket.AutoLoader.Instantiator must be provided',
+		NAMESPACE_MANAGER_NOT_PROVIDED: 'Instance of Picket.NamespaceManager must be provided',
+		MEMBER_REGISTRY_NOT_PROVIDED: 'Instance of Picket.Registry.Member must be provided',
 		ALREADY_RUNNING: 'Cannot start a new loading session whilst one is already running',
 		NOT_RUNNING: 'Cannot continue a loading session whilst not running',
 		SCRIPT_NOT_LOADED: 'A required script could not be loaded',
@@ -4299,14 +4299,14 @@ if (!Function.prototype.bind) {
 		NON_STRING_CLASS_NAME: 'A provided class name was not a string'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('AutoLoader.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('AutoLoader.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.AutoLoader = window.ClassyJS.AutoLoader || {}
+	window.Picket = window.Picket || {},
+	window.Picket.AutoLoader = window.Picket.AutoLoader || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Instantiator = function(){};
 	
@@ -4316,11 +4316,11 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.AutoLoader = window.ClassyJS.AutoLoader || {}
+	window.Picket = window.Picket || {},
+	window.Picket.AutoLoader = window.Picket.AutoLoader || {}
 );
 
-(function(ClassyJS, AutoLoader, _){
+(function(Picket, AutoLoader, _){
 	
 	_.Script = function(){};
 	
@@ -4343,87 +4343,87 @@ if (!Function.prototype.bind) {
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.AutoLoader = window.ClassyJS.AutoLoader || {},
-	window.ClassyJS.AutoLoader.Includer = window.ClassyJS.AutoLoader.Includer || {}
+	window.Picket = window.Picket || {},
+	window.Picket.AutoLoader = window.Picket.AutoLoader || {},
+	window.Picket.AutoLoader.Includer = window.Picket.AutoLoader.Includer || {}
 );
 
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Factory = function(){};
 	
 	_.Factory.prototype.buildClass = function(identifier)
 	{
-		return new ClassyJS.Reflection.Class(identifier);
+		return new Picket.Reflection.Class(identifier);
 	};
 	
 	_.Factory.prototype.buildClassInstance = function(instance)
 	{
-		return new ClassyJS.Reflection.ClassInstance(instance);
+		return new Picket.Reflection.ClassInstance(instance);
 	};
 	
 	_.Factory.prototype.buildInterface = function(instance)
 	{
-		return new ClassyJS.Reflection.Interface(instance);
+		return new Picket.Reflection.Interface(instance);
 	};
 	
 	_.Factory.prototype.buildProperty = function(className, propertyName)
 	{
-		return new ClassyJS.Reflection.Property(className, propertyName);
+		return new Picket.Reflection.Property(className, propertyName);
 	};
 	
 	_.Factory.prototype.buildMethod = function(className, methodName)
 	{
-		return new ClassyJS.Reflection.Method(className, methodName);
+		return new Picket.Reflection.Method(className, methodName);
 	};
 	
 	_.Factory.prototype.buildEvent = function(className, eventName)
 	{
-		return new ClassyJS.Reflection.Event(className, eventName);
+		return new Picket.Reflection.Event(className, eventName);
 	};
 	
 	_.Factory.prototype.buildConstant = function(className, constantName)
 	{
-		return new ClassyJS.Reflection.Constant(className, constantName);
+		return new Picket.Reflection.Constant(className, constantName);
 	};
 	
 	_.Factory.prototype.buildPropertyInstance = function(objectInstance, propertyName)
 	{
-		return new ClassyJS.Reflection.PropertyInstance(objectInstance, propertyName);
+		return new Picket.Reflection.PropertyInstance(objectInstance, propertyName);
 	};
 	
 	_.Factory.prototype.buildMethodInstance = function(objectInstance, methodName)
 	{
-		return new ClassyJS.Reflection.MethodInstance(objectInstance, methodName);
+		return new Picket.Reflection.MethodInstance(objectInstance, methodName);
 	};
 	
 	_.Factory.prototype.buildEventInstance = function(objectInstance, eventName)
 	{
-		return new ClassyJS.Reflection.EventInstance(objectInstance, eventName);
+		return new Picket.Reflection.EventInstance(objectInstance, eventName);
 	};
 	
 	_.Factory.prototype.buildArgument = function(identifier, isOptional, defaultValue, owner)
 	{
-		return new ClassyJS.Reflection.Argument(identifier, isOptional, defaultValue, owner);
+		return new Picket.Reflection.Argument(identifier, isOptional, defaultValue, owner);
 	};
 	
 	_.Factory.prototype.buildType = function(identifier)
 	{
-		return new ClassyJS.Reflection.Type(identifier);
+		return new Picket.Reflection.Type(identifier);
 	};
 	
 	_.Factory.prototype.buildAccessType = function(identifier)
 	{
-		return new ClassyJS.Reflection.AccessType(identifier);
+		return new Picket.Reflection.AccessType(identifier);
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	// @todo propertyExists, methodExists, etc
 	
@@ -4431,7 +4431,7 @@ if (!Function.prototype.bind) {
 	{
 		
 		if (typeof identifier == 'string') {
-			identifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			identifier = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 				identifier
 			);
 		}
@@ -4443,11 +4443,11 @@ if (!Function.prototype.bind) {
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(identifier)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(identifier)) {
 			throw new _.Class.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
-		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(identifier);
+		this._classObject = Picket._instantiator.getTypeRegistry().getClass(identifier);
 		
 	};
 	
@@ -4464,7 +4464,7 @@ if (!Function.prototype.bind) {
 	_.Class.prototype.getParent = function()
 	{
 		var parentClassName = this._classObject.getParentClass();
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(parentClassName);
+		return Picket._instantiator.getReflectionFactory().buildClass(parentClassName);
 	};
 	
 	_.Class.prototype.getInterfaces = function()
@@ -4473,7 +4473,7 @@ if (!Function.prototype.bind) {
 		var reflectionInterfaces = [];
 		for (var i = 0; i < interfaceNames.length; i++) {
 			reflectionInterfaces.push(
-				ClassyJS._instantiator.getReflectionFactory().buildInterface(interfaceNames[i])
+				Picket._instantiator.getReflectionFactory().buildInterface(interfaceNames[i])
 			);
 		}
 		return reflectionInterfaces;
@@ -4481,7 +4481,7 @@ if (!Function.prototype.bind) {
 	
 	_.Class.prototype.implementsInterface = function(interfaceName)
 	{
-		var interfaces = ClassyJS._instantiator.getTypeRegistry().getInterfacesFromClass(
+		var interfaces = Picket._instantiator.getTypeRegistry().getInterfacesFromClass(
 			this._classObject
 		);
 		for (var i = 0; i < interfaces.length; i++) {
@@ -4499,13 +4499,13 @@ if (!Function.prototype.bind) {
 	
 	_.Class.prototype.getProperties = function()
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Property);
+		return _getFilteredMembers(this, Picket.Member.Property);
 	};
 	
 	_.Class.prototype.getProperty = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		var propertiesArray = _getFilteredMembers(this, ClassyJS.Member.Property, name);
+		var propertiesArray = _getFilteredMembers(this, Picket.Member.Property, name);
 		// @todo Throw if length is not 1
 		return propertiesArray[0];
 	};
@@ -4513,19 +4513,19 @@ if (!Function.prototype.bind) {
 	_.Class.prototype.getMethods = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		return _getFilteredMembers(this, ClassyJS.Member.Method, name);
+		return _getFilteredMembers(this, Picket.Member.Method, name);
 	};
 	
 	_.Class.prototype.getEvents = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		return _getFilteredMembers(this, ClassyJS.Member.Event, name);
+		return _getFilteredMembers(this, Picket.Member.Event, name);
 	};
 	
 	_.Class.prototype.getEvent = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		var eventsArray = _getFilteredMembers(this, ClassyJS.Member.Event, name);
+		var eventsArray = _getFilteredMembers(this, Picket.Member.Event, name);
 		// @todo Throw if length is not 1
 		return eventsArray[0];
 	};
@@ -4533,13 +4533,13 @@ if (!Function.prototype.bind) {
 	_.Class.prototype.getConstants = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		return _getFilteredMembers(this, ClassyJS.Member.Constant, name);
+		return _getFilteredMembers(this, Picket.Member.Constant, name);
 	};
 	
 	_.Class.prototype.getConstant = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		var constantsArray = _getFilteredMembers(this, ClassyJS.Member.Constant, name);
+		var constantsArray = _getFilteredMembers(this, Picket.Member.Constant, name);
 		// @todo Throw if length is not 1
 		return constantsArray[0];
 	};
@@ -4563,7 +4563,7 @@ if (!Function.prototype.bind) {
 	{
 		var args = Array.prototype.splice.call(arguments, 0);
 		args.unshift(null);
-		var constructor = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+		var constructor = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 			this._classObject.getName()
 		);
 		var F = constructor.bind.apply(constructor, args);
@@ -4575,7 +4575,7 @@ if (!Function.prototype.bind) {
 		
 		// Get the real constructor function
 		// for the class and ensure it is a function
-		var constructor = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+		var constructor = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 			this.getName()
 		);
 		
@@ -4587,14 +4587,14 @@ if (!Function.prototype.bind) {
 		// Create an instance of the proxy
 		var mock = new Mock();
 		
-		var properties = _filterByType(this, ClassyJS.Member.Property, _getMembers(this));
-		var methods = _filterByType(this, ClassyJS.Member.Method, _getMembers(this));
+		var properties = _filterByType(this, Picket.Member.Property, _getMembers(this));
+		var methods = _filterByType(this, Picket.Member.Method, _getMembers(this));
 		
 		for (var i = 0; i < properties.length; i++) mock[properties[i].getName()] = function(){};
 		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
 		
 		// @todo Test this line
-		ClassyJS._instantiator.getTypeRegistry().registerMock(mock, this._classObject);
+		Picket._instantiator.getTypeRegistry().registerMock(mock, this._classObject);
 		
 		// Return the finished mock
 		return mock;
@@ -4603,7 +4603,7 @@ if (!Function.prototype.bind) {
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._classObject);
 	};
 	
 	var _getFilteredMembers = function(_this, type, name)
@@ -4646,30 +4646,30 @@ if (!Function.prototype.bind) {
 	{
 		var reflectionMembers = [];
 		for (var i = 0; i < members.length; i++) {
-			if (members[i] instanceof ClassyJS.Member.Property) {
+			if (members[i] instanceof Picket.Member.Property) {
 				reflectionMembers.push(
-					ClassyJS._instantiator.getReflectionFactory().buildProperty(
+					Picket._instantiator.getReflectionFactory().buildProperty(
 						_this.getName(),
 						members[i].getName()
 					)
 				);
-			} else if (members[i] instanceof ClassyJS.Member.Method) {
+			} else if (members[i] instanceof Picket.Member.Method) {
 				reflectionMembers.push(
-					ClassyJS._instantiator.getReflectionFactory().buildMethod(
+					Picket._instantiator.getReflectionFactory().buildMethod(
 						_this.getName(),
 						members[i].getName()
 					)
 				);
-			} else if (members[i] instanceof ClassyJS.Member.Event) {
+			} else if (members[i] instanceof Picket.Member.Event) {
 				reflectionMembers.push(
-					ClassyJS._instantiator.getReflectionFactory().buildEvent(
+					Picket._instantiator.getReflectionFactory().buildEvent(
 						_this.getName(),
 						members[i].getName()
 					)
 				);
-			} else if (members[i] instanceof ClassyJS.Member.Constant) {
+			} else if (members[i] instanceof Picket.Member.Constant) {
 				reflectionMembers.push(
-					ClassyJS._instantiator.getReflectionFactory().buildConstant(
+					Picket._instantiator.getReflectionFactory().buildConstant(
 						_this.getName(),
 						members[i].getName()
 					)
@@ -4684,7 +4684,7 @@ if (!Function.prototype.bind) {
 		try {
 			_this._classObject.requestInstantiation();
 		} catch (error) {
-			if (!(error instanceof ClassyJS.Type.Class.Fatal)) throw error;
+			if (!(error instanceof Picket.Type.Class.Fatal)) throw error;
 			if (error.code == 'CANNOT_INSTANTIATE_ABSTRACT_CLASS') return 'explicit';
 			if (error.code == 'CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS') return 'implicit';
 			if (error.code == 'CANNOT_INSTANTIATE_CLASS_WITH_UNIMPLEMENTED_INTERFACE_MEMBERS') {
@@ -4699,26 +4699,26 @@ if (!Function.prototype.bind) {
 	window.Reflection.Class = _.Class;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		CLASS_DOES_NOT_EXIST: 'Provided identifier does not describe a valid class',
 		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be a string, function or object'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Class.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Class.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Class = window.ClassyJS.Reflection.Class || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Class = window.Picket.Reflection.Class || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.ClassInstance = function(instance)
 	{
@@ -4730,7 +4730,7 @@ if (!Function.prototype.bind) {
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(instance)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(instance)) {
 			throw new _.ClassInstance.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
@@ -4740,7 +4740,7 @@ if (!Function.prototype.bind) {
 	
 	_.ClassInstance.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(this._instance);
+		return Picket._instantiator.getReflectionFactory().buildClass(this._instance);
 	};
 	
 	_.ClassInstance.prototype.getMemberInstances = function()
@@ -4750,39 +4750,39 @@ if (!Function.prototype.bind) {
 	
 	_.ClassInstance.prototype.getPropertyInstances = function()
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Property);
+		return _getFilteredMembers(this, Picket.Member.Property);
 	};
 	
 	_.ClassInstance.prototype.getPropertyInstance = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		var propertiesArray = _getFilteredMembers(this, ClassyJS.Member.Property, name);
+		var propertiesArray = _getFilteredMembers(this, Picket.Member.Property, name);
 		// @todo Throw if length is not 1
 		return propertiesArray[0];
 	};
 	
 	_.ClassInstance.prototype.getMethodInstances = function(name)
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Method, name);
+		return _getFilteredMembers(this, Picket.Member.Method, name);
 	};
 	
 	_.ClassInstance.prototype.getEventInstances = function()
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Event);
+		return _getFilteredMembers(this, Picket.Member.Event);
 	};
 	
 	_.ClassInstance.prototype.getEventInstance = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		var eventsArray =  _getFilteredMembers(this, ClassyJS.Member.Event, name);
+		var eventsArray =  _getFilteredMembers(this, Picket.Member.Event, name);
 		// @todo Throw if length is not 1
 		return eventsArray[0];
 	};
 	
 	var _getMembers = function(_this)
 	{
-		var classObject = ClassyJS._instantiator.getTypeRegistry().getClass(_this._instance);
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(classObject);
+		var classObject = Picket._instantiator.getTypeRegistry().getClass(_this._instance);
+		return Picket._instantiator.getMemberRegistry().getMembers(classObject);
 	};
 	
 	var _getFilteredMembers = function(_this, type, name)
@@ -4824,19 +4824,19 @@ if (!Function.prototype.bind) {
 	var _convertToReflectionMembers = function(_this, members)
 	{
 		var reflectionMembers = [];
-		var factory = ClassyJS._instantiator.getReflectionFactory();
+		var factory = Picket._instantiator.getReflectionFactory();
 		for (var i = 0; i < members.length; i++) {
-			if (members[i] instanceof ClassyJS.Member.Property) {
+			if (members[i] instanceof Picket.Member.Property) {
 				reflectionMembers.push(factory.buildPropertyInstance(
 					_this._instance,
 					members[i].getName()
 				));
-			} else if (members[i] instanceof ClassyJS.Member.Method) {
+			} else if (members[i] instanceof Picket.Member.Method) {
 				reflectionMembers.push(factory.buildMethodInstance(
 					_this._instance,
 					members[i].getName()
 				));
-			} else if (members[i] instanceof ClassyJS.Member.Event) {
+			} else if (members[i] instanceof Picket.Member.Event) {
 				reflectionMembers.push(factory.buildEventInstance(
 					_this._instance,
 					members[i].getName()
@@ -4852,26 +4852,26 @@ if (!Function.prototype.bind) {
 	window.Reflection.ClassInstance = _.ClassInstance;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		CLASS_DOES_NOT_EXIST: 'Provided object is not an instance of a valid class',
 		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be an object instance'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.ClassInstance.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.ClassInstance.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.ClassInstance = window.ClassyJS.Reflection.ClassInstance || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.ClassInstance = window.Picket.Reflection.ClassInstance || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Interface = function(name)
 	{
@@ -4883,14 +4883,14 @@ if (!Function.prototype.bind) {
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().interfaceExists(name)) {
+		if (!Picket._instantiator.getTypeRegistry().interfaceExists(name)) {
 			throw new _.Interface.Fatal(
 				'INTERFACE_DOES_NOT_EXIST',
 				'Provided name: ' + name
 			);
 		}
 		
-		this._interfaceObject = ClassyJS._instantiator.getTypeRegistry().getInterface(name);
+		this._interfaceObject = Picket._instantiator.getTypeRegistry().getInterface(name);
 		
 	};
 	
@@ -4906,17 +4906,17 @@ if (!Function.prototype.bind) {
 	
 	_.Interface.prototype.getMethods = function(name)
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Method, name);
+		return _getFilteredMembers(this, Picket.Member.Method, name);
 	};
 	
 	_.Interface.prototype.getEvents = function()
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Event);
+		return _getFilteredMembers(this, Picket.Member.Event);
 	};
 	
 	_.Interface.prototype.getEvent = function(name)
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Event, name);
+		return _getFilteredMembers(this, Picket.Member.Event, name);
 	};
 	
 	_.Interface.prototype.getMock = function()
@@ -4926,21 +4926,21 @@ if (!Function.prototype.bind) {
 		
 		var mock = new Mock();
 		
-		var properties = _filterByType(this, ClassyJS.Member.Property, _getMembers(this));
-		var methods = _filterByType(this, ClassyJS.Member.Method, _getMembers(this));
+		var properties = _filterByType(this, Picket.Member.Property, _getMembers(this));
+		var methods = _filterByType(this, Picket.Member.Method, _getMembers(this));
 		
 		for (var i = 0; i < properties.length; i++) mock[properties[i].getName()] = function(){};
 		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
 		
 		mock.bind = function(){};
 		
-		ClassyJS._instantiator.getTypeRegistry().registerMock(mock, new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition(
-				'class ClassyJS.Mock' + Math.floor(Math.random() * 999999) + ' implements ' + this._interfaceObject.getName()
+		Picket._instantiator.getTypeRegistry().registerMock(mock, new Picket.Type.Class(
+			new Picket.Type.Class.Definition(
+				'class Picket.Mock' + Math.floor(Math.random() * 999999) + ' implements ' + this._interfaceObject.getName()
 			),
-			ClassyJS._instantiator.getTypeRegistry(),
-			ClassyJS._instantiator.getMemberRegistry(),
-			ClassyJS._instantiator.getNamespaceManager()
+			Picket._instantiator.getTypeRegistry(),
+			Picket._instantiator.getMemberRegistry(),
+			Picket._instantiator.getNamespaceManager()
 		));
 		
 		return mock;
@@ -4949,7 +4949,7 @@ if (!Function.prototype.bind) {
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._interfaceObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._interfaceObject);
 	};
 	
 	var _getFilteredMembers = function(_this, type, name)
@@ -4992,13 +4992,13 @@ if (!Function.prototype.bind) {
 	{
 		var reflectionMembers = [];
 		for (var i = 0; i < members.length; i++) {
-			if (members[i] instanceof ClassyJS.Member.Method) {
+			if (members[i] instanceof Picket.Member.Method) {
 				reflectionMembers.push(
-					ClassyJS._instantiator.getReflectionFactory().buildMethod(members[i])
+					Picket._instantiator.getReflectionFactory().buildMethod(members[i])
 				);
-			} else if (members[i] instanceof ClassyJS.Member.Event) {
+			} else if (members[i] instanceof Picket.Member.Event) {
 				reflectionMembers.push(
-					ClassyJS._instantiator.getReflectionFactory().buildEvent(members[i])
+					Picket._instantiator.getReflectionFactory().buildEvent(members[i])
 				);
 			}
 		}
@@ -5009,32 +5009,32 @@ if (!Function.prototype.bind) {
 	window.Reflection.Interface = _.Interface;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INTERFACE_DOES_NOT_EXIST: 'Provided name does not describe a valid interface',
 		NON_STRING_INTERFACE_NAME_PROVIDED: 'The provided name must be a string'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Interface.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Interface.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Interface = window.ClassyJS.Reflection.Interface || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Interface = window.Picket.Reflection.Interface || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Property = function(classIdentifier, propertyName)
 	{
 		
 		if (typeof classIdentifier == 'string') {
-			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			classIdentifier = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 				classIdentifier
 			);
 		}
@@ -5053,17 +5053,17 @@ if (!Function.prototype.bind) {
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(classIdentifier)) {
 			throw new _.Property.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
-		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		this._classObject = Picket._instantiator.getTypeRegistry().getClass(classIdentifier);
 		
 		var members = _getMembers(this);
 		
 		for (var i = 0; i < members.length; i++) {
 			
-			if (members[i] instanceof ClassyJS.Member.Property
+			if (members[i] instanceof Picket.Member.Property
 			&&  members[i].getName() == propertyName) {
 				this._propertyObject = members[i];
 				return;
@@ -5085,14 +5085,14 @@ if (!Function.prototype.bind) {
 	
 	_.Property.prototype.getType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildType(
+		return Picket._instantiator.getReflectionFactory().buildType(
 			this._propertyObject.getTypeIdentifier()
 		);
 	};
 	
 	_.Property.prototype.getAccessType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+		return Picket._instantiator.getReflectionFactory().buildAccessType(
 			this._propertyObject.getAccessTypeIdentifier()
 		);
 	};
@@ -5120,25 +5120,25 @@ if (!Function.prototype.bind) {
 	
 	_.Property.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+		return Picket._instantiator.getReflectionFactory().buildClass(
 			this._classObject.getName()
 		);
 	};
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._classObject);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Property = _.Property;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INVALID_IDENTIFIER_PROVIDED: 'Class identifier must be a string, function or object',
@@ -5150,22 +5150,22 @@ if (!Function.prototype.bind) {
 			'A call was made to \'getDefaultValue\' when no default value exists'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Property.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Property.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Property = window.ClassyJS.Reflection.Property || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Property = window.Picket.Reflection.Property || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.PropertyInstance = function(objectInstance, propertyName)
 	{
 		
 		// Force an error if the
 		// property is not valid
-		ClassyJS._instantiator.getMemberRegistry().getPropertyValue(
+		Picket._instantiator.getMemberRegistry().getPropertyValue(
 			objectInstance,
 			objectInstance,
 			propertyName
@@ -5178,7 +5178,7 @@ if (!Function.prototype.bind) {
 	
 	_.PropertyInstance.prototype.getProperty = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildProperty(
+		return Picket._instantiator.getReflectionFactory().buildProperty(
 			this._objectInstance,
 			this._name
 		);
@@ -5186,7 +5186,7 @@ if (!Function.prototype.bind) {
 	
 	_.PropertyInstance.prototype.getValue = function()
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getPropertyValue(
+		return Picket._instantiator.getMemberRegistry().getPropertyValue(
 			this._objectInstance,
 			this._objectInstance,
 			this._name
@@ -5195,7 +5195,7 @@ if (!Function.prototype.bind) {
 	
 	_.PropertyInstance.prototype.setValue = function(value)
 	{
-		ClassyJS._instantiator.getMemberRegistry().setPropertyValue(
+		Picket._instantiator.getMemberRegistry().setPropertyValue(
 			this._objectInstance,
 			this._objectInstance,
 			this._name,
@@ -5207,31 +5207,31 @@ if (!Function.prototype.bind) {
 	window.Reflection.PropertyInstance = _.PropertyInstance;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.PropertyInstance.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.PropertyInstance.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.PropertyInstance = window.ClassyJS.Reflection.PropertyInstance || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.PropertyInstance = window.Picket.Reflection.PropertyInstance || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Method = function(classIdentifier, methodName)
 	{
 		
 		if (typeof classIdentifier == 'string') {
-			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			classIdentifier = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 				classIdentifier
 			);
 		}
@@ -5250,17 +5250,17 @@ if (!Function.prototype.bind) {
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(classIdentifier)) {
 			throw new _.Method.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
-		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		this._classObject = Picket._instantiator.getTypeRegistry().getClass(classIdentifier);
 		
 		var members = _getMembers(this);
 		
 		for (var i = 0; i < members.length; i++) {
 			
-			if (members[i] instanceof ClassyJS.Member.Method
+			if (members[i] instanceof Picket.Member.Method
 			&&  members[i].getName() == methodName) {
 				this._methodObject = members[i];
 				return;
@@ -5282,7 +5282,7 @@ if (!Function.prototype.bind) {
 	
 	_.Method.prototype.getAccessType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+		return Picket._instantiator.getReflectionFactory().buildAccessType(
 			this._methodObject.getAccessTypeIdentifier()
 		);
 	};
@@ -5293,7 +5293,7 @@ if (!Function.prototype.bind) {
 		var reflectionArguments = [];
 		for (var i = 0; i < types.length; i++) {
 			var isOptional = this._methodObject.argumentIsOptional(i);
-			reflectionArguments.push(ClassyJS._instantiator.getReflectionFactory().buildArgument(
+			reflectionArguments.push(Picket._instantiator.getReflectionFactory().buildArgument(
 				types[i],
 				isOptional,
 				isOptional ? this._methodObject.getDefaultArgumentValue(i) : undefined,
@@ -5305,25 +5305,25 @@ if (!Function.prototype.bind) {
 	
 	_.Method.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+		return Picket._instantiator.getReflectionFactory().buildClass(
 			this._classObject.getName()
 		);
 	};
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._classObject);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Method = _.Method;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
@@ -5336,29 +5336,29 @@ if (!Function.prototype.bind) {
 			'Provided method name and class identifier do not describe a valid method'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Method.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Method.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Method = window.ClassyJS.Reflection.Method || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Method = window.Picket.Reflection.Method || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.MethodInstance = function(objectInstance, methodName)
 	{
 		
 		// @todo Check class exists (typeRegistry.classExists(objectInstance))
 		
-		var classObject = ClassyJS._instantiator.getTypeRegistry().getClass(objectInstance);
+		var classObject = Picket._instantiator.getTypeRegistry().getClass(objectInstance);
 		
-		var members = ClassyJS._instantiator.getMemberRegistry().getMembers(classObject);
+		var members = Picket._instantiator.getMemberRegistry().getMembers(classObject);
 		
 		var methodExists = false;
 		
 		for (var i = 0; i < members.length; i++) {
-			if (!(members[i] instanceof ClassyJS.Member.Method)) continue;
+			if (!(members[i] instanceof Picket.Member.Method)) continue;
 			if (members[i].getName() == methodName) {
 				methodExists = true;
 				break;
@@ -5379,7 +5379,7 @@ if (!Function.prototype.bind) {
 	
 	_.MethodInstance.prototype.getMethod = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildMethod(
+		return Picket._instantiator.getReflectionFactory().buildMethod(
 			this._objectInstance,
 			this._name
 		);
@@ -5387,7 +5387,7 @@ if (!Function.prototype.bind) {
 	
 	_.MethodInstance.prototype.call = function()
 	{
-		return ClassyJS._instantiator.getMemberRegistry().callMethod(
+		return Picket._instantiator.getMemberRegistry().callMethod(
 			this._objectInstance,
 			this._objectInstance,
 			this._name,
@@ -5399,32 +5399,32 @@ if (!Function.prototype.bind) {
 	window.Reflection.MethodInstance = _.MethodInstance;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		METHOD_DOES_NOT_EXIST:
 			'Provided method name and class instance do not describe a valid method'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.MethodInstance.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.MethodInstance.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.MethodInstance = window.ClassyJS.Reflection.MethodInstance || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.MethodInstance = window.Picket.Reflection.MethodInstance || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Event = function(classIdentifier, eventName)
 	{
 		
 		if (typeof classIdentifier == 'string') {
-			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			classIdentifier = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 				classIdentifier
 			);
 		}
@@ -5443,17 +5443,17 @@ if (!Function.prototype.bind) {
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(classIdentifier)) {
 			throw new _.Event.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
-		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		this._classObject = Picket._instantiator.getTypeRegistry().getClass(classIdentifier);
 		
 		var members = _getMembers(this);
 		
 		for (var i = 0; i < members.length; i++) {
 			
-			if (members[i] instanceof ClassyJS.Member.Event
+			if (members[i] instanceof Picket.Member.Event
 			&&  members[i].getName() == eventName) {
 				this._eventObject = members[i];
 				return;
@@ -5478,7 +5478,7 @@ if (!Function.prototype.bind) {
 		var types = this._eventObject.getArgumentTypeIdentifiers();
 		var reflectionArguments = [];
 		for (var i = 0; i < types.length; i++) {
-			reflectionArguments.push(ClassyJS._instantiator.getReflectionFactory().buildArgument(
+			reflectionArguments.push(Picket._instantiator.getReflectionFactory().buildArgument(
 				types[i],
 				false,
 				undefined,
@@ -5490,32 +5490,32 @@ if (!Function.prototype.bind) {
 	
 	_.Event.prototype.getAccessType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+		return Picket._instantiator.getReflectionFactory().buildAccessType(
 			this._eventObject.getAccessTypeIdentifier()
 		);
 	};
 	
 	_.Event.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+		return Picket._instantiator.getReflectionFactory().buildClass(
 			this._classObject.getName()
 		);
 	};
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._classObject);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Event = _.Event;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
@@ -5528,29 +5528,29 @@ if (!Function.prototype.bind) {
 			'Provided event name and class identifier do not describe a valid event'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Event.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Event.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Event = window.ClassyJS.Reflection.Event || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Event = window.Picket.Reflection.Event || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.EventInstance = function(objectInstance, eventName)
 	{
 		
 		// @todo Check class exists (typeRegistry.classExists(objectInstance))
 		
-		var classObject = ClassyJS._instantiator.getTypeRegistry().getClass(objectInstance);
+		var classObject = Picket._instantiator.getTypeRegistry().getClass(objectInstance);
 		
-		var members = ClassyJS._instantiator.getMemberRegistry().getMembers(classObject);
+		var members = Picket._instantiator.getMemberRegistry().getMembers(classObject);
 		
 		var eventExists = false;
 		
 		for (var i = 0; i < members.length; i++) {
-			if (!(members[i] instanceof ClassyJS.Member.Event)) continue;
+			if (!(members[i] instanceof Picket.Member.Event)) continue;
 			if (members[i].getName() == eventName) {
 				eventExists = true;
 				break;
@@ -5571,7 +5571,7 @@ if (!Function.prototype.bind) {
 	
 	_.EventInstance.prototype.getEvent = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildEvent(
+		return Picket._instantiator.getReflectionFactory().buildEvent(
 			this._objectInstance,
 			this._name
 		);
@@ -5579,7 +5579,7 @@ if (!Function.prototype.bind) {
 	
 	_.EventInstance.prototype.trigger = function()
 	{
-		ClassyJS._instantiator.getMemberRegistry().triggerEvent(
+		Picket._instantiator.getMemberRegistry().triggerEvent(
 			this._objectInstance,
 			this._name,
 			Array.prototype.splice.call(arguments, 0, arguments.length)
@@ -5590,32 +5590,32 @@ if (!Function.prototype.bind) {
 	window.Reflection.EventInstance = _.EventInstance;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		EVENT_DOES_NOT_EXIST:
 			'Provided event name and class instance do not describe a valid event'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.EventInstance.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.EventInstance.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.EventInstance = window.ClassyJS.Reflection.EventInstance || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.EventInstance = window.Picket.Reflection.EventInstance || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Constant = function(classIdentifier, constantName)
 	{
 		
 		if (typeof classIdentifier == 'string') {
-			classIdentifier = ClassyJS._instantiator.getNamespaceManager().getNamespaceObject(
+			classIdentifier = Picket._instantiator.getNamespaceManager().getNamespaceObject(
 				classIdentifier
 			);
 		}
@@ -5634,17 +5634,17 @@ if (!Function.prototype.bind) {
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(classIdentifier)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(classIdentifier)) {
 			throw new _.Constant.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
-		this._classObject = ClassyJS._instantiator.getTypeRegistry().getClass(classIdentifier);
+		this._classObject = Picket._instantiator.getTypeRegistry().getClass(classIdentifier);
 		
 		var members = _getMembers(this);
 		
 		for (var i = 0; i < members.length; i++) {
 			
-			if (members[i] instanceof ClassyJS.Member.Constant
+			if (members[i] instanceof Picket.Member.Constant
 			&&  members[i].getName() == constantName) {
 				this._constantObject = members[i];
 				return;
@@ -5666,14 +5666,14 @@ if (!Function.prototype.bind) {
 	
 	_.Constant.prototype.getType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildType(
+		return Picket._instantiator.getReflectionFactory().buildType(
 			this._constantObject.getTypeIdentifier()
 		);
 	};
 	
 	_.Constant.prototype.getAccessType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildAccessType(
+		return Picket._instantiator.getReflectionFactory().buildAccessType(
 			this._constantObject.getAccessTypeIdentifier()
 		);
 	};
@@ -5690,25 +5690,25 @@ if (!Function.prototype.bind) {
 	
 	_.Constant.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(
+		return Picket._instantiator.getReflectionFactory().buildClass(
 			this._classObject.getName()
 		);
 	};
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._classObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._classObject);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Constant = _.Constant;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
@@ -5721,15 +5721,15 @@ if (!Function.prototype.bind) {
 			'Provided constant name and class identifier do not describe a valid constant',
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Constant.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Constant.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Constant = window.ClassyJS.Reflection.Constant || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Constant = window.Picket.Reflection.Constant || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Argument = function(typeIdentifier, isOptional, defaultValue, owner)
 	{
@@ -5773,7 +5773,7 @@ if (!Function.prototype.bind) {
 	
 	_.Argument.prototype.getType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildType(this._typeIdentifier);
+		return Picket._instantiator.getReflectionFactory().buildType(this._typeIdentifier);
 	};
 	
 	_.Argument.prototype.isOptional = function()
@@ -5794,18 +5794,18 @@ if (!Function.prototype.bind) {
 	
 	_.Argument.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(this._owner);
+		return Picket._instantiator.getReflectionFactory().buildClass(this._owner);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Argument = _.Argument;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		NON_STRING_TYPE_IDENTIFIER_SUPPLIED: 'The provided type identifier must be a string',
@@ -5818,15 +5818,15 @@ if (!Function.prototype.bind) {
 		NON_DEFAULT_RETRIEVED: 'A call was made to getDefaultValue when no default exists'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Argument.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Argument.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Argument = window.ClassyJS.Reflection.Argument || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Argument = window.Picket.Reflection.Argument || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.AccessType = function(identifier)
 	{
@@ -5843,11 +5843,11 @@ if (!Function.prototype.bind) {
 	window.Reflection.AccessType = _.AccessType;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Type = function(identifier)
 	{
@@ -5870,29 +5870,29 @@ if (!Function.prototype.bind) {
 	
 	_.Type.prototype.isValidValue = function(value)
 	{
-		return ClassyJS._instantiator.getTypeChecker().isValidType(value, this._identifier);
+		return Picket._instantiator.getTypeChecker().isValidType(value, this._identifier);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Type = _.Type;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );
 
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		NON_STRING_IDENTIFIER_PROVIDED: 'The provided type identifier must be a string'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Type.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Type.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Type = window.ClassyJS.Reflection.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Type = window.Picket.Reflection.Type || {}
 );
 
 (function(){
@@ -5901,12 +5901,12 @@ if (!Function.prototype.bind) {
 	// somewhere else and also ensure we
 	// are creating single instances of
 	// said classes
-	var instantiator = new ClassyJS.Instantiator();
+	var instantiator = new Picket.Instantiator();
 	
 	// We'll make this available to the
 	// various reflection classes by
 	// storing it 'globally'
-	ClassyJS._instantiator = instantiator;
+	Picket._instantiator = instantiator;
 	
 	var namespaceManager = instantiator.getNamespaceManager();
 	
@@ -5937,11 +5937,11 @@ if (!Function.prototype.bind) {
 		_typeCheckMembers(members, typeObject);
 		
 		// If we are dealing with a class...
-		if (typeObject instanceof ClassyJS.Type.Class) {
+		if (typeObject instanceof Picket.Type.Class) {
 			
 			// Create a new class constructor
 			// providing it the class registry
-			var constructor = new ClassyJS.Type.Class.Constructor(
+			var constructor = new Picket.Type.Class.Constructor(
 				instantiator.getTypeRegistry(),
 				instantiator.getMemberRegistry(),
 				typeObject.getName()
@@ -5961,7 +5961,7 @@ if (!Function.prototype.bind) {
 						typeObject.getParentClass()
 					);
 				} catch (error) {
-					if ((!error instanceof ClassyJS.NamespaceManager.Fatal)
+					if ((!error instanceof Picket.NamespaceManager.Fatal)
 					||	error.code != 'NAMESPACE_OBJECT_DOES_NOT_EXIST') {
 						throw error;
 					}
@@ -6021,7 +6021,7 @@ if (!Function.prototype.bind) {
 				);
 			}
 			
-		} else if (typeObject instanceof ClassyJS.Type.Interface) {
+		} else if (typeObject instanceof Picket.Type.Interface) {
 			
 			instantiator.getTypeRegistry().registerInterface(typeObject);
 			
@@ -6037,11 +6037,11 @@ if (!Function.prototype.bind) {
 			
 			instantiator.getMemberRegistry().register(member, typeObject);
 			
-			if (member instanceof ClassyJS.Member.Method && member.isStatic()) {
+			if (member instanceof Picket.Member.Method && member.isStatic()) {
 				
 				staticMethods.push(member.getName());
 				
-			} else if (member instanceof ClassyJS.Member.Constant) {
+			} else if (member instanceof Picket.Member.Constant) {
 				
 				constants.push(member.getName());
 				
@@ -6049,7 +6049,7 @@ if (!Function.prototype.bind) {
 			
 		}
 		
-		if (typeObject instanceof ClassyJS.Type.Class) {
+		if (typeObject instanceof Picket.Type.Class) {
 			
 			for (var i in staticMethods) {
 				
@@ -6071,7 +6071,7 @@ if (!Function.prototype.bind) {
 				constructor[constants[i]] = (function(name){
 					return function(){
 						// Note that the '|| {}' below is due
-						// to a hack in ClassyJS.Member.Constant.
+						// to a hack in Picket.Member.Constant.
 						// It should go if possible.
 						return instantiator.getMemberRegistry().getConstant(
 							constructor,
@@ -6113,25 +6113,25 @@ if (!Function.prototype.bind) {
 	
 	var _typeCheckMembers = function(members, definition)
 	{
-		if (definition instanceof ClassyJS.Type.Class) {
+		if (definition instanceof Picket.Type.Class) {
 			if (typeof members != 'undefined') {
 				if (Object.prototype.toString.call(members) == '[object Array]') {
-					throw new ClassyJS.Main.Fatal(
+					throw new Picket.Main.Fatal(
 						'NON_OBJECT_CLASS_MEMBERS',
 						'Provided type: array'
 					);
 				}
 				if (typeof members != 'object') {
-					throw new ClassyJS.Main.Fatal(
+					throw new Picket.Main.Fatal(
 						'NON_OBJECT_CLASS_MEMBERS',
 						'Provided type: ' + typeof members
 					);
 				}
 			}
-		} else if (definition instanceof ClassyJS.Type.Interface) {
+		} else if (definition instanceof Picket.Type.Interface) {
 			if (typeof members != 'undefined') {
 				if (Object.prototype.toString.call(members) != '[object Array]') {
-					throw new ClassyJS.Main.Fatal(
+					throw new Picket.Main.Fatal(
 						'NON_ARRAY_INTERFACE_MEMBERS',
 						'Provided type: ' + typeof members
 					);
@@ -6151,9 +6151,9 @@ if (!Function.prototype.bind) {
 	{
 		var members = instantiator.getMemberRegistry().getMembers(classObject);
 		for (var i in members) {
-			if (members[i] instanceof ClassyJS.Member.Method && members[i].isStatic()) {
+			if (members[i] instanceof Picket.Member.Method && members[i].isStatic()) {
 				staticMethods.push(members[i].getName());
-			} else if (members[i] instanceof ClassyJS.Member.Constant) {
+			} else if (members[i] instanceof Picket.Member.Constant) {
 				constants.push(members[i].getName());
 			}
 		}
@@ -6161,16 +6161,16 @@ if (!Function.prototype.bind) {
 	
 })();
 
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	var messages = {
 		NON_OBJECT_CLASS_MEMBERS:		'Provided class members must be defined as object',
 		NON_ARRAY_INTERFACE_MEMBERS:	'Provided interface members must be defined as array'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Main.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Main.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Main = window.ClassyJS.Main || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Main = window.Picket.Main || {}
 );

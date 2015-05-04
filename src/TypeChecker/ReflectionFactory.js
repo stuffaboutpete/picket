@@ -1,4 +1,4 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.ReflectionFactory = function(){};
 	
@@ -8,6 +8,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.TypeChecker = window.ClassyJS.TypeChecker || {}
+	window.Picket = window.Picket || {},
+	window.Picket.TypeChecker = window.Picket.TypeChecker || {}
 );

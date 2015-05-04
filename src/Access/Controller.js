@@ -1,8 +1,8 @@
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	_.Controller = function(typeRegistry)
 	{
-		if (!(typeRegistry instanceof ClassyJS.Registry.Type)) {
+		if (!(typeRegistry instanceof Picket.Registry.Type)) {
 			throw new _.Controller.Fatal(
 				'NO_TYPE_REGISTRY_PROVIDED',
 				'Provided type: ' + typeof typeRegistry
@@ -51,6 +51,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Access = window.ClassyJS.Access || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Access = window.Picket.Access || {}
 );

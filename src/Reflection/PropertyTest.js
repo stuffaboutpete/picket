@@ -12,26 +12,26 @@ describe('Reflection.Property', function(){
 	var reflectionType;
 	
 	beforeEach(function(){
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		namespaceManager = mocker.getMock(ClassyJS.NamespaceManager);
-		typeRegistry = mocker.getMock(ClassyJS.Registry.Type);
-		memberRegistry = mocker.getMock(ClassyJS.Registry.Member);
-		classObject = mocker.getMock(ClassyJS.Type.Class);
-		propertyObject = mocker.getMock(ClassyJS.Member.Property);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		namespaceManager = mocker.getMock(Picket.NamespaceManager);
+		typeRegistry = mocker.getMock(Picket.Registry.Type);
+		memberRegistry = mocker.getMock(Picket.Registry.Member);
+		classObject = mocker.getMock(Picket.Type.Class);
+		propertyObject = mocker.getMock(Picket.Member.Property);
 		classConstructor = function(){};
 		spyOn(namespaceManager, 'getNamespaceObject').and.returnValue(classConstructor);
 		spyOn(typeRegistry, 'getClass').and.returnValue(classObject);
-		spyOn(ClassyJS._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
-		spyOn(ClassyJS._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
-		spyOn(ClassyJS._instantiator, 'getNamespaceManager').and.returnValue(namespaceManager);
+		spyOn(Picket._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
+		spyOn(Picket._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		spyOn(Picket._instantiator, 'getNamespaceManager').and.returnValue(namespaceManager);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('instantiation with a string class looks up namespace and gets class object', function(){
@@ -63,7 +63,7 @@ describe('Reflection.Property', function(){
 	});
 	
 	it('throws error if type registry indicates class does not exist', function(){
-		var expectedFatal = new ClassyJS.Reflection.Property.Fatal('CLASS_DOES_NOT_EXIST');
+		var expectedFatal = new Picket.Reflection.Property.Fatal('CLASS_DOES_NOT_EXIST');
 		spyOn(typeRegistry, 'classExists').and.returnValue(false);
 		expect(function(){
 			new Reflection.Property('NonClass', 'propertyName');
@@ -71,7 +71,7 @@ describe('Reflection.Property', function(){
 	});
 	
 	it('throws error if non string, object or function is provided', function(){
-		var expectedFatal = new ClassyJS.Reflection.Property.Fatal(
+		var expectedFatal = new Picket.Reflection.Property.Fatal(
 			'INVALID_IDENTIFIER_PROVIDED',
 			'Provided type: number'
 		);
@@ -80,7 +80,7 @@ describe('Reflection.Property', function(){
 	});
 	
 	it('throws error if non-string property name is provided', function(){
-		var expectedFatal = new ClassyJS.Reflection.Property.Fatal(
+		var expectedFatal = new Picket.Reflection.Property.Fatal(
 			'NON_STRING_PROPERTY_NAME_PROVIDED',
 			'Provided type: number'
 		);
@@ -89,7 +89,7 @@ describe('Reflection.Property', function(){
 	});
 	
 	it('throws error if no property of given name is found', function(){
-		var expectedFatal = new ClassyJS.Reflection.Property.Fatal(
+		var expectedFatal = new Picket.Reflection.Property.Fatal(
 			'PROPERTY_DOES_NOT_EXIST',
 			'Property name: propertyName'
 		);
@@ -173,7 +173,7 @@ describe('Reflection.Property', function(){
 	});
 	
 	it('throws error if default value is requested when it does not exist', function(){
-		var expectedFatal = new ClassyJS.Reflection.Property.Fatal(
+		var expectedFatal = new Picket.Reflection.Property.Fatal(
 			'UNDEFINED_DEFAULT_VALUE_REQUESTED'
 		);
 		spyOn(typeRegistry, 'classExists').and.returnValue(true);

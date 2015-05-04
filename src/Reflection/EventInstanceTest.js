@@ -14,23 +14,23 @@ describe('Reflection.EventInstance', function(){
 	beforeEach(function(){
 		define('class My.Class');
 		objectInstance = new My.Class();
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		typeRegistry = mocker.getMock(ClassyJS.Registry.Type);
-		memberRegistry = mocker.getMock(ClassyJS.Registry.Member);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		typeRegistry = mocker.getMock(Picket.Registry.Type);
+		memberRegistry = mocker.getMock(Picket.Registry.Member);
 		reflectionEvent = mocker.getMock(Reflection.Event);
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		eventObject = mocker.getMock(ClassyJS.Member.Event);
-		eventObject2 = mocker.getMock(ClassyJS.Member.Event);
-		classObject = mocker.getMock(ClassyJS.Type.Class);
-		spyOn(ClassyJS._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
-		spyOn(ClassyJS._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		eventObject = mocker.getMock(Picket.Member.Event);
+		eventObject2 = mocker.getMock(Picket.Member.Event);
+		classObject = mocker.getMock(Picket.Type.Class);
+		spyOn(Picket._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
+		spyOn(Picket._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('can be instantiated with an object instance and event name', function(){
@@ -50,7 +50,7 @@ describe('Reflection.EventInstance', function(){
 	});
 	
 	it('throws error if event does not exist', function(){
-		var expectedFatal = new ClassyJS.Reflection.EventInstance.Fatal(
+		var expectedFatal = new Picket.Reflection.EventInstance.Fatal(
 			'EVENT_DOES_NOT_EXIST',
 			'Event name: myEvent'
 		);

@@ -10,14 +10,14 @@ describe('Member.Property', function(){
 	var accessInstance;
 	
 	beforeEach(function(){
-		definition = new ClassyJS.Member.Property.Definition('public myProperty (string)');
-		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
-		accessController = new ClassyJS.Access.Controller(
-			new ClassyJS.Registry.Type(
-				new ClassyJS.NamespaceManager()
+		definition = new Picket.Member.Property.Definition('public myProperty (string)');
+		typeChecker = new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory());
+		accessController = new Picket.Access.Controller(
+			new Picket.Registry.Type(
+				new Picket.NamespaceManager()
 			)
 		);
-		property = new ClassyJS.Member.Property(
+		property = new Picket.Member.Property(
 			definition,
 			false,
 			'Default value',
@@ -29,23 +29,23 @@ describe('Member.Property', function(){
 	});
 	
 	it('can be instantiated', function(){
-		var property = new ClassyJS.Member.Property(
+		var property = new Picket.Member.Property(
 			definition,
 			false,
 			null,
 			typeChecker,
 			accessController
 		);
-		expect(property instanceof ClassyJS.Member.Property).toBe(true);
+		expect(property instanceof Picket.Member.Property).toBe(true);
 	});
 	
 	it('throws error if no definition is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'NO_DEFINITION_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Property(
+			new Picket.Member.Property(
 				undefined,
 				false,
 				null,
@@ -56,21 +56,21 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if it is indicated that this was defined in an interface', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'PROPERTY_CANNOT_BE_DEFINED_BY_INTERFACE'
 		);
 		expect(function(){
-			new ClassyJS.Member.Property(definition, true);
+			new Picket.Member.Property(definition, true);
 		}).toThrow(expectedFatal);
 	});
 	
 	it('throws error if no type checker is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'NO_TYPE_CHECKER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Property(
+			new Picket.Member.Property(
 				definition,
 				false,
 				null,
@@ -81,12 +81,12 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if no access controller is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'NO_ACCESS_CONTROLLER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Property(
+			new Picket.Member.Property(
 				definition,
 				false,
 				null,
@@ -96,14 +96,14 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if default value is not of declared type', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'INVALID_DEFAULT_VALUE',
 			'Provided type: string; Expected type: number'
 		);
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('number');
 		spyOn(typeChecker, 'isValidType').and.returnValue(false);
 		expect(function(){
-			new ClassyJS.Member.Property(
+			new Picket.Member.Property(
 				definition,
 				false,
 				'Example',
@@ -115,10 +115,10 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if default value is undefined', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal('NO_DEFAULT_VALUE_PROVIDED');
+		var expectedFatal = new Picket.Member.Property.Fatal('NO_DEFAULT_VALUE_PROVIDED');
 		spyOn(typeChecker, 'isValidType');
 		expect(function(){
-			new ClassyJS.Member.Property(
+			new Picket.Member.Property(
 				definition,
 				false,
 				undefined,
@@ -131,7 +131,7 @@ describe('Member.Property', function(){
 	
 	it('does not throw error if default value is null', function(){
 		spyOn(typeChecker, 'isValidType');
-		new ClassyJS.Member.Property(
+		new Picket.Member.Property(
 			definition,
 			false,
 			null,
@@ -162,7 +162,7 @@ describe('Member.Property', function(){
 		// Note that this is disabled due to
 		// a hack. Read the comment inside
 		// the related method.
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'NON_OBJECT_TARGET_INSTANCE_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -172,7 +172,7 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if access controller does not permit access to default value', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'ACCESS_NOT_ALLOWED',
 			'Access type: protected'
 		);
@@ -185,8 +185,8 @@ describe('Member.Property', function(){
 	
 	it('returns copy of array if provided as default value', function(){
 		var defaultArray = [];
-		var property = new ClassyJS.Member.Property(
-			new ClassyJS.Member.Property.Definition('public myProperty (array)'),
+		var property = new Picket.Member.Property(
+			new Picket.Member.Property.Definition('public myProperty (array)'),
 			false,
 			defaultArray,
 			typeChecker,
@@ -199,8 +199,8 @@ describe('Member.Property', function(){
 	it('returns array copy containing original objects if provided as default value', function(){
 		var defaultContent = {};
 		var defaultArray = [defaultContent];
-		var property = new ClassyJS.Member.Property(
-			new ClassyJS.Member.Property.Definition('public myProperty (array)'),
+		var property = new Picket.Member.Property(
+			new Picket.Member.Property.Definition('public myProperty (array)'),
 			false,
 			defaultArray,
 			typeChecker,
@@ -224,7 +224,7 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if value is set with non-object target instance', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'NON_OBJECT_TARGET_INSTANCE_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -242,7 +242,7 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if access controller does not permit access whilst setting value', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'ACCESS_NOT_ALLOWED',
 			'Access type: private'
 		);
@@ -256,7 +256,7 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if type checker does not allow type whilst setting value', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'INVALID_TYPE',
 			'Allowed type: number; Provided type: object'
 		);
@@ -284,7 +284,7 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if get value is requested with non-object target instance', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'NON_OBJECT_TARGET_INSTANCE_PROVIDED',
 			'Provided type: function'
 		);
@@ -302,7 +302,7 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if access controller does not permit access to getting value', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'ACCESS_NOT_ALLOWED',
 			'Access type: protected'
 		);
@@ -316,7 +316,7 @@ describe('Member.Property', function(){
 	});
 	
 	it('throws error if type checker does not allow type whilst getting value', function(){
-		var expectedFatal = new ClassyJS.Member.Property.Fatal(
+		var expectedFatal = new Picket.Member.Property.Fatal(
 			'INVALID_TYPE',
 			'Allowed type: [number]; Provided type: number'
 		);

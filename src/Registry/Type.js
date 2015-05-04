@@ -1,8 +1,8 @@
-;(function(ClassyJS, _){
+;(function(Picket, _){
 	
 	_.Type = function(namespaceManager)
 	{
-		if (!(namespaceManager instanceof ClassyJS.NamespaceManager)) {
+		if (!(namespaceManager instanceof Picket.NamespaceManager)) {
 			throw new _.Type.Fatal(
 				'NON_NAMESPACE_MANAGER_PROVIDED',
 				'Provided type: ' + typeof namespaceManager
@@ -17,7 +17,7 @@
 	
 	_.Type.prototype.registerClass = function(classObject, classConstructor)
 	{
-		if (!(classObject instanceof ClassyJS.Type.Class)) {
+		if (!(classObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_OBJECT_PROVIDED',
 				'Provided type: ' + typeof classObject
@@ -48,7 +48,7 @@
 				'Provided type: ' + typeof parentClassName
 			);
 		}
-		if (!(childClassObject instanceof ClassyJS.Type.Class)) {
+		if (!(childClassObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_OBJECT_PROVIDED',
 				'Provided type: ' + typeof childClassObject
@@ -111,7 +111,7 @@
 				'Provided type: ' + typeof interfaceName
 			);
 		}
-		if (!(classObject instanceof ClassyJS.Type.Class)) {
+		if (!(classObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_OBJECT_PROVIDED',
 				'Provided type: ' + typeof classObject
@@ -183,7 +183,7 @@
 	
 	_.Type.prototype.getInterfacesFromClass = function(classObject)
 	{
-		if (!(classObject instanceof ClassyJS.Type.Class)) {
+		if (!(classObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_OBJECT_PROVIDED',
 				'Provided type: ' + typeof classObject
@@ -225,13 +225,13 @@
 	{
 		var originalClassObject = classObject;
 		var returnType = (typeof classObject == 'object')
-			? ((classObject instanceof ClassyJS.Type.Class) ? 'classObject' : 'instance')
+			? ((classObject instanceof Picket.Type.Class) ? 'classObject' : 'instance')
 			: 'constructor';
-		if (typeof classObject == 'object' && !(classObject instanceof ClassyJS.Type.Class)) {
+		if (typeof classObject == 'object' && !(classObject instanceof Picket.Type.Class)) {
 			classObject = classObject.constructor;
 		}
 		if (typeof classObject == 'function') classObject = this.getClass(classObject);
-		if (!(classObject instanceof ClassyJS.Type.Class)) {
+		if (!(classObject instanceof Picket.Type.Class)) {
 			throw new _.Type.Fatal(
 				'NON_CLASS_CONSTRUCTOR_OR_INSTANCE_PROVIDED',
 				'Provided type: ' + typeof originalClassObject
@@ -343,6 +343,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Registry = window.ClassyJS.Registry || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Registry = window.Picket.Registry || {}
 );

@@ -1,8 +1,8 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Constant = function(definition, isFromInterface, value, typeChecker, accessController)
 	{
-		if (!(definition instanceof ClassyJS.Member.Constant.Definition)) {
+		if (!(definition instanceof Picket.Member.Constant.Definition)) {
 			throw new _.Constant.Fatal(
 				'NO_DEFINITION_PROVIDED',
 				'Provided type: ' + typeof definition
@@ -11,13 +11,13 @@
 		if (isFromInterface !== false) {
 			throw new _.Constant.Fatal('IS_FROM_INTERFACE');
 		}
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Constant.Fatal(
 				'NO_TYPE_CHECKER_PROVIDED',
 				'Provided type: ' + typeof typeChecker
 			);
 		}
-		if (!(accessController instanceof ClassyJS.Access.Controller)) {
+		if (!(accessController instanceof Picket.Access.Controller)) {
 			throw new _.Constant.Fatal(
 				'NO_ACCESS_CONTROLLER_PROVIDED',
 				'Provided type: ' + typeof accessController
@@ -117,6 +117,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );

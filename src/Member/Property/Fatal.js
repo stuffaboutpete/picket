@@ -1,12 +1,12 @@
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	var messages = {
-		NO_DEFINITION_PROVIDED: 'Instance of ClassyJS.Member.Property.Definition must be provided',
+		NO_DEFINITION_PROVIDED: 'Instance of Picket.Member.Property.Definition must be provided',
 		PROPERTY_CANNOT_BE_DEFINED_BY_INTERFACE:
 			'Constructor argument indicated that this property was defined ' +
 			'within an interface. Properties cannot be defined within interfaces',
-		NO_TYPE_CHECKER_PROVIDED: 'Instance of ClassyJS.TypeChecker must be provided',
-		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of ClassyJS.Access.Controller must be provided',
+		NO_TYPE_CHECKER_PROVIDED: 'Instance of Picket.TypeChecker must be provided',
+		NO_ACCESS_CONTROLLER_PROVIDED: 'Instance of Picket.Access.Controller must be provided',
 		INVALID_DEFAULT_VALUE:
 			'Value provided as default does not match type specified in the property signature',
 		NO_DEFAULT_VALUE_PROVIDED:
@@ -20,10 +20,10 @@
 		INVALID_TYPE: 'Property cannot be set to the provided type'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Property.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Property.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Property = window.ClassyJS.Member.Property || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Property = window.Picket.Member.Property || {}
 );

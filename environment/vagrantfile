@@ -5,11 +5,11 @@ Vagrant.configure("2") do |config|
 	config.vm.network :private_network, ip: "192.168.82.71"
 	config.vm.network :public_network, bridge: "en0: Wi-Fi (AirPort)"
 	
-	config.vm.synced_folder "../", "/classyjs"
+	config.vm.synced_folder "../", "/picket"
 	
 	config.vm.provider :virtualbox do |vb|
 		vb.customize ["modifyvm", :id, "--memory", 1024]
-		vb.name = "ClassyJS"
+		vb.name = "Picket"
 	end
 	
 	config.vm.provision :puppet do |puppet|

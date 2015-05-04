@@ -20,43 +20,43 @@ describe('Registry.Member', function(){
 	var accessInstance;
 	
 	beforeEach(function(){
-		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
-		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
-		accessController = new ClassyJS.Access.Controller(typeRegistry);
-		registry = new ClassyJS.Registry.Member(typeRegistry, typeChecker);
-		classObject = new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition('class MyClass'),
-			new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-			new ClassyJS.Registry.Member(
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+		typeRegistry = new Picket.Registry.Type(new Picket.NamespaceManager());
+		typeChecker = new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory());
+		accessController = new Picket.Access.Controller(typeRegistry);
+		registry = new Picket.Registry.Member(typeRegistry, typeChecker);
+		classObject = new Picket.Type.Class(
+			new Picket.Type.Class.Definition('class MyClass'),
+			new Picket.Registry.Type(new Picket.NamespaceManager()),
+			new Picket.Registry.Member(
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 			),
-			new ClassyJS.NamespaceManager()
+			new Picket.NamespaceManager()
 		);
-		interfaceObject = new ClassyJS.Type.Interface();
-		propertyObject = new ClassyJS.Member.Property(
-			new ClassyJS.Member.Property.Definition('public myProperty (string)'),
+		interfaceObject = new Picket.Type.Interface();
+		propertyObject = new Picket.Member.Property(
+			new Picket.Member.Property.Definition('public myProperty (string)'),
 			false,
 			null,
 			typeChecker,
 			accessController
 		);
-		methodObject = new ClassyJS.Member.Method(
-			new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+		methodObject = new Picket.Member.Method(
+			new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 			false,
 			function(){},
 			typeChecker,
 			accessController
 		);
-		eventObject = new ClassyJS.Member.Event(
-			new ClassyJS.Member.Event.Definition('public event myEvent ()'),
+		eventObject = new Picket.Member.Event(
+			new Picket.Member.Event.Definition('public event myEvent ()'),
 			false,
 			undefined,
 			typeChecker,
 			accessController
 		);
-		constantObject = new ClassyJS.Member.Constant(
-			new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT'),
+		constantObject = new Picket.Member.Constant(
+			new Picket.Member.Constant.Definition('public constant MY_CONSTANT'),
 			false,
 			undefined,
 			typeChecker,
@@ -68,27 +68,27 @@ describe('Registry.Member', function(){
 	describe('instantiation', function(){
 		
 		it('can be done', function(){
-			var registry = new ClassyJS.Registry.Member(typeRegistry, typeChecker);
-			expect(registry instanceof ClassyJS.Registry.Member).toBe(true);
+			var registry = new Picket.Registry.Member(typeRegistry, typeChecker);
+			expect(registry instanceof Picket.Registry.Member).toBe(true);
 		});
 		
 		it('throws error if no type registry is supplied', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'TYPE_REGISTRY_REQUIRED',
 				'Provided type: undefined'
 			);
 			expect(function(){
-				new ClassyJS.Registry.Member(undefined, typeChecker);
+				new Picket.Registry.Member(undefined, typeChecker);
 			}).toThrow(expectedFatal);
 		});
 		
 		it('throws error if no type checker is supplied', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'TYPE_CHECKER_REQUIRED',
 				'Provided type: undefined'
 			);
 			expect(function(){
-				new ClassyJS.Registry.Member(typeRegistry);
+				new Picket.Registry.Member(typeRegistry);
 			}).toThrow(expectedFatal);
 		});
 		
@@ -109,7 +109,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('throws error if property is registered against non class or interface', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'TARGET_NOT_CLASS_OR_INTERFACE',
 				'Provided type: object'
 			);
@@ -127,7 +127,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('throws error if method is registered against non class or interface', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'TARGET_NOT_CLASS_OR_INTERFACE',
 				'Provided type: object'
 			);
@@ -145,7 +145,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('throws error if event is registered against non class or interface', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'TARGET_NOT_CLASS_OR_INTERFACE',
 				'Provided type: object'
 			);
@@ -165,37 +165,37 @@ describe('Registry.Member', function(){
 		
 		beforeEach(function(){
 			spyOn(propertyObject, 'getName').and.returnValue('myProperty');
-			methodObject2 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject2 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
 				accessController
 			);
-			methodObject3 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject3 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
 				accessController
 			);
-			parentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			parentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			grandParentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			grandParentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
 		});
 		
@@ -213,7 +213,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if non class or interface object is supplied', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'TARGET_NOT_CLASS_OR_INTERFACE',
 				'Provided type: object'
 			);
@@ -340,8 +340,8 @@ describe('Registry.Member', function(){
 		beforeEach(function(){
 			classInstance = {};
 			classInstance2 = {};
-			propertyObject2 = new ClassyJS.Member.Property(
-				new ClassyJS.Member.Property.Definition('public myProperty (string)'),
+			propertyObject2 = new Picket.Member.Property(
+				new Picket.Member.Property.Definition('public myProperty (string)'),
 				false,
 				null,
 				typeChecker,
@@ -359,7 +359,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if two with same name are registered against same class', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'PROPERTY_ALREADY_REGISTERED',
 				'Property name: myProperty'
 			);
@@ -456,8 +456,8 @@ describe('Registry.Member', function(){
 				return instance;
 			});
 			registry.register(methodObject, classObject);
-			methodObject2 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject2 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -476,7 +476,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if method with same name, arg types is registered', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'METHOD_ALREADY_REGISTERED',
 				'Method name: myMethod; Argument types: string, number; Is static: false'
 			);
@@ -488,7 +488,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if non class instance is supplied when calling', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'NON_CLASS_INSTANCE_OR_CONSTRUCTOR_PROVIDED',
 				'Provided type: string'
 			);
@@ -498,7 +498,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if non string method name is supplied when calling', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'NON_STRING_METHOD_NAME_PROVIDED',
 				'Provided type: number'
 			);
@@ -508,7 +508,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if non array method arguments are supplied when calling', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'NON_ARRAY_METHOD_ARGUMENTS_PROVIDED',
 				'Provided type: object'
 			);
@@ -605,13 +605,13 @@ describe('Registry.Member', function(){
 		});
 		
 		it('will not call static method against class instance', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'METHOD_NOT_REGISTERED',
 				'Provided name: myMethod'
 			);
-			var registry = new ClassyJS.Registry.Member(typeRegistry, typeChecker);
-			var staticMethodObject = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			var registry = new Picket.Registry.Member(typeRegistry, typeChecker);
+			var staticMethodObject = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -639,15 +639,15 @@ describe('Registry.Member', function(){
 		var methodObject2;
 		
 		beforeEach(function(){
-			methodObject = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
 				accessController
 			);
-			methodObject2 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject2 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -712,13 +712,13 @@ describe('Registry.Member', function(){
 		});
 		
 		it('will call static method against class constructor', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'METHOD_NOT_REGISTERED',
 				'Provided name: myMethod'
 			);
-			var registry = new ClassyJS.Registry.Member(typeRegistry, typeChecker);
-			var nonStaticMethodObject = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			var registry = new Picket.Registry.Member(typeRegistry, typeChecker);
+			var nonStaticMethodObject = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -750,8 +750,8 @@ describe('Registry.Member', function(){
 		
 		beforeEach(function(){
 			classInstance = {};
-			eventObject2 = new ClassyJS.Member.Event(
-				new ClassyJS.Member.Event.Definition('public event myEvent ()'),
+			eventObject2 = new Picket.Member.Event(
+				new Picket.Member.Event.Definition('public event myEvent ()'),
 				false,
 				undefined,
 				typeChecker,
@@ -759,15 +759,15 @@ describe('Registry.Member', function(){
 			);
 			targetObject = {};
 			targetObject2 = {};
-			targetMethodObject = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			targetMethodObject = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
 				accessController
 			);
-			targetMethodObject2 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			targetMethodObject2 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -790,7 +790,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if event with same name is already registered against class', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'EVENT_ALREADY_REGISTERED',
 				'Event name: myEvent'
 			);
@@ -812,7 +812,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('throws error if event object does not permit bind', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal('EVENT_BIND_NOT_PERMITTED');
+			var expectedFatal = new Picket.Registry.Member.Fatal('EVENT_BIND_NOT_PERMITTED');
 			spyOn(eventObject, 'requestBind').and.returnValue(false);
 			expect(function(){ registry.bindEvent(
 				classInstance,
@@ -864,13 +864,13 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if method argument types do not match event', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'EVENT_TARGET_METHOD_NOT_REGISTERED',
 				'Event name: myEvent; Method name: differentArgsMethod'
 			);
 			var targetObject3 = {};
-			var targetMethodObject3 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			var targetMethodObject3 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -897,8 +897,8 @@ describe('Registry.Member', function(){
 		
 		beforeEach(function(){
 			classConstructor = function(){};
-			constantObject2 = new ClassyJS.Member.Constant(
-				new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT'),
+			constantObject2 = new Picket.Member.Constant(
+				new Picket.Member.Constant.Definition('public constant MY_CONSTANT'),
 				false,
 				undefined,
 				typeChecker,
@@ -911,7 +911,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if two with same name are registered against same class', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'CONSTANT_ALREADY_REGISTERED',
 				'Constant name: MY_CONSTANT'
 			);
@@ -921,7 +921,7 @@ describe('Registry.Member', function(){
 		});
 		
 		it('triggers error if retrieved by providing class instance', function(){
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'CONSTANT_RETRIEVED_AGAINST_CLASS_INSTANCE'
 			);
 			expect(function(){
@@ -960,26 +960,26 @@ describe('Registry.Member', function(){
 			childClassInstance = {};
 			parentClassInstance = {};
 			grandParentClassInstance = {};
-			parentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			parentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			grandParentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			grandParentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			propertyObject2 = new ClassyJS.Member.Property(
-				new ClassyJS.Member.Property.Definition('public myProperty (string)'),
+			propertyObject2 = new Picket.Member.Property(
+				new Picket.Member.Property.Definition('public myProperty (string)'),
 				false,
 				null,
 				typeChecker,
@@ -1019,7 +1019,7 @@ describe('Registry.Member', function(){
 			spyOn(typeRegistry, 'hasParent').and.callFake(function(classInstance){
 				return (classInstance === childClassInstance) ? true : false;
 			});
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'PROPERTY_NOT_REGISTERED',
 				'Provided name: myProperty'
 			);
@@ -1112,26 +1112,26 @@ describe('Registry.Member', function(){
 			childClassInstance = {};
 			parentClassInstance = {};
 			grandParentClassInstance = {};
-			parentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			parentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			grandParentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			grandParentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			methodObject2 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject2 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -1173,7 +1173,7 @@ describe('Registry.Member', function(){
 			spyOn(typeRegistry, 'hasParent').and.callFake(function(classInstance){
 				return (classInstance === childClassInstance) ? true : false;
 			});
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'METHOD_NOT_REGISTERED',
 				'Provided name: myMethod'
 			);
@@ -1229,8 +1229,8 @@ describe('Registry.Member', function(){
 		});
 		
 		it('retains child as call target when calling parent method', function(){
-			methodObject = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -1252,8 +1252,8 @@ describe('Registry.Member', function(){
 		});
 		
 		it('passes parent object as scope variable when calling child method', function(){
-			methodObject = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -1294,26 +1294,26 @@ describe('Registry.Member', function(){
 			childClassConstructor = function(){};
 			parentClassConstructor = function(){};
 			grandParentClassConstructor = function(){};
-			parentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			parentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			grandParentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			grandParentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			methodObject2 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			methodObject2 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -1354,7 +1354,7 @@ describe('Registry.Member', function(){
 			spyOn(typeRegistry, 'hasParent').and.callFake(function(classConstructor){
 				return (classConstructor === childClassConstructor) ? true : false;
 			});
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'METHOD_NOT_REGISTERED',
 				'Provided name: myMethod'
 			);
@@ -1427,41 +1427,41 @@ describe('Registry.Member', function(){
 			childClassInstance = {};
 			parentClassInstance = {};
 			grandParentClassInstance = {};
-			parentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			parentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			grandParentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			grandParentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			eventObject2 = new ClassyJS.Member.Event(
-				new ClassyJS.Member.Event.Definition('public event myEvent ()'),
+			eventObject2 = new Picket.Member.Event(
+				new Picket.Member.Event.Definition('public event myEvent ()'),
 				false,
 				undefined,
 				typeChecker,
 				accessController
 			);
 			targetObject = {};
-			targetMethodObject = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			targetMethodObject = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
 				accessController
 			);
-			targetMethodObject2 = new ClassyJS.Member.Method(
-				new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+			targetMethodObject2 = new Picket.Member.Method(
+				new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 				false,
 				function(){},
 				typeChecker,
@@ -1509,7 +1509,7 @@ describe('Registry.Member', function(){
 			spyOn(typeRegistry, 'hasParent').and.callFake(function(classInstance){
 				return (classInstance === childClassInstance) ? true : false;
 			});
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'EVENT_NOT_REGISTERED',
 				'Provided name: myEvent'
 			);
@@ -1580,26 +1580,26 @@ describe('Registry.Member', function(){
 			childClassConstructor = function(){};
 			parentClassConstructor = function(){};
 			grandParentClassConstructor = function(){};
-			parentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			parentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			grandParentClassObject = new ClassyJS.Type.Class(
-				new ClassyJS.Type.Class.Definition('class MyClass'),
-				new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-				new ClassyJS.Registry.Member(
-					new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager()),
-					new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			grandParentClassObject = new Picket.Type.Class(
+				new Picket.Type.Class.Definition('class MyClass'),
+				new Picket.Registry.Type(new Picket.NamespaceManager()),
+				new Picket.Registry.Member(
+					new Picket.Registry.Type(new Picket.NamespaceManager()),
+					new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 				),
-				new ClassyJS.NamespaceManager()
+				new Picket.NamespaceManager()
 			);
-			constantObject2 = new ClassyJS.Member.Constant(
-				new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT'),
+			constantObject2 = new Picket.Member.Constant(
+				new Picket.Member.Constant.Definition('public constant MY_CONSTANT'),
 				false,
 				undefined,
 				typeChecker,
@@ -1636,7 +1636,7 @@ describe('Registry.Member', function(){
 			spyOn(typeRegistry, 'hasParent').and.callFake(function(classConstructor){
 				return (classConstructor === childClassConstructor) ? true : false;
 			});
-			var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+			var expectedFatal = new Picket.Registry.Member.Fatal(
 				'CONSTANT_NOT_REGISTERED',
 				'Provided name: MY_CONSTANT'
 			);

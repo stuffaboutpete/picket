@@ -9,14 +9,14 @@ describe('Member.Method', function(){
 	var accessInstance;
 	
 	beforeEach(function(){
-		definition = new ClassyJS.Member.Method.Definition('public myMethod () -> undefined');
-		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
-		accessController = new ClassyJS.Access.Controller(
-			new ClassyJS.Registry.Type(
-				new ClassyJS.NamespaceManager()
+		definition = new Picket.Member.Method.Definition('public myMethod () -> undefined');
+		typeChecker = new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory());
+		accessController = new Picket.Access.Controller(
+			new Picket.Registry.Type(
+				new Picket.NamespaceManager()
 			)
 		);
-		method = new ClassyJS.Member.Method(
+		method = new Picket.Member.Method(
 			definition,
 			false,
 			function(){},
@@ -29,23 +29,23 @@ describe('Member.Method', function(){
 	});
 	
 	it('can be instantiated', function(){
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			function(){},
 			typeChecker,
 			accessController
 		);
-		expect(method instanceof ClassyJS.Member.Method).toBe(true);
+		expect(method instanceof Picket.Member.Method).toBe(true);
 	});
 	
 	it('throws error if no definition is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NO_DEFINITION_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Method(
+			new Picket.Member.Method(
 				undefined,
 				false,
 				undefined,
@@ -56,12 +56,12 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if no type checker is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NO_TYPE_CHECKER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Method(
+			new Picket.Member.Method(
 				definition,
 				false,
 				undefined,
@@ -72,12 +72,12 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if no access controller is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NO_ACCESS_CONTROLLER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Method(
+			new Picket.Member.Method(
 				definition,
 				false,
 				undefined,
@@ -87,9 +87,9 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if isFromInterface and value is not null, undefined or \'\'', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('UNEXPECTED_IMPLEMENTATION');
+		var expectedFatal = new Picket.Member.Method.Fatal('UNEXPECTED_IMPLEMENTATION');
 		expect(function(){
-			new ClassyJS.Member.Method(
+			new Picket.Member.Method(
 				definition,
 				true,
 				function(){},
@@ -100,10 +100,10 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if is abstract and value is not null, undefined or \'\'', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('UNEXPECTED_IMPLEMENTATION');
+		var expectedFatal = new Picket.Member.Method.Fatal('UNEXPECTED_IMPLEMENTATION');
 		spyOn(definition, 'isAbstract').and.returnValue(true);
 		expect(function(){
-			new ClassyJS.Member.Method(
+			new Picket.Member.Method(
 				definition,
 				false,
 				function(){},
@@ -114,13 +114,13 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if implementation is not function', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NON_FUNCTION_IMPLEMENTATION',
 			'Provided type: object'
 		);
 		spyOn(definition, 'isAbstract').and.returnValue(false);
 		expect(function(){
-			new ClassyJS.Member.Method(
+			new Picket.Member.Method(
 				definition,
 				false,
 				{},
@@ -131,14 +131,14 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if any argument type is undefined', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('UNDEFINED_ARGUMENT_TYPE');
+		var expectedFatal = new Picket.Member.Method.Fatal('UNDEFINED_ARGUMENT_TYPE');
 		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue([
 			'string',
 			'number',
 			'undefined'
 		]);
 		expect(function(){
-			new ClassyJS.Member.Method(
+			new Picket.Member.Method(
 				definition,
 				false,
 				function(){},
@@ -149,13 +149,13 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if any argument type is undefined', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('NULL_ARGUMENT_TYPE');
+		var expectedFatal = new Picket.Member.Method.Fatal('NULL_ARGUMENT_TYPE');
 		spyOn(
 			definition,
 			'getArgumentTypeIdentifiers'
 		).and.returnValue(['string', 'null', 'string']);
 		expect(function(){
-			new ClassyJS.Member.Method(
+			new Picket.Member.Method(
 				definition,
 				false,
 				function(){},
@@ -177,7 +177,7 @@ describe('Member.Method', function(){
 	
 	it('returns isAbstract from definition', function(){
 		spyOn(definition, 'isAbstract').and.returnValue(true);
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			undefined,
@@ -193,7 +193,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if called with non-object or function target', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NON_OBJECT_OR_CONSTRUCTOR_TARGET_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -203,7 +203,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if called with non-object or function local target', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NON_OBJECT_OR_CONSTRUCTOR_LOCAL_TARGET_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -213,7 +213,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if called with non-array arguments', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NON_ARRAY_ARGUMENTS_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -235,7 +235,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if access controller indicates method cannot be called', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
+		var expectedFatal = new Picket.Member.Method.Fatal('ACCESS_NOT_ALLOWED');
 		spyOn(accessController, 'canAccess').and.returnValue(false);
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('public');
 		expect(function(){
@@ -260,7 +260,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('checks return argument from method implementation', function(){
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			function(){ return 'Return'; },
@@ -285,11 +285,11 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if type checker indicates return value is not valid', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'INVALID_RETURN_VALUE',
 			'Returned type: string; Expected type: number'
 		);
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			function(){ return 'Return'; },
@@ -306,7 +306,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('returns implementation return argument', function(){
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			function(){ return 'Return'; },
@@ -325,7 +325,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('binds owner instance to this within method implementation', function(){
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			function(){ return this; },
@@ -344,7 +344,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('passes arguments to method implementation', function(){
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			function(arg1, arg2, arg3){ return [arg1, arg2, arg3]; },
@@ -363,9 +363,9 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if method is called whilst abstract', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('INTERACTION_WITH_ABSTRACT');
+		var expectedFatal = new Picket.Member.Method.Fatal('INTERACTION_WITH_ABSTRACT');
 		spyOn(definition, 'isAbstract').and.returnValue(true);
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			undefined,
@@ -378,8 +378,8 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if interface defined method is called', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('INTERACTION_WITH_ABSTRACT');
-		var method = new ClassyJS.Member.Method(
+		var expectedFatal = new Picket.Member.Method.Fatal('INTERACTION_WITH_ABSTRACT');
+		var method = new Picket.Member.Method(
 			definition,
 			true,
 			undefined,
@@ -396,7 +396,7 @@ describe('Member.Method', function(){
 			expect(example1).toBe('Value 1');
 			expect(example2).toBe('Value 2');
 		};
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			methodImplementation,
@@ -410,7 +410,7 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if scope variables are not object', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NON_OBJECT_SCOPE_VARIABLES',
 			'Provided type: string'
 		);
@@ -428,7 +428,7 @@ describe('Member.Method', function(){
 	it('allows interface method to have no argument types', function(){
 		spyOn(definition, 'hasArgumentTypes');
 		spyOn(definition, 'getArgumentTypeIdentifiers');
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			true,
 			undefined,
@@ -442,7 +442,7 @@ describe('Member.Method', function(){
 		spyOn(definition, 'isAbstract').and.returnValue(true);
 		spyOn(definition, 'hasArgumentTypes');
 		spyOn(definition, 'getArgumentTypeIdentifiers');
-		var method = new ClassyJS.Member.Method(
+		var method = new Picket.Member.Method(
 			definition,
 			false,
 			undefined,
@@ -453,13 +453,13 @@ describe('Member.Method', function(){
 	});
 	
 	it('throws error if non-interface and non-abstract does not declare argument types', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal(
+		var expectedFatal = new Picket.Member.Method.Fatal(
 			'NON_ABSTRACT_METHOD_DECLARED_WITH_NO_ARGUMENT_TYPES'
 		);
 		spyOn(definition, 'isAbstract').and.returnValue(false);
 		spyOn(definition, 'hasArgumentTypes').and.returnValue(false);
 		expect(function(){
-			var method = new ClassyJS.Member.Method(
+			var method = new Picket.Member.Method(
 				definition,
 				false,
 				function(){},

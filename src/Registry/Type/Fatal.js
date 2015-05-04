@@ -1,10 +1,10 @@
-;(function(ClassyJS, Registry, _){
+;(function(Picket, Registry, _){
 	
 	var messages = {
 		NON_NAMESPACE_MANAGER_PROVIDED:
-			'Instance of ClassyJS.NamespaceManager must be provided to the constructor',
+			'Instance of Picket.NamespaceManager must be provided to the constructor',
 		NON_CLASS_OBJECT_PROVIDED:
-			'Provided class object is not an instance of ClassyJS.Type.Class',
+			'Provided class object is not an instance of Picket.Type.Class',
 		NON_STRING_INTERFACE_NAME_PROVIDED: 'Provided interface name is not a string',
 		NON_CLASS_CONSTRUCTOR_PROVIDED: 'Provided class constructor is not a function',
 		INVALID_CLASS_LOOKUP: 'Class object was looked up using a non instance or constructor',
@@ -36,10 +36,10 @@
 		NON_STRING_PARENT_PROVIDED: 'The provided parent class name must be a string'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Registry.Type.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Registry.Type.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Registry = window.ClassyJS.Registry || {},
-	window.ClassyJS.Registry.Type = window.ClassyJS.Registry.Type || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Registry = window.Picket.Registry || {},
+	window.Picket.Registry.Type = window.Picket.Registry.Type || {}
 );

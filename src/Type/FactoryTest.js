@@ -13,29 +13,29 @@ describe('Type.Factory', function(){
 	var namespaceManager;
 	
 	beforeEach(function(){
-		definitionFactory = new ClassyJS.Type.DefinitionFactory(
-			new ClassyJS.Type.Class.Definition.Factory(),
-			new ClassyJS.Type.Interface.Definition.Factory()
+		definitionFactory = new Picket.Type.DefinitionFactory(
+			new Picket.Type.Class.Definition.Factory(),
+			new Picket.Type.Interface.Definition.Factory()
 		);
-		classFactory = new ClassyJS.Type.Class.Factory();
-		interfaceFactory = new ClassyJS.Type.Interface.Factory();
-		classDefinition = new ClassyJS.Type.Class.Definition('class MyClass');
-		interfaceDefinition = new ClassyJS.Type.Interface.Definition('interface IMyInterface');
-		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
-		memberRegistry = new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker(
-			new ClassyJS.TypeChecker.ReflectionFactory()
+		classFactory = new Picket.Type.Class.Factory();
+		interfaceFactory = new Picket.Type.Interface.Factory();
+		classDefinition = new Picket.Type.Class.Definition('class MyClass');
+		interfaceDefinition = new Picket.Type.Interface.Definition('interface IMyInterface');
+		typeRegistry = new Picket.Registry.Type(new Picket.NamespaceManager());
+		memberRegistry = new Picket.Registry.Member(typeRegistry, new Picket.TypeChecker(
+			new Picket.TypeChecker.ReflectionFactory()
 		));
-		namespaceManager = new ClassyJS.NamespaceManager();
-		classObject = new ClassyJS.Type.Class(
+		namespaceManager = new Picket.NamespaceManager();
+		classObject = new Picket.Type.Class(
 			classDefinition,
 			typeRegistry,
-			new ClassyJS.Registry.Member(typeRegistry, new ClassyJS.TypeChecker(
-				new ClassyJS.TypeChecker.ReflectionFactory()
+			new Picket.Registry.Member(typeRegistry, new Picket.TypeChecker(
+				new Picket.TypeChecker.ReflectionFactory()
 			)),
 			namespaceManager
 		);
-		interfaceObject = new ClassyJS.Type.Interface();
-		factory = new ClassyJS.Type.Factory(
+		interfaceObject = new Picket.Type.Interface();
+		factory = new Picket.Type.Factory(
 			definitionFactory,
 			classFactory,
 			interfaceFactory,
@@ -46,7 +46,7 @@ describe('Type.Factory', function(){
 	});
 	
 	it('can be instantiated', function(){
-		var factory = new ClassyJS.Type.Factory(
+		var factory = new Picket.Type.Factory(
 			definitionFactory,
 			classFactory,
 			interfaceFactory,
@@ -54,16 +54,16 @@ describe('Type.Factory', function(){
 			memberRegistry,
 			namespaceManager
 		);
-		expect(factory instanceof ClassyJS.Type.Factory).toBe(true);
+		expect(factory instanceof Picket.Type.Factory).toBe(true);
 	});
 	
 	it('throws error if no type definition factory is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NO_DEFINITION_FACTORY_PROVIDED',
 			'Provided type: object'
 		);
 		expect(function(){
-			new ClassyJS.Type.Factory(
+			new Picket.Type.Factory(
 				{},
 				classFactory,
 				interfaceFactory,
@@ -75,12 +75,12 @@ describe('Type.Factory', function(){
 	});
 	
 	it('throws error if no class factory is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NO_CLASS_FACTORY_PROVIDED',
 			'Provided type: string'
 		);
 		expect(function(){
-			new ClassyJS.Type.Factory(
+			new Picket.Type.Factory(
 				definitionFactory,
 				'string',
 				interfaceFactory,
@@ -92,12 +92,12 @@ describe('Type.Factory', function(){
 	});
 	
 	it('throws error if no interface factory is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NO_INTERFACE_FACTORY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.Factory(
+			new Picket.Type.Factory(
 				definitionFactory,
 				classFactory,
 				undefined,
@@ -109,12 +109,12 @@ describe('Type.Factory', function(){
 	});
 	
 	it('throws error if no type registry is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NO_TYPE_REGISTRY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.Factory(
+			new Picket.Type.Factory(
 				definitionFactory,
 				classFactory,
 				interfaceFactory,
@@ -126,12 +126,12 @@ describe('Type.Factory', function(){
 	});
 	
 	it('throws error if no member registry is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NO_MEMBER_REGISTRY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.Factory(
+			new Picket.Type.Factory(
 				definitionFactory,
 				classFactory,
 				interfaceFactory,
@@ -143,12 +143,12 @@ describe('Type.Factory', function(){
 	});
 	
 	it('throws error if no namespace manager is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NO_NAMESPACE_MANAGER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.Factory(
+			new Picket.Type.Factory(
 				definitionFactory,
 				classFactory,
 				interfaceFactory,
@@ -165,7 +165,7 @@ describe('Type.Factory', function(){
 	});
 	
 	it('throws error if build is called with non string argument', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NON_STRING_SIGNATURE_PROVIDED',
 			'Provided type: number'
 		);
@@ -173,7 +173,7 @@ describe('Type.Factory', function(){
 	});
 	
 	it('throws error if build is called with empty string argument', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal('EMPTY_STRING_SIGNATURE_PROVIDED');
+		var expectedFatal = new Picket.Type.Factory.Fatal('EMPTY_STRING_SIGNATURE_PROVIDED');
 		expect(function(){ factory.build('') }).toThrow(expectedFatal);
 	});
 	
@@ -218,7 +218,7 @@ describe('Type.Factory', function(){
 	});
 	
 	it('will throw error if definition factory returns non definition', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NON_DEFINITION_RETURNED_FROM_FACTORY',
 			'Returned type: object'
 		);
@@ -227,7 +227,7 @@ describe('Type.Factory', function(){
 	});
 	
 	it('will throw error if class factory returns non class', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NON_CLASS_RETURNED_FROM_FACTORY',
 			'Returned type: object'
 		);
@@ -237,7 +237,7 @@ describe('Type.Factory', function(){
 	});
 	
 	it('will throw error if interface factory returns non interface', function(){
-		var expectedFatal = new ClassyJS.Type.Factory.Fatal(
+		var expectedFatal = new Picket.Type.Factory.Fatal(
 			'NON_INTERFACE_RETURNED_FROM_FACTORY',
 			'Returned type: object'
 		);

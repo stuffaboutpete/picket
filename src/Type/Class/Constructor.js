@@ -1,4 +1,4 @@
-;(function(ClassyJS, Type, _){
+;(function(Picket, Type, _){
 	
 	_.Constructor = function(typeRegistry, memberRegistry, fullClassName)
 	{
@@ -155,7 +155,7 @@
 		var _get = function(name, object)
 		{
 			// Note that the '|| {}' below is due
-			// to a hack in ClassyJS.Member.Property.
+			// to a hack in Picket.Member.Property.
 			// It should go if possible.
 			return memberRegistry.getPropertyValue(
 				object,
@@ -178,9 +178,9 @@
 		{
 			var members = memberRegistry.getMembers(classObject);
 			for (var i in members) {
-				if (members[i] instanceof ClassyJS.Member.Property) {
+				if (members[i] instanceof Picket.Member.Property) {
 					properties.push(members[i]);
-				} else if (members[i] instanceof ClassyJS.Member.Method) {
+				} else if (members[i] instanceof Picket.Member.Method) {
 					methods.push(members[i]);
 				}
 			}
@@ -191,7 +191,7 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Type = window.ClassyJS.Type || {},
-	window.ClassyJS.Type.Class = window.ClassyJS.Type.Class || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Type = window.Picket.Type || {},
+	window.Picket.Type.Class = window.Picket.Type.Class || {}
 );

@@ -1,4 +1,4 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Type = function(identifier)
 	{
@@ -21,13 +21,13 @@
 	
 	_.Type.prototype.isValidValue = function(value)
 	{
-		return ClassyJS._instantiator.getTypeChecker().isValidType(value, this._identifier);
+		return Picket._instantiator.getTypeChecker().isValidType(value, this._identifier);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Type = _.Type;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

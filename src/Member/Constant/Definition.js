@@ -1,4 +1,4 @@
-;(function(ClassyJS, Member, _){
+;(function(Picket, Member, _){
 	
 	_.Definition = function(signature)
 	{
@@ -40,7 +40,7 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Constant = window.ClassyJS.Member.Constant || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Constant = window.Picket.Member.Constant || {}
 );

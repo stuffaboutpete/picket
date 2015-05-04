@@ -1,4 +1,4 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Factory = function(
 		memberDefinitionFactory,
@@ -10,43 +10,43 @@
 		accessController
 	)
 	{
-		if (!(memberDefinitionFactory instanceof ClassyJS.Member.DefinitionFactory)) {
+		if (!(memberDefinitionFactory instanceof Picket.Member.DefinitionFactory)) {
 			throw new _.Factory.Fatal(
 				'NO_DEFINITION_FACTORY_PROVIDED',
 				'Provided type: ' + typeof memberDefinitionFactory
 			);
 		}
-		if (!(propertyFactory instanceof ClassyJS.Member.Property.Factory)) {
+		if (!(propertyFactory instanceof Picket.Member.Property.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_PROPERTY_FACTORY_PROVIDED',
 				'Provided type: ' + typeof propertyFactory
 			);
 		}
-		if (!(methodFactory instanceof ClassyJS.Member.Method.Factory)) {
+		if (!(methodFactory instanceof Picket.Member.Method.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_METHOD_FACTORY_PROVIDED',
 				'Provided type: ' + typeof methodFactory
 			);
 		}
-		if (!(eventFactory instanceof ClassyJS.Member.Event.Factory)) {
+		if (!(eventFactory instanceof Picket.Member.Event.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_EVENT_FACTORY_PROVIDED',
 				'Provided type: ' + typeof eventFactory
 			);
 		}
-		if (!(constantFactory instanceof ClassyJS.Member.Constant.Factory)) {
+		if (!(constantFactory instanceof Picket.Member.Constant.Factory)) {
 			throw new _.Factory.Fatal(
 				'NO_CONSTANT_FACTORY_PROVIDED',
 				'Provided type: ' + typeof constantFactory
 			);
 		}
-		if (!(typeChecker instanceof ClassyJS.TypeChecker)) {
+		if (!(typeChecker instanceof Picket.TypeChecker)) {
 			throw new _.Factory.Fatal(
 				'NO_TYPE_CHECKER_PROVIDED',
 				'Provided type: ' + typeof typeChecker
 			);
 		}
-		if (!(accessController instanceof ClassyJS.Access.Controller)) {
+		if (!(accessController instanceof Picket.Access.Controller)) {
 			throw new _.Factory.Fatal(
 				'NO_ACCESS_CONTROLLER_PROVIDED',
 				'Provided type: ' + typeof accessController
@@ -87,7 +87,7 @@
 				this._typeChecker,
 				this._accessController
 			);
-			if (!(propertyObject instanceof ClassyJS.Member.Property)) {
+			if (!(propertyObject instanceof Picket.Member.Property)) {
 				throw new _.Factory.Fatal(
 					'NON_PROPERTY_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof propertyObject
@@ -102,7 +102,7 @@
 				this._typeChecker,
 				this._accessController
 			);
-			if (!(methodObject instanceof ClassyJS.Member.Method)) {
+			if (!(methodObject instanceof Picket.Member.Method)) {
 				throw new _.Factory.Fatal(
 					'NON_METHOD_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof methodObject
@@ -117,7 +117,7 @@
 				this._typeChecker,
 				this._accessController
 			);
-			if (!(eventObject instanceof ClassyJS.Member.Event)) {
+			if (!(eventObject instanceof Picket.Member.Event)) {
 				throw new _.Factory.Fatal(
 					'NON_EVENT_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof eventObject
@@ -132,7 +132,7 @@
 				this._typeChecker,
 				this._accessController
 			);
-			if (!(constantObject instanceof ClassyJS.Member.Constant)) {
+			if (!(constantObject instanceof Picket.Member.Constant)) {
 				throw new _.Factory.Fatal(
 					'NON_CONSTANT_RETURNED_FROM_FACTORY',
 					'Returned type: ' + typeof constantObject
@@ -148,6 +148,6 @@
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {}
 );

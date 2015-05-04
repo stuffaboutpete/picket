@@ -5,41 +5,41 @@ describe('Type.DefinitionFactory', function(){
 	var interfaceFactory;
 	
 	beforeEach(function(){
-		classFactory = new ClassyJS.Type.Class.Definition.Factory();
-		interfaceFactory = new ClassyJS.Type.Interface.Definition.Factory();
-		factory = new ClassyJS.Type.DefinitionFactory(classFactory, interfaceFactory);
+		classFactory = new Picket.Type.Class.Definition.Factory();
+		interfaceFactory = new Picket.Type.Interface.Definition.Factory();
+		factory = new Picket.Type.DefinitionFactory(classFactory, interfaceFactory);
 	});
 	
 	it('can be instantiated with class and interface factories', function(){
-		var factory = new ClassyJS.Type.DefinitionFactory(
+		var factory = new Picket.Type.DefinitionFactory(
 			classFactory,
 			interfaceFactory
 		);
-		expect(factory instanceof ClassyJS.Type.DefinitionFactory).toBe(true);
+		expect(factory instanceof Picket.Type.DefinitionFactory).toBe(true);
 	});
 	
 	it('throws error if class factory is not provided', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Type.DefinitionFactory.Fatal(
 			'CLASS_DEFINITION_FACTORY_NOT_PROVIDED',
 			'Provided type: object'
 		);
 		expect(function(){
-			new ClassyJS.Type.DefinitionFactory({}, interfaceFactory);
+			new Picket.Type.DefinitionFactory({}, interfaceFactory);
 		}).toThrow(expectedFatal);
 	});
 	
 	it('throws error if interface factory is not provided', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Type.DefinitionFactory.Fatal(
 			'INTERFACE_DEFINITION_FACTORY_NOT_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.DefinitionFactory(classFactory);
+			new Picket.Type.DefinitionFactory(classFactory);
 		}).toThrow(expectedFatal);
 	});
 	
 	it('throws error if build is called with no signature', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Type.DefinitionFactory.Fatal(
 			'NON_STRING_SIGNATURE',
 			'Provided type: undefined'
 		);
@@ -47,7 +47,7 @@ describe('Type.DefinitionFactory', function(){
 	});
 	
 	it('throws error if build is called with non string signature', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Type.DefinitionFactory.Fatal(
 			'NON_STRING_SIGNATURE',
 			'Provided type: number'
 		);
@@ -73,7 +73,7 @@ describe('Type.DefinitionFactory', function(){
 	});
 	
 	it('throws error if signature contains both \'class\' and \'interface\'', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Type.DefinitionFactory.Fatal(
 			'AMBIGUOUS_SIGNATURE',
 			'Signature: class interface MySomething'
 		);
@@ -81,7 +81,7 @@ describe('Type.DefinitionFactory', function(){
 	});
 	
 	it('throws error if signature contains neither \'class\' or \'interface\'', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Type.DefinitionFactory.Fatal(
 			'AMBIGUOUS_SIGNATURE',
 			'Signature: MySomething'
 		);
@@ -101,7 +101,7 @@ describe('Type.DefinitionFactory', function(){
 	});
 	
 	it('throws error if class factory does not return an object', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Type.DefinitionFactory.Fatal(
 			'FACTORY_RETURNED_NON_OBJECT',
 			'Returned type: undefined'
 		);
@@ -110,7 +110,7 @@ describe('Type.DefinitionFactory', function(){
 	});
 	
 	it('throws error if interface factory does not return an object', function(){
-		var expectedFatal = new ClassyJS.Type.DefinitionFactory.Fatal(
+		var expectedFatal = new Picket.Type.DefinitionFactory.Fatal(
 			'FACTORY_RETURNED_NON_OBJECT',
 			'Returned type: undefined'
 		);

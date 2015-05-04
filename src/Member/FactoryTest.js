@@ -18,27 +18,27 @@ describe('Member.Factory', function(){
 	var accessController;
 	
 	beforeEach(function(){
-		definitionFactory = new ClassyJS.Member.DefinitionFactory(
-			new ClassyJS.Member.Property.Definition.Factory(),
-			new ClassyJS.Member.Method.Definition.Factory(),
-			new ClassyJS.Member.Event.Definition.Factory(),
-			new ClassyJS.Member.Constant.Definition.Factory()
+		definitionFactory = new Picket.Member.DefinitionFactory(
+			new Picket.Member.Property.Definition.Factory(),
+			new Picket.Member.Method.Definition.Factory(),
+			new Picket.Member.Event.Definition.Factory(),
+			new Picket.Member.Constant.Definition.Factory()
 		);
-		propertyFactory = new ClassyJS.Member.Property.Factory();
-		methodFactory = new ClassyJS.Member.Method.Factory();
-		eventFactory = new ClassyJS.Member.Event.Factory();
-		constantFactory = new ClassyJS.Member.Constant.Factory();
-		propertyDefinition = new ClassyJS.Member.Property.Definition('public myProperty (string)');
-		methodDefinition = new ClassyJS.Member.Method.Definition('public myMethod () -> undefined');
-		eventDefinition = new ClassyJS.Member.Event.Definition('public event myEvent()');
-		constantDefinition = new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT');
-		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
-		accessController = new ClassyJS.Access.Controller(
-			new ClassyJS.Registry.Type(
-				new ClassyJS.NamespaceManager()
+		propertyFactory = new Picket.Member.Property.Factory();
+		methodFactory = new Picket.Member.Method.Factory();
+		eventFactory = new Picket.Member.Event.Factory();
+		constantFactory = new Picket.Member.Constant.Factory();
+		propertyDefinition = new Picket.Member.Property.Definition('public myProperty (string)');
+		methodDefinition = new Picket.Member.Method.Definition('public myMethod () -> undefined');
+		eventDefinition = new Picket.Member.Event.Definition('public event myEvent()');
+		constantDefinition = new Picket.Member.Constant.Definition('public constant MY_CONSTANT');
+		typeChecker = new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory());
+		accessController = new Picket.Access.Controller(
+			new Picket.Registry.Type(
+				new Picket.NamespaceManager()
 			)
 		);
-		factory = new ClassyJS.Member.Factory(
+		factory = new Picket.Member.Factory(
 			definitionFactory,
 			propertyFactory,
 			methodFactory,
@@ -47,29 +47,29 @@ describe('Member.Factory', function(){
 			typeChecker,
 			accessController
 		);
-		propertyObject = new ClassyJS.Member.Property(
+		propertyObject = new Picket.Member.Property(
 			propertyDefinition,
 			false,
 			null,
 			typeChecker,
 			accessController
 		);
-		methodObject = new ClassyJS.Member.Method(
-			new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+		methodObject = new Picket.Member.Method(
+			new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 			false,
 			function(){},
 			typeChecker,
 			accessController
 		);
-		eventObject = new ClassyJS.Member.Event(
-			new ClassyJS.Member.Event.Definition('public event myEvent ()'),
+		eventObject = new Picket.Member.Event(
+			new Picket.Member.Event.Definition('public event myEvent ()'),
 			false,
 			undefined,
 			typeChecker,
 			accessController
 		);
-		constantObject = new ClassyJS.Member.Constant(
-			new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT'),
+		constantObject = new Picket.Member.Constant(
+			new Picket.Member.Constant.Definition('public constant MY_CONSTANT'),
 			false,
 			undefined,
 			typeChecker,
@@ -78,7 +78,7 @@ describe('Member.Factory', function(){
 	});
 	
 	it('can be instantiated', function(){
-		var factory = new ClassyJS.Member.Factory(
+		var factory = new Picket.Member.Factory(
 			definitionFactory,
 			propertyFactory,
 			methodFactory,
@@ -87,16 +87,16 @@ describe('Member.Factory', function(){
 			typeChecker,
 			accessController
 		);
-		expect(factory instanceof ClassyJS.Member.Factory).toBe(true);
+		expect(factory instanceof Picket.Member.Factory).toBe(true);
 	});
 	
 	it('throws error if no member definition factory is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NO_DEFINITION_FACTORY_PROVIDED',
 			'Provided type: object'
 		);
 		expect(function(){
-			new ClassyJS.Member.Factory(
+			new Picket.Member.Factory(
 				{},
 				propertyFactory,
 				methodFactory,
@@ -107,12 +107,12 @@ describe('Member.Factory', function(){
 	});
 	
 	it('throws error if no property factory is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NO_PROPERTY_FACTORY_PROVIDED',
 			'Provided type: string'
 		);
 		expect(function(){
-			new ClassyJS.Member.Factory(
+			new Picket.Member.Factory(
 				definitionFactory,
 				'string',
 				methodFactory,
@@ -123,12 +123,12 @@ describe('Member.Factory', function(){
 	});
 	
 	it('throws error if no method factory is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NO_METHOD_FACTORY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Factory(
+			new Picket.Member.Factory(
 				definitionFactory,
 				propertyFactory,
 				undefined,
@@ -139,12 +139,12 @@ describe('Member.Factory', function(){
 	});
 	
 	it('throws error if no event factory is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NO_EVENT_FACTORY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Factory(
+			new Picket.Member.Factory(
 				definitionFactory,
 				propertyFactory,
 				methodFactory,
@@ -155,12 +155,12 @@ describe('Member.Factory', function(){
 	});
 	
 	it('throws error if no constant factory is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NO_CONSTANT_FACTORY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Factory(
+			new Picket.Member.Factory(
 				definitionFactory,
 				propertyFactory,
 				methodFactory,
@@ -170,12 +170,12 @@ describe('Member.Factory', function(){
 	});
 	
 	it('throws error if no type checker is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NO_TYPE_CHECKER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Factory(
+			new Picket.Member.Factory(
 				definitionFactory,
 				propertyFactory,
 				methodFactory,
@@ -188,12 +188,12 @@ describe('Member.Factory', function(){
 	});
 	
 	it('throws error if no access controller is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NO_ACCESS_CONTROLLER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Factory(
+			new Picket.Member.Factory(
 				definitionFactory,
 				propertyFactory,
 				methodFactory,
@@ -211,7 +211,7 @@ describe('Member.Factory', function(){
 	});
 	
 	it('throws error if build is called with non string argument', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NON_STRING_SIGNATURE_PROVIDED',
 			'Provided type: number'
 		);
@@ -219,12 +219,12 @@ describe('Member.Factory', function(){
 	});
 	
 	it('throws error if build is called with empty string argument', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal('EMPTY_STRING_SIGNATURE_PROVIDED');
+		var expectedFatal = new Picket.Member.Factory.Fatal('EMPTY_STRING_SIGNATURE_PROVIDED');
 		expect(function(){ factory.build('', false) }).toThrow(expectedFatal);
 	});
 	
 	it('throws error if build is called with non boolean interface indicator', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NON_BOOLEAN_INTERFACE_INDICATOR_PROVIDED',
 			'Provided type: number'
 		);
@@ -326,7 +326,7 @@ describe('Member.Factory', function(){
 	});
 	
 	it('will throw error if definition factory returns non definition', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NON_DEFINITION_RETURNED_FROM_FACTORY',
 			'Returned type: object'
 		);
@@ -335,7 +335,7 @@ describe('Member.Factory', function(){
 	});
 	
 	it('will throw error if property factory returns non property', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NON_PROPERTY_RETURNED_FROM_FACTORY',
 			'Returned type: object'
 		);
@@ -345,7 +345,7 @@ describe('Member.Factory', function(){
 	});
 	
 	it('will throw error if method factory returns non method', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NON_METHOD_RETURNED_FROM_FACTORY',
 			'Returned type: object'
 		);
@@ -355,7 +355,7 @@ describe('Member.Factory', function(){
 	});
 	
 	it('will throw error if event factory returns non event', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NON_EVENT_RETURNED_FROM_FACTORY',
 			'Returned type: object'
 		);
@@ -365,7 +365,7 @@ describe('Member.Factory', function(){
 	});
 	
 	it('will throw error if constant factory returns non constant', function(){
-		var expectedFatal = new ClassyJS.Member.Factory.Fatal(
+		var expectedFatal = new Picket.Member.Factory.Fatal(
 			'NON_CONSTANT_RETURNED_FROM_FACTORY',
 			'Returned type: object'
 		);

@@ -12,21 +12,21 @@ describe('Type.Class', function(){
 	var parentClass;
 	
 	beforeEach(function(){
-		definition = new ClassyJS.Type.Class.Definition('class MyClass');
-		typeRegistry = new ClassyJS.Registry.Type(new ClassyJS.NamespaceManager());
-		memberRegistry = new ClassyJS.Registry.Member(
+		definition = new Picket.Type.Class.Definition('class MyClass');
+		typeRegistry = new Picket.Registry.Type(new Picket.NamespaceManager());
+		memberRegistry = new Picket.Registry.Member(
 			typeRegistry,
-			new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory())
+			new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory())
 		);
-		namespaceManager = new ClassyJS.NamespaceManager();
-		classObject = new ClassyJS.Type.Class(
+		namespaceManager = new Picket.NamespaceManager();
+		classObject = new Picket.Type.Class(
 			definition,
 			typeRegistry,
 			memberRegistry,
 			namespaceManager
 		);
 		parentConstructor = function(){};
-		parentClass = new ClassyJS.Type.Class(
+		parentClass = new Picket.Type.Class(
 			definition,
 			typeRegistry,
 			memberRegistry,
@@ -35,22 +35,22 @@ describe('Type.Class', function(){
 	});
 	
 	it('can be instantiated', function(){
-		var classObject = new ClassyJS.Type.Class(
+		var classObject = new Picket.Type.Class(
 			definition,
 			typeRegistry,
 			memberRegistry,
 			namespaceManager
 		);
-		expect(classObject instanceof ClassyJS.Type.Class).toBe(true);
+		expect(classObject instanceof Picket.Type.Class).toBe(true);
 	});
 	
 	it('throws error if no definition is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'NO_DEFINITION_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.Class(
+			new Picket.Type.Class(
 				undefined,
 				typeRegistry,
 				memberRegistry,
@@ -60,12 +60,12 @@ describe('Type.Class', function(){
 	});
 	
 	it('throws error if no type registry is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'NO_TYPE_REGISTRY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.Class(
+			new Picket.Type.Class(
 				definition,
 				undefined,
 				memberRegistry,
@@ -75,12 +75,12 @@ describe('Type.Class', function(){
 	});
 	
 	it('throws error if no member registry is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'NO_MEMBER_REGISTRY_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.Class(
+			new Picket.Type.Class(
 				definition,
 				typeRegistry,
 				undefined,
@@ -90,12 +90,12 @@ describe('Type.Class', function(){
 	});
 	
 	it('throws error if no namespace manager is provided', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'NO_NAMESPACE_MANAGER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Type.Class(
+			new Picket.Type.Class(
 				definition,
 				typeRegistry,
 				memberRegistry
@@ -125,7 +125,7 @@ describe('Type.Class', function(){
 	});
 	
 	it('throws error if parent class is requested when isExtension is false', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal('NO_PARENT_CLASS_RELATIONSHIP');
+		var expectedFatal = new Picket.Type.Class.Fatal('NO_PARENT_CLASS_RELATIONSHIP');
 		spyOn(definition, 'isExtension').and.returnValue(false);
 		expect(function(){ classObject.getParentClass(); }).toThrow(expectedFatal);
 	});
@@ -140,13 +140,13 @@ describe('Type.Class', function(){
 	});
 	
 	it('throws error if instantiation is requested on explicitly abstract class', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal('CANNOT_INSTANTIATE_ABSTRACT_CLASS');
+		var expectedFatal = new Picket.Type.Class.Fatal('CANNOT_INSTANTIATE_ABSTRACT_CLASS');
 		spyOn(definition, 'isAbstract').and.returnValue(true);
 		expect(function(){ classObject.requestInstantiation(); }).toThrow(expectedFatal);
 	});
 	
 	it('throws error if instantiation is requested on class with abstract members', function(){
-		var expectedFatal = new ClassyJS.Type.Class.Fatal(
+		var expectedFatal = new Picket.Type.Class.Fatal(
 			'CANNOT_INSTANTIATE_CLASS_WITH_ABSTRACT_MEMBERS'
 		);
 		spyOn(memberRegistry, 'hasAbstractMembers').and.returnValue(true);

@@ -1,8 +1,8 @@
-;(function(ClassyJS, Registry, _){
+;(function(Picket, Registry, _){
 	
 	var messages = {
-		TYPE_REGISTRY_REQUIRED: 'Instance of ClassyJS.Registry.Type is required by constructor',
-		TYPE_CHECKER_REQUIRED: 'Instance of ClassyJS.TypeChecker is required by constructor',
+		TYPE_REGISTRY_REQUIRED: 'Instance of Picket.Registry.Type is required by constructor',
+		TYPE_CHECKER_REQUIRED: 'Instance of Picket.TypeChecker is required by constructor',
 		NON_CLASS_INSTANCE_OR_CONSTRUCTOR_PROVIDED:
 			'The provided call target was not an object instance or constructor',
 		NON_STRING_METHOD_NAME_PROVIDED: 'The provided method name is not a string',
@@ -34,10 +34,10 @@
 			'A constant was requested using an instance of a class instead of its constructor'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Registry.Member.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Registry.Member.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Registry = window.ClassyJS.Registry || {},
-	window.ClassyJS.Registry.Member = window.ClassyJS.Registry.Member || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Registry = window.Picket.Registry || {},
+	window.Picket.Registry.Member = window.Picket.Registry.Member || {}
 );

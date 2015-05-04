@@ -1,4 +1,4 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Interface = function(name)
 	{
@@ -10,14 +10,14 @@
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().interfaceExists(name)) {
+		if (!Picket._instantiator.getTypeRegistry().interfaceExists(name)) {
 			throw new _.Interface.Fatal(
 				'INTERFACE_DOES_NOT_EXIST',
 				'Provided name: ' + name
 			);
 		}
 		
-		this._interfaceObject = ClassyJS._instantiator.getTypeRegistry().getInterface(name);
+		this._interfaceObject = Picket._instantiator.getTypeRegistry().getInterface(name);
 		
 	};
 	
@@ -33,17 +33,17 @@
 	
 	_.Interface.prototype.getMethods = function(name)
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Method, name);
+		return _getFilteredMembers(this, Picket.Member.Method, name);
 	};
 	
 	_.Interface.prototype.getEvents = function()
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Event);
+		return _getFilteredMembers(this, Picket.Member.Event);
 	};
 	
 	_.Interface.prototype.getEvent = function(name)
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Event, name);
+		return _getFilteredMembers(this, Picket.Member.Event, name);
 	};
 	
 	_.Interface.prototype.getMock = function()
@@ -53,21 +53,21 @@
 		
 		var mock = new Mock();
 		
-		var properties = _filterByType(this, ClassyJS.Member.Property, _getMembers(this));
-		var methods = _filterByType(this, ClassyJS.Member.Method, _getMembers(this));
+		var properties = _filterByType(this, Picket.Member.Property, _getMembers(this));
+		var methods = _filterByType(this, Picket.Member.Method, _getMembers(this));
 		
 		for (var i = 0; i < properties.length; i++) mock[properties[i].getName()] = function(){};
 		for (var i = 0; i < methods.length; i++) mock[methods[i].getName()] = function(){};
 		
 		mock.bind = function(){};
 		
-		ClassyJS._instantiator.getTypeRegistry().registerMock(mock, new ClassyJS.Type.Class(
-			new ClassyJS.Type.Class.Definition(
-				'class ClassyJS.Mock' + Math.floor(Math.random() * 999999) + ' implements ' + this._interfaceObject.getName()
+		Picket._instantiator.getTypeRegistry().registerMock(mock, new Picket.Type.Class(
+			new Picket.Type.Class.Definition(
+				'class Picket.Mock' + Math.floor(Math.random() * 999999) + ' implements ' + this._interfaceObject.getName()
 			),
-			ClassyJS._instantiator.getTypeRegistry(),
-			ClassyJS._instantiator.getMemberRegistry(),
-			ClassyJS._instantiator.getNamespaceManager()
+			Picket._instantiator.getTypeRegistry(),
+			Picket._instantiator.getMemberRegistry(),
+			Picket._instantiator.getNamespaceManager()
 		));
 		
 		return mock;
@@ -76,7 +76,7 @@
 	
 	var _getMembers = function(_this)
 	{
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(_this._interfaceObject);
+		return Picket._instantiator.getMemberRegistry().getMembers(_this._interfaceObject);
 	};
 	
 	var _getFilteredMembers = function(_this, type, name)
@@ -119,13 +119,13 @@
 	{
 		var reflectionMembers = [];
 		for (var i = 0; i < members.length; i++) {
-			if (members[i] instanceof ClassyJS.Member.Method) {
+			if (members[i] instanceof Picket.Member.Method) {
 				reflectionMembers.push(
-					ClassyJS._instantiator.getReflectionFactory().buildMethod(members[i])
+					Picket._instantiator.getReflectionFactory().buildMethod(members[i])
 				);
-			} else if (members[i] instanceof ClassyJS.Member.Event) {
+			} else if (members[i] instanceof Picket.Member.Event) {
 				reflectionMembers.push(
-					ClassyJS._instantiator.getReflectionFactory().buildEvent(members[i])
+					Picket._instantiator.getReflectionFactory().buildEvent(members[i])
 				);
 			}
 		}
@@ -136,6 +136,6 @@
 	window.Reflection.Interface = _.Interface;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

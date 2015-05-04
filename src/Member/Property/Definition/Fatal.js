@@ -1,15 +1,15 @@
-;(function(ClassyJS, Member, Property, _){
+;(function(Picket, Member, Property, _){
 	
 	var messages = {
 		NON_STRING_SIGNATURE:		'Signature must be provided as a string',
 		SIGNATURE_NOT_RECOGNISED:	'Provided signature could not be understood' 
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Member.Property.Definition.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Member.Property.Definition.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Member = window.ClassyJS.Member || {},
-	window.ClassyJS.Member.Property = window.ClassyJS.Member.Property || {},
-	window.ClassyJS.Member.Property.Definition = window.ClassyJS.Member.Property.Definition || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Member = window.Picket.Member || {},
+	window.Picket.Member.Property = window.Picket.Member.Property || {},
+	window.Picket.Member.Property.Definition = window.Picket.Member.Property.Definition || {}
 );

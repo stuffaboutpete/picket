@@ -1,4 +1,4 @@
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		NON_STRING_TYPE_IDENTIFIER_SUPPLIED: 'The provided type identifier must be a string',
@@ -11,10 +11,10 @@
 		NON_DEFAULT_RETRIEVED: 'A call was made to getDefaultValue when no default exists'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Argument.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Argument.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Argument = window.ClassyJS.Reflection.Argument || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Argument = window.Picket.Reflection.Argument || {}
 );

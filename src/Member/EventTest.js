@@ -12,14 +12,14 @@ describe('Member.Event', function(){
 	var methodObject2;
 	
 	beforeEach(function(){
-		definition = new ClassyJS.Member.Event.Definition('public event myEvent ()');
-		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
-		accessController = new ClassyJS.Access.Controller(
-			new ClassyJS.Registry.Type(
-				new ClassyJS.NamespaceManager()
+		definition = new Picket.Member.Event.Definition('public event myEvent ()');
+		typeChecker = new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory());
+		accessController = new Picket.Access.Controller(
+			new Picket.Registry.Type(
+				new Picket.NamespaceManager()
 			)
 		);
-		eventObject = new ClassyJS.Member.Event(
+		eventObject = new Picket.Member.Event(
 			definition,
 			false,
 			undefined,
@@ -30,15 +30,15 @@ describe('Member.Event', function(){
 		accessInstance = {};
 		eventBinderInstance = {};
 		eventBinderInstance2 = {};
-		methodObject = new ClassyJS.Member.Method(
-			new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+		methodObject = new Picket.Member.Method(
+			new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 			false,
 			function(){},
 			typeChecker,
 			accessController
 		);
-		methodObject2 = new ClassyJS.Member.Method(
-			new ClassyJS.Member.Method.Definition('public myMethod () -> undefined'),
+		methodObject2 = new Picket.Member.Method(
+			new Picket.Member.Method.Definition('public myMethod () -> undefined'),
 			false,
 			function(){},
 			typeChecker,
@@ -47,23 +47,23 @@ describe('Member.Event', function(){
 	});
 	
 	it('can be instantiated', function(){
-		var eventObject = new ClassyJS.Member.Event(
+		var eventObject = new Picket.Member.Event(
 			definition,
 			false,
 			undefined,
 			typeChecker,
 			accessController
 		);
-		expect(eventObject instanceof ClassyJS.Member.Event).toBe(true);
+		expect(eventObject instanceof Picket.Member.Event).toBe(true);
 	});
 	
 	it('throws error if no definition is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NO_DEFINITION_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Event(
+			new Picket.Member.Event(
 				undefined,
 				false,
 				undefined,
@@ -74,12 +74,12 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if no type checker is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NO_TYPE_CHECKER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Event(
+			new Picket.Member.Event(
 				definition,
 				false,
 				undefined,
@@ -90,12 +90,12 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if no access controller is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NO_ACCESS_CONTROLLER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Event(
+			new Picket.Member.Event(
 				definition,
 				false,
 				undefined,
@@ -105,33 +105,33 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if value is not null, undefined or empty string', function(){
-		new ClassyJS.Member.Event(
+		new Picket.Member.Event(
 			definition,
 			false,
 			null,
 			typeChecker,
 			accessController
 		);
-		new ClassyJS.Member.Event(
+		new Picket.Member.Event(
 			definition,
 			false,
 			undefined,
 			typeChecker,
 			accessController
 		);
-		new ClassyJS.Member.Event(
+		new Picket.Member.Event(
 			definition,
 			false,
 			'',
 			typeChecker,
 			accessController
 		);
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'INVALID_VALUE_PROVIDED',
 			'Provided type: number'
 		);
 		expect(function(){
-			new ClassyJS.Member.Event(
+			new Picket.Member.Event(
 				definition,
 				false,
 				0,
@@ -139,12 +139,12 @@ describe('Member.Event', function(){
 				accessController
 			);
 		}).toThrow(expectedFatal);
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'INVALID_VALUE_PROVIDED',
 			'Provided type: boolean'
 		);
 		expect(function(){
-			new ClassyJS.Member.Event(
+			new Picket.Member.Event(
 				definition,
 				false,
 				false,
@@ -152,12 +152,12 @@ describe('Member.Event', function(){
 				accessController
 			);
 		}).toThrow(expectedFatal);
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'INVALID_VALUE_PROVIDED',
 			'Provided type: string'
 		);
 		expect(function(){
-			new ClassyJS.Member.Event(
+			new Picket.Member.Event(
 				definition,
 				false,
 				'string',
@@ -168,14 +168,14 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if any argument type is undefined', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal('UNDEFINED_ARGUMENT_TYPE');
+		var expectedFatal = new Picket.Member.Event.Fatal('UNDEFINED_ARGUMENT_TYPE');
 		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue([
 			'string',
 			'number',
 			'undefined'
 		]);
 		expect(function(){
-			new ClassyJS.Member.Event(
+			new Picket.Member.Event(
 				definition,
 				false,
 				undefined,
@@ -186,10 +186,10 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if any argument type is undefined', function(){
-		var expectedFatal = new ClassyJS.Member.Method.Fatal('NULL_ARGUMENT_TYPE');
+		var expectedFatal = new Picket.Member.Method.Fatal('NULL_ARGUMENT_TYPE');
 		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue(['string', 'null', 'string']);
 		expect(function(){
-			new ClassyJS.Member.Event(
+			new Picket.Member.Event(
 				definition,
 				false,
 				undefined,
@@ -221,7 +221,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if bind is requested with non-object target instance', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NON_OBJECT_TARGET_INSTANCE_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -231,7 +231,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if bind is requested with non-object access instance', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NON_OBJECT_ACCESS_INSTANCE_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -241,7 +241,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if access controller does not permit binding', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'ACCESS_NOT_ALLOWED',
 			'Access type: protected'
 		);
@@ -264,7 +264,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if trigger is called with non array of callbacks', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NON_ARRAY_CALLBACKS_PROVIDED',
 			'Provided type: object'
 		);
@@ -272,7 +272,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if callback is non-array', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NON_ARRAY_CALLBACK_PROVIDED',
 			'Provided type: object'
 		);
@@ -280,7 +280,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if callback instance is not object', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NON_OBJECT_CALLBACK_INSTANCE',
 			'Provided type: string'
 		);
@@ -291,7 +291,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if callback method is not method object', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'INVALID_CALLBACK_METHOD',
 			'Provided type: number'
 		);
@@ -302,7 +302,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if trigger is called with non array of arguments', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal(
+		var expectedFatal = new Picket.Member.Event.Fatal(
 			'NON_ARRAY_ARGUMENTS_PROVIDED',
 			'Provided type: object'
 		);
@@ -312,7 +312,7 @@ describe('Member.Event', function(){
 	});
 	
 	it('throws error if type checker indicates arguments are invalid', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal('INVALID_ARGUMENTS');
+		var expectedFatal = new Picket.Member.Event.Fatal('INVALID_ARGUMENTS');
 		spyOn(typeChecker, 'areValidTypes').and.returnValue(false);
 		spyOn(definition, 'getArgumentTypeIdentifiers').and.returnValue(['string']);
 		expect(function(){
@@ -362,8 +362,8 @@ describe('Member.Event', function(){
 	});
 	
 	it('will throw error if bind requested when this is defined within interface', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal('INTERACTION_WITH_ABSTRACT');
-		var eventObject = new ClassyJS.Member.Event(
+		var expectedFatal = new Picket.Member.Event.Fatal('INTERACTION_WITH_ABSTRACT');
+		var eventObject = new Picket.Member.Event(
 			definition,
 			true,
 			undefined,
@@ -376,8 +376,8 @@ describe('Member.Event', function(){
 	});
 	
 	it('will throw error if triggered when this is defined within interface', function(){
-		var expectedFatal = new ClassyJS.Member.Event.Fatal('INTERACTION_WITH_ABSTRACT');
-		var eventObject = new ClassyJS.Member.Event(
+		var expectedFatal = new Picket.Member.Event.Fatal('INTERACTION_WITH_ABSTRACT');
+		var eventObject = new Picket.Member.Event(
 			definition,
 			true,
 			undefined,

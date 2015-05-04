@@ -1,4 +1,4 @@
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
@@ -11,10 +11,10 @@
 			'Provided constant name and class identifier do not describe a valid constant',
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Constant.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Constant.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Constant = window.ClassyJS.Reflection.Constant || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Constant = window.Picket.Reflection.Constant || {}
 );

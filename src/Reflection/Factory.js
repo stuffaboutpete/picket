@@ -1,73 +1,73 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Factory = function(){};
 	
 	_.Factory.prototype.buildClass = function(identifier)
 	{
-		return new ClassyJS.Reflection.Class(identifier);
+		return new Picket.Reflection.Class(identifier);
 	};
 	
 	_.Factory.prototype.buildClassInstance = function(instance)
 	{
-		return new ClassyJS.Reflection.ClassInstance(instance);
+		return new Picket.Reflection.ClassInstance(instance);
 	};
 	
 	_.Factory.prototype.buildInterface = function(instance)
 	{
-		return new ClassyJS.Reflection.Interface(instance);
+		return new Picket.Reflection.Interface(instance);
 	};
 	
 	_.Factory.prototype.buildProperty = function(className, propertyName)
 	{
-		return new ClassyJS.Reflection.Property(className, propertyName);
+		return new Picket.Reflection.Property(className, propertyName);
 	};
 	
 	_.Factory.prototype.buildMethod = function(className, methodName)
 	{
-		return new ClassyJS.Reflection.Method(className, methodName);
+		return new Picket.Reflection.Method(className, methodName);
 	};
 	
 	_.Factory.prototype.buildEvent = function(className, eventName)
 	{
-		return new ClassyJS.Reflection.Event(className, eventName);
+		return new Picket.Reflection.Event(className, eventName);
 	};
 	
 	_.Factory.prototype.buildConstant = function(className, constantName)
 	{
-		return new ClassyJS.Reflection.Constant(className, constantName);
+		return new Picket.Reflection.Constant(className, constantName);
 	};
 	
 	_.Factory.prototype.buildPropertyInstance = function(objectInstance, propertyName)
 	{
-		return new ClassyJS.Reflection.PropertyInstance(objectInstance, propertyName);
+		return new Picket.Reflection.PropertyInstance(objectInstance, propertyName);
 	};
 	
 	_.Factory.prototype.buildMethodInstance = function(objectInstance, methodName)
 	{
-		return new ClassyJS.Reflection.MethodInstance(objectInstance, methodName);
+		return new Picket.Reflection.MethodInstance(objectInstance, methodName);
 	};
 	
 	_.Factory.prototype.buildEventInstance = function(objectInstance, eventName)
 	{
-		return new ClassyJS.Reflection.EventInstance(objectInstance, eventName);
+		return new Picket.Reflection.EventInstance(objectInstance, eventName);
 	};
 	
 	_.Factory.prototype.buildArgument = function(identifier, isOptional, defaultValue, owner)
 	{
-		return new ClassyJS.Reflection.Argument(identifier, isOptional, defaultValue, owner);
+		return new Picket.Reflection.Argument(identifier, isOptional, defaultValue, owner);
 	};
 	
 	_.Factory.prototype.buildType = function(identifier)
 	{
-		return new ClassyJS.Reflection.Type(identifier);
+		return new Picket.Reflection.Type(identifier);
 	};
 	
 	_.Factory.prototype.buildAccessType = function(identifier)
 	{
-		return new ClassyJS.Reflection.AccessType(identifier);
+		return new Picket.Reflection.AccessType(identifier);
 	};
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

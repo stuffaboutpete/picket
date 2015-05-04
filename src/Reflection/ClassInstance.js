@@ -1,4 +1,4 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.ClassInstance = function(instance)
 	{
@@ -10,7 +10,7 @@
 			);
 		}
 		
-		if (!ClassyJS._instantiator.getTypeRegistry().classExists(instance)) {
+		if (!Picket._instantiator.getTypeRegistry().classExists(instance)) {
 			throw new _.ClassInstance.Fatal('CLASS_DOES_NOT_EXIST');
 		}
 		
@@ -20,7 +20,7 @@
 	
 	_.ClassInstance.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(this._instance);
+		return Picket._instantiator.getReflectionFactory().buildClass(this._instance);
 	};
 	
 	_.ClassInstance.prototype.getMemberInstances = function()
@@ -30,39 +30,39 @@
 	
 	_.ClassInstance.prototype.getPropertyInstances = function()
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Property);
+		return _getFilteredMembers(this, Picket.Member.Property);
 	};
 	
 	_.ClassInstance.prototype.getPropertyInstance = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		var propertiesArray = _getFilteredMembers(this, ClassyJS.Member.Property, name);
+		var propertiesArray = _getFilteredMembers(this, Picket.Member.Property, name);
 		// @todo Throw if length is not 1
 		return propertiesArray[0];
 	};
 	
 	_.ClassInstance.prototype.getMethodInstances = function(name)
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Method, name);
+		return _getFilteredMembers(this, Picket.Member.Method, name);
 	};
 	
 	_.ClassInstance.prototype.getEventInstances = function()
 	{
-		return _getFilteredMembers(this, ClassyJS.Member.Event);
+		return _getFilteredMembers(this, Picket.Member.Event);
 	};
 	
 	_.ClassInstance.prototype.getEventInstance = function(name)
 	{
 		// @todo Ensure name is a string or undefined
-		var eventsArray =  _getFilteredMembers(this, ClassyJS.Member.Event, name);
+		var eventsArray =  _getFilteredMembers(this, Picket.Member.Event, name);
 		// @todo Throw if length is not 1
 		return eventsArray[0];
 	};
 	
 	var _getMembers = function(_this)
 	{
-		var classObject = ClassyJS._instantiator.getTypeRegistry().getClass(_this._instance);
-		return ClassyJS._instantiator.getMemberRegistry().getMembers(classObject);
+		var classObject = Picket._instantiator.getTypeRegistry().getClass(_this._instance);
+		return Picket._instantiator.getMemberRegistry().getMembers(classObject);
 	};
 	
 	var _getFilteredMembers = function(_this, type, name)
@@ -104,19 +104,19 @@
 	var _convertToReflectionMembers = function(_this, members)
 	{
 		var reflectionMembers = [];
-		var factory = ClassyJS._instantiator.getReflectionFactory();
+		var factory = Picket._instantiator.getReflectionFactory();
 		for (var i = 0; i < members.length; i++) {
-			if (members[i] instanceof ClassyJS.Member.Property) {
+			if (members[i] instanceof Picket.Member.Property) {
 				reflectionMembers.push(factory.buildPropertyInstance(
 					_this._instance,
 					members[i].getName()
 				));
-			} else if (members[i] instanceof ClassyJS.Member.Method) {
+			} else if (members[i] instanceof Picket.Member.Method) {
 				reflectionMembers.push(factory.buildMethodInstance(
 					_this._instance,
 					members[i].getName()
 				));
-			} else if (members[i] instanceof ClassyJS.Member.Event) {
+			} else if (members[i] instanceof Picket.Member.Event) {
 				reflectionMembers.push(factory.buildEventInstance(
 					_this._instance,
 					members[i].getName()
@@ -132,6 +132,6 @@
 	window.Reflection.ClassInstance = _.ClassInstance;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

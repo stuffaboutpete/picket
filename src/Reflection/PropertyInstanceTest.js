@@ -10,23 +10,23 @@ describe('Reflection.PropertyInstance', function(){
 	beforeEach(function(){
 		define('class My.Class');
 		objectInstance = new My.Class();
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		propertyObject = mocker.getMock(ClassyJS.Member.Property);
-		memberRegistry = mocker.getMock(ClassyJS.Registry.Member);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		propertyObject = mocker.getMock(Picket.Member.Property);
+		memberRegistry = mocker.getMock(Picket.Registry.Member);
 		reflectionProperty = mocker.getMock(Reflection.Property);
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		spyOn(ClassyJS._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		spyOn(Picket._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('throws error if member registry indicates property does not exist', function(){
-		var expectedFatal = new ClassyJS.Registry.Member.Fatal(
+		var expectedFatal = new Picket.Registry.Member.Fatal(
 			'PROPERTY_NOT_REGISTERED',
 			'Provided name: nonExistentProperty'
 		);

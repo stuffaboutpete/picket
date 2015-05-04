@@ -1,4 +1,4 @@
-;(function(ClassyJS, Reflection, _){
+;(function(Picket, Reflection, _){
 	
 	var messages = {
 		INSTANTIATION_BEFORE_DEPENDENCIES_INJECTED:
@@ -11,10 +11,10 @@
 			'Provided event name and class identifier do not describe a valid event'
 	};
 	
-	_.Fatal = ClassyJS.Fatal.getFatal('Reflection.Event.Fatal', messages);
+	_.Fatal = Picket.Fatal.getFatal('Reflection.Event.Fatal', messages);
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {},
-	window.ClassyJS.Reflection.Event = window.ClassyJS.Reflection.Event || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {},
+	window.Picket.Reflection.Event = window.Picket.Reflection.Event || {}
 );

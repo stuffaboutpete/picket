@@ -7,21 +7,21 @@ describe('Reflection.Argument', function(){
 	var reflectionClass;
 	
 	beforeEach(function(){
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		reflectionType = mocker.getMock(ClassyJS.Reflection.Type);
-		reflectionClass = mocker.getMock(ClassyJS.Reflection.Class);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		reflectionType = mocker.getMock(Picket.Reflection.Type);
+		reflectionClass = mocker.getMock(Picket.Reflection.Class);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('throws error if type identifier is not a string', function(){
-		var expectedFatal = new ClassyJS.Reflection.Argument.Fatal(
+		var expectedFatal = new Picket.Reflection.Argument.Fatal(
 			'NON_STRING_TYPE_IDENTIFIER_SUPPLIED',
 			'Provided type: number'
 		);
@@ -31,7 +31,7 @@ describe('Reflection.Argument', function(){
 	});
 	
 	it('throws error if optional flag is not a boolean', function(){
-		var expectedFatal = new ClassyJS.Reflection.Argument.Fatal(
+		var expectedFatal = new Picket.Reflection.Argument.Fatal(
 			'NON_BOOLEAN_OPTIONAL_FLAG_SUPPLIED',
 			'Provided type: string'
 		);
@@ -41,14 +41,14 @@ describe('Reflection.Argument', function(){
 	});
 	
 	it('throws error if not-optional but default value has been provided', function(){
-		var expectedFatal = new ClassyJS.Reflection.Argument.Fatal('UNEXPECTED_DEFAULT_PROVIDED');
+		var expectedFatal = new Picket.Reflection.Argument.Fatal('UNEXPECTED_DEFAULT_PROVIDED');
 		expect(function(){
 			new Reflection.Argument('string', false, 'Example', {});
 		}).toThrow(expectedFatal);
 	});
 	
 	it('throws error if owner is not either an object, function or string', function(){
-		var expectedFatal = new ClassyJS.Reflection.Argument.Fatal(
+		var expectedFatal = new Picket.Reflection.Argument.Fatal(
 			'INVALID_OWNER_TYPE_PROVIDED',
 			'Provided type: number'
 		);
@@ -93,7 +93,7 @@ describe('Reflection.Argument', function(){
 	});
 	
 	it('will throw error if default value is retrieved when it is undefined', function(){
-		var expectedFatal = new ClassyJS.Reflection.Argument.Fatal('NON_DEFAULT_RETRIEVED');
+		var expectedFatal = new Picket.Reflection.Argument.Fatal('NON_DEFAULT_RETRIEVED');
 		var reflectionArgument = new Reflection.Argument('string', true, undefined, {});
 		expect(function(){ reflectionArgument.getDefaultValue(); }).toThrow(expectedFatal);
 	});

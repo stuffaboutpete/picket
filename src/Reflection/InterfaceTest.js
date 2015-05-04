@@ -12,28 +12,28 @@ describe('Reflection.Interface', function(){
 	var reflectionEvent;
 	
 	beforeEach(function(){
-		mocker = new ClassyJS.Mocker();
-		originalInstantiator = ClassyJS._instantiator;
-		ClassyJS._instantiator = mocker.getMock(ClassyJS.Instantiator);
-		typeRegistry = mocker.getMock(ClassyJS.Registry.Type);
-		interfaceObject = mocker.getMock(ClassyJS.Type.Interface);
-		memberRegistry = mocker.getMock(ClassyJS.Registry.Member);
-		methodObject = mocker.getMock(ClassyJS.Member.Method);
-		eventObject = mocker.getMock(ClassyJS.Member.Event);
-		reflectionFactory = mocker.getMock(ClassyJS.Reflection.Factory);
-		reflectionMethod = mocker.getMock(ClassyJS.Reflection.Method);
-		reflectionEvent = mocker.getMock(ClassyJS.Reflection.Event);
-		spyOn(ClassyJS._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
-		spyOn(ClassyJS._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
-		spyOn(ClassyJS._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
+		mocker = new Picket.Mocker();
+		originalInstantiator = Picket._instantiator;
+		Picket._instantiator = mocker.getMock(Picket.Instantiator);
+		typeRegistry = mocker.getMock(Picket.Registry.Type);
+		interfaceObject = mocker.getMock(Picket.Type.Interface);
+		memberRegistry = mocker.getMock(Picket.Registry.Member);
+		methodObject = mocker.getMock(Picket.Member.Method);
+		eventObject = mocker.getMock(Picket.Member.Event);
+		reflectionFactory = mocker.getMock(Picket.Reflection.Factory);
+		reflectionMethod = mocker.getMock(Picket.Reflection.Method);
+		reflectionEvent = mocker.getMock(Picket.Reflection.Event);
+		spyOn(Picket._instantiator, 'getTypeRegistry').and.returnValue(typeRegistry);
+		spyOn(Picket._instantiator, 'getMemberRegistry').and.returnValue(memberRegistry);
+		spyOn(Picket._instantiator, 'getReflectionFactory').and.returnValue(reflectionFactory);
 	});
 	
 	afterEach(function(){
-		ClassyJS._instantiator = originalInstantiator;
+		Picket._instantiator = originalInstantiator;
 	});
 	
 	it('throws error if interface is instantiated with a non string', function(){
-		var expectedFatal = new ClassyJS.Reflection.Interface.Fatal(
+		var expectedFatal = new Picket.Reflection.Interface.Fatal(
 			'NON_STRING_INTERFACE_NAME_PROVIDED',
 			'Provided type: number'
 		);
@@ -48,7 +48,7 @@ describe('Reflection.Interface', function(){
 	});
 	
 	it('throws error if type registry suggests interface does not exist', function(){
-		var expectedFatal = new ClassyJS.Reflection.Interface.Fatal(
+		var expectedFatal = new Picket.Reflection.Interface.Fatal(
 			'INTERFACE_DOES_NOT_EXIST',
 			'Provided name: My.IInterface'
 		);

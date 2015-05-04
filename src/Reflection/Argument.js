@@ -1,4 +1,4 @@
-(function(ClassyJS, _){
+(function(Picket, _){
 	
 	_.Argument = function(typeIdentifier, isOptional, defaultValue, owner)
 	{
@@ -42,7 +42,7 @@
 	
 	_.Argument.prototype.getType = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildType(this._typeIdentifier);
+		return Picket._instantiator.getReflectionFactory().buildType(this._typeIdentifier);
 	};
 	
 	_.Argument.prototype.isOptional = function()
@@ -63,13 +63,13 @@
 	
 	_.Argument.prototype.getClass = function()
 	{
-		return ClassyJS._instantiator.getReflectionFactory().buildClass(this._owner);
+		return Picket._instantiator.getReflectionFactory().buildClass(this._owner);
 	};
 	
 	window.Reflection = window.Reflection || {};
 	window.Reflection.Argument = _.Argument;
 	
 })(
-	window.ClassyJS = window.ClassyJS || {},
-	window.ClassyJS.Reflection = window.ClassyJS.Reflection || {}
+	window.Picket = window.Picket || {},
+	window.Picket.Reflection = window.Picket.Reflection || {}
 );

@@ -4,12 +4,12 @@
 	// somewhere else and also ensure we
 	// are creating single instances of
 	// said classes
-	var instantiator = new ClassyJS.Instantiator();
+	var instantiator = new Picket.Instantiator();
 	
 	// We'll make this available to the
 	// various reflection classes by
 	// storing it 'globally'
-	ClassyJS._instantiator = instantiator;
+	Picket._instantiator = instantiator;
 	
 	var namespaceManager = instantiator.getNamespaceManager();
 	
@@ -40,11 +40,11 @@
 		_typeCheckMembers(members, typeObject);
 		
 		// If we are dealing with a class...
-		if (typeObject instanceof ClassyJS.Type.Class) {
+		if (typeObject instanceof Picket.Type.Class) {
 			
 			// Create a new class constructor
 			// providing it the class registry
-			var constructor = new ClassyJS.Type.Class.Constructor(
+			var constructor = new Picket.Type.Class.Constructor(
 				instantiator.getTypeRegistry(),
 				instantiator.getMemberRegistry(),
 				typeObject.getName()
@@ -64,7 +64,7 @@
 						typeObject.getParentClass()
 					);
 				} catch (error) {
-					if ((!error instanceof ClassyJS.NamespaceManager.Fatal)
+					if ((!error instanceof Picket.NamespaceManager.Fatal)
 					||	error.code != 'NAMESPACE_OBJECT_DOES_NOT_EXIST') {
 						throw error;
 					}
@@ -124,7 +124,7 @@
 				);
 			}
 			
-		} else if (typeObject instanceof ClassyJS.Type.Interface) {
+		} else if (typeObject instanceof Picket.Type.Interface) {
 			
 			instantiator.getTypeRegistry().registerInterface(typeObject);
 			
@@ -140,11 +140,11 @@
 			
 			instantiator.getMemberRegistry().register(member, typeObject);
 			
-			if (member instanceof ClassyJS.Member.Method && member.isStatic()) {
+			if (member instanceof Picket.Member.Method && member.isStatic()) {
 				
 				staticMethods.push(member.getName());
 				
-			} else if (member instanceof ClassyJS.Member.Constant) {
+			} else if (member instanceof Picket.Member.Constant) {
 				
 				constants.push(member.getName());
 				
@@ -152,7 +152,7 @@
 			
 		}
 		
-		if (typeObject instanceof ClassyJS.Type.Class) {
+		if (typeObject instanceof Picket.Type.Class) {
 			
 			for (var i in staticMethods) {
 				
@@ -174,7 +174,7 @@
 				constructor[constants[i]] = (function(name){
 					return function(){
 						// Note that the '|| {}' below is due
-						// to a hack in ClassyJS.Member.Constant.
+						// to a hack in Picket.Member.Constant.
 						// It should go if possible.
 						return instantiator.getMemberRegistry().getConstant(
 							constructor,
@@ -216,25 +216,25 @@
 	
 	var _typeCheckMembers = function(members, definition)
 	{
-		if (definition instanceof ClassyJS.Type.Class) {
+		if (definition instanceof Picket.Type.Class) {
 			if (typeof members != 'undefined') {
 				if (Object.prototype.toString.call(members) == '[object Array]') {
-					throw new ClassyJS.Main.Fatal(
+					throw new Picket.Main.Fatal(
 						'NON_OBJECT_CLASS_MEMBERS',
 						'Provided type: array'
 					);
 				}
 				if (typeof members != 'object') {
-					throw new ClassyJS.Main.Fatal(
+					throw new Picket.Main.Fatal(
 						'NON_OBJECT_CLASS_MEMBERS',
 						'Provided type: ' + typeof members
 					);
 				}
 			}
-		} else if (definition instanceof ClassyJS.Type.Interface) {
+		} else if (definition instanceof Picket.Type.Interface) {
 			if (typeof members != 'undefined') {
 				if (Object.prototype.toString.call(members) != '[object Array]') {
-					throw new ClassyJS.Main.Fatal(
+					throw new Picket.Main.Fatal(
 						'NON_ARRAY_INTERFACE_MEMBERS',
 						'Provided type: ' + typeof members
 					);
@@ -254,9 +254,9 @@
 	{
 		var members = instantiator.getMemberRegistry().getMembers(classObject);
 		for (var i in members) {
-			if (members[i] instanceof ClassyJS.Member.Method && members[i].isStatic()) {
+			if (members[i] instanceof Picket.Member.Method && members[i].isStatic()) {
 				staticMethods.push(members[i].getName());
-			} else if (members[i] instanceof ClassyJS.Member.Constant) {
+			} else if (members[i] instanceof Picket.Member.Constant) {
 				constants.push(members[i].getName());
 			}
 		}

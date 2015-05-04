@@ -8,14 +8,14 @@ describe('Member.Constant', function(){
 	var accessInstance;
 	
 	beforeEach(function(){
-		definition = new ClassyJS.Member.Constant.Definition('public constant MY_CONSTANT');
-		typeChecker = new ClassyJS.TypeChecker(new ClassyJS.TypeChecker.ReflectionFactory());
-		accessController = new ClassyJS.Access.Controller(
-			new ClassyJS.Registry.Type(
-				new ClassyJS.NamespaceManager()
+		definition = new Picket.Member.Constant.Definition('public constant MY_CONSTANT');
+		typeChecker = new Picket.TypeChecker(new Picket.TypeChecker.ReflectionFactory());
+		accessController = new Picket.Access.Controller(
+			new Picket.Registry.Type(
+				new Picket.NamespaceManager()
 			)
 		);
-		constant = new ClassyJS.Member.Constant(
+		constant = new Picket.Member.Constant(
 			definition,
 			false,
 			undefined,
@@ -27,23 +27,23 @@ describe('Member.Constant', function(){
 	});
 	
 	it('can be instantiated', function(){
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			undefined,
 			typeChecker,
 			accessController
 		);
-		expect(constant instanceof ClassyJS.Member.Constant).toBe(true);
+		expect(constant instanceof Picket.Member.Constant).toBe(true);
 	});
 	
 	it('throws error if no definition is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
+		var expectedFatal = new Picket.Member.Constant.Fatal(
 			'NO_DEFINITION_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Constant(
+			new Picket.Member.Constant(
 				undefined,
 				false,
 				undefined,
@@ -54,9 +54,9 @@ describe('Member.Constant', function(){
 	});
 	
 	it('throws error if isFromInterface is not false', function(){
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal('IS_FROM_INTERFACE');
+		var expectedFatal = new Picket.Member.Constant.Fatal('IS_FROM_INTERFACE');
 		expect(function(){
-			new ClassyJS.Member.Constant(
+			new Picket.Member.Constant(
 				definition,
 				true,
 				undefined,
@@ -67,12 +67,12 @@ describe('Member.Constant', function(){
 	});
 	
 	it('throws error if no type checker is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
+		var expectedFatal = new Picket.Member.Constant.Fatal(
 			'NO_TYPE_CHECKER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Constant(
+			new Picket.Member.Constant(
 				definition,
 				false,
 				undefined,
@@ -83,12 +83,12 @@ describe('Member.Constant', function(){
 	});
 	
 	it('throws error if no access controller is provided', function(){
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
+		var expectedFatal = new Picket.Member.Constant.Fatal(
 			'NO_ACCESS_CONTROLLER_PROVIDED',
 			'Provided type: undefined'
 		);
 		expect(function(){
-			new ClassyJS.Member.Constant(
+			new Picket.Member.Constant(
 				definition,
 				false,
 				undefined,
@@ -98,12 +98,12 @@ describe('Member.Constant', function(){
 	});
 	
 	it('throws error if value is not string or number', function(){
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
+		var expectedFatal = new Picket.Member.Constant.Fatal(
 			'INVALID_VALUE_TYPE',
 			'Provided type: object'
 		);
 		expect(function(){
-			new ClassyJS.Member.Constant(
+			new Picket.Member.Constant(
 				definition,
 				false,
 				{},
@@ -111,12 +111,12 @@ describe('Member.Constant', function(){
 				accessController
 			);
 		}).toThrow(expectedFatal);
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
+		var expectedFatal = new Picket.Member.Constant.Fatal(
 			'INVALID_VALUE_TYPE',
 			'Provided type: object'
 		);
 		expect(function(){
-			new ClassyJS.Member.Constant(
+			new Picket.Member.Constant(
 				definition,
 				false,
 				['string'],
@@ -124,12 +124,12 @@ describe('Member.Constant', function(){
 				accessController
 			);
 		}).toThrow(expectedFatal);
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
+		var expectedFatal = new Picket.Member.Constant.Fatal(
 			'INVALID_VALUE_TYPE',
 			'Provided type: boolean'
 		);
 		expect(function(){
-			new ClassyJS.Member.Constant(
+			new Picket.Member.Constant(
 				definition,
 				false,
 				true,
@@ -140,14 +140,14 @@ describe('Member.Constant', function(){
 	});
 	
 	it('will allow undefined value', function(){
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			undefined,
 			typeChecker,
 			accessController
 		);
-		expect(constant instanceof ClassyJS.Member.Constant).toBe(true);
+		expect(constant instanceof Picket.Member.Constant).toBe(true);
 	});
 	
 	it('can return name from definition', function(){
@@ -158,7 +158,7 @@ describe('Member.Constant', function(){
 	it('will check string type with type checker', function(){
 		spyOn(typeChecker, 'isValidType').and.returnValue(true);
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('string');
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			'Example',
@@ -171,7 +171,7 @@ describe('Member.Constant', function(){
 	it('will check number type with type checker', function(){
 		spyOn(typeChecker, 'isValidType').and.returnValue(true);
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('number');
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			123,
@@ -184,7 +184,7 @@ describe('Member.Constant', function(){
 	it('will not call type checker if value is undefined', function(){
 		spyOn(typeChecker, 'isValidType');
 		spyOn(definition, 'getTypeIdentifier');
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			undefined,
@@ -195,14 +195,14 @@ describe('Member.Constant', function(){
 	});
 	
 	it('throws error if type checker indicates value is not valid', function(){
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
+		var expectedFatal = new Picket.Member.Constant.Fatal(
 			'INVALID_VALUE',
 			'Constant type: number'
 		);
 		spyOn(typeChecker, 'isValidType').and.returnValue(false);
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('number');
 		expect(function(){
-			new ClassyJS.Member.Constant(
+			new Picket.Member.Constant(
 				definition,
 				false,
 				'Example',
@@ -228,7 +228,7 @@ describe('Member.Constant', function(){
 		// Note that this is disabled due to
 		// a hack. Read the comment inside
 		// the related method.
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal(
+		var expectedFatal = new Picket.Member.Constant.Fatal(
 			'NON_FUNCTION_TARGET_CONSTRUCTOR_PROVIDED',
 			'Provided type: undefined'
 		);
@@ -236,7 +236,7 @@ describe('Member.Constant', function(){
 	});
 	
 	it('throws error if access controller does not allow access to value', function(){
-		var expectedFatal = new ClassyJS.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
+		var expectedFatal = new Picket.Member.Constant.Fatal('ACCESS_NOT_ALLOWED');
 		spyOn(accessController, 'canAccess').and.returnValue(false);
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('public');
 		expect(function(){
@@ -248,7 +248,7 @@ describe('Member.Constant', function(){
 		spyOn(typeChecker, 'isValidType').and.returnValue(true);
 		spyOn(accessController, 'canAccess').and.returnValue(true);
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('public');
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			'Example value',
@@ -262,7 +262,7 @@ describe('Member.Constant', function(){
 		spyOn(typeChecker, 'isValidType').and.returnValue(true);
 		spyOn(accessController, 'canAccess').and.returnValue(true);
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('public');
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			321,
@@ -275,7 +275,7 @@ describe('Member.Constant', function(){
 	it('will return generated string', function(){
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('string');
 		spyOn(accessController, 'canAccess').and.returnValue(true);
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			undefined,
@@ -291,7 +291,7 @@ describe('Member.Constant', function(){
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('number');
 		spyOn(accessController, 'canAccess').and.returnValue(true);
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('public');
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			undefined,
@@ -305,7 +305,7 @@ describe('Member.Constant', function(){
 		spyOn(accessController, 'canAccess').and.returnValue(true);
 		spyOn(definition, 'getAccessTypeIdentifier').and.returnValue('public');
 		spyOn(definition, 'getTypeIdentifier').and.returnValue('string');
-		var constant = new ClassyJS.Member.Constant(
+		var constant = new Picket.Member.Constant(
 			definition,
 			false,
 			undefined,
