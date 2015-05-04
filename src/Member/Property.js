@@ -63,12 +63,21 @@
 			_requestAccess(this, targetInstance, accessInstance);
 		}
 		// _requestAccess(this, targetInstance, accessInstance);
-		if (Object.prototype.toString.call(this._defaultValue) == '[object Array]') {
-			var newArray = [];
-			for (var i = 0; i < this._defaultValue.length; i++) {
-				newArray.push(this._defaultValue[i]);
+		if (this._defaultValue !== null) {
+			if (Object.prototype.toString.call(this._defaultValue) == '[object Array]') {
+				var newArray = [];
+				for (var i = 0; i < this._defaultValue.length; i++) {
+					newArray.push(this._defaultValue[i]);
+				}
+				return newArray;
 			}
-			return newArray;
+			if (typeof this._defaultValue == 'object') {
+				var newObject = {};
+				for (var key in this._defaultValue) {
+					newObject[key] = this._defaultValue[key];
+				}
+				return newObject;
+			}
 		}
 		return this._defaultValue;
 	};

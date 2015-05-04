@@ -73,11 +73,12 @@ describe('Properties', function(){
 		expect(new My.Class().array()[0]).toBe(new My.Class().array()[0]);
 	});
 	
-	it('have same object instances when declared as default', function(){
+	it('have different objects containing same vales when declared as default', function(){
 		define('class My.Class', {
-			'public object (object)': {}
+			'public object (object)': { key: {} }
 		});
-		expect(new My.Class().object()).toBe(new My.Class().object());
+		expect(new My.Class().object()).not.toBe(new My.Class().object());
+		expect(new My.Class().object().key).toBe(new My.Class().object().key);
 	});
 	
 	it('can be concatenated when strings', function(){
