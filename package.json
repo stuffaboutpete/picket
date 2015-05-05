@@ -1,5 +1,28 @@
 {
-	
+	"name": "picket",
+	"version": "0.1.0",
+	"description": "Picket allows you to create large-scale object-orientated architectures in JavaScript",
+	"author": "Pete Smith <pete@peteonline.co.uk>",
+	"contributors": [{
+		"name": "Pete Smith",
+		"email": "pete@peteonline.co.uk"
+	}],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/peteonline/picket.git"
+	},
+	"bugs": {
+		"url": "https://github.com/peteonline/picket/issues"
+	},
+	"keywords": [
+		"picket",
+		"object",
+		"orientated",
+		"class",
+		"interface",
+		"type",
+		"hinting"
+	],
 	"devDependencies": {
 		"gulp": "*",
 		"gulp-concat": "*",
@@ -12,6 +35,6 @@
 		"gulp-karma": "*",
 		"karma-jasmine": "*",
 		"karma-phantomjs-launcher": "*"
-	}
-	
+	},
+	"license": "MIT"
 }
