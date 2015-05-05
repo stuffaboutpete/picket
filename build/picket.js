@@ -4069,6 +4069,7 @@ if (!Function.prototype.bind) {
 		this._requestedScripts = [];
 		this._loadedScripts = [];
 		this._classCallbacks = {};
+		this._resourcesDeclaredAvailable = [];
 	};
 	
 	_.AutoLoader.prototype.isRunning = function()
@@ -4129,7 +4130,9 @@ if (!Function.prototype.bind) {
 			);
 		}
 		if (!this.isRunning()) throw new _.AutoLoader.Fatal('NOT_RUNNING');
-		this._continueBuffer.push(_getScriptLocation(this, className));
+		if (!_resourceDeclaredAvailable(this, className)) {
+			this._continueBuffer.push(_getScriptLocation(this, className));
+		}
 		if (typeof callback == 'function') {
 			if (typeof this._classCallbacks[className] == 'undefined') {
 				this._classCallbacks[className] = [];
@@ -4137,6 +4140,14 @@ if (!Function.prototype.bind) {
 			this._classCallbacks[className].push(callback);
 		}
 		_load(this, className);
+	};
+	
+	_.AutoLoader.prototype.declareAssemblyResources = function(resources)
+	{
+		// @todo Throw if resources is not an array
+		for (var i = 0; i < resources.length; i++) {
+			this._resourcesDeclaredAvailable.push(resources[i]);
+		}
 	};
 	
 	var _addClassAutoloadPatterns = function(_this, map)
@@ -4155,7 +4166,7 @@ if (!Function.prototype.bind) {
 	
 	var _load = function(_this, className, stack)
 	{
-		if (_classExists(_this, className)) {
+		if (_classExists(_this, className) || _resourceDeclaredAvailable(_this, className)) {
 			_attemptFinish(_this);
 		} else {
 			var scriptLocation = _getScriptLocation(_this, className);
@@ -4289,6 +4300,11 @@ if (!Function.prototype.bind) {
 		}
 		_this._loadedScripts.push(scriptLocation);
 		_this._continueBuffer = [];
+	};
+	
+	var _resourceDeclaredAvailable = function(_this, resourceName)
+	{
+		return (_this._resourcesDeclaredAvailable.indexOf(resourceName) == -1) ? false : true;
 	};
 	
 })(window.Picket = window.Picket || {});
@@ -6118,6 +6134,11 @@ if (!Function.prototype.bind) {
 			arguments.callee.caller.$$localOwner,
 			targetMethod
 		);
+	};
+	
+	Picket.declareAssemblyResources = function(resources)
+	{
+		instantiator.getAutoLoader().declareAssemblyResources(resources);
 	};
 	
 	var _typeCheckMembers = function(members, definition)

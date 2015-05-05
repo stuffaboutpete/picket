@@ -84,4 +84,32 @@ describe('Autoloading', function(){
 		start('AutoLoad.Class7dgMw9', classMap);
 	});
 	
+	it('allows a file to name its resources and these will not be reloaded', function(done){
+		define('class My.AutoloadComplete', {
+			'public static complete () -> undefined': function(){
+				// Create reflection objects as an opportunity to error
+				new Reflection.Class('AutoLoad.Class7gcF9l');
+				new Reflection.Class('AutoLoad.Classhc4dCj');
+				new Reflection.Interface('AutoLoad.Interface4ghsd7');
+				new My.AutoloadComplete();
+			},
+			'public construct () -> undefined': function(){
+				require('AutoLoad.Class7gcF9l', 'handleClass7gcF9lLoaded');
+			},
+			'private handleClass7gcF9lLoaded (string) -> undefined': function(className){
+				var scripts = document.getElementsByTagName('script');
+				var assemblyResources = ['Class7gcF9l', 'Classhc4dCj', 'Interface4ghsd7'];
+				for (var i = 0; i < scripts.length; i++) {
+					for (var j = 0; j < scripts[i].attributes.length; j++) {
+						var match = scripts[i].src.match(/([A-Za-z0-9]+)\.js/);
+						if (!match) continue;
+						if (assemblyResources.indexOf(match[1]) > -1) fail();
+					}
+				}
+				done();
+			}
+		});
+		start('AutoLoad.Class76fb1M', classMap);
+	});
+	
 });

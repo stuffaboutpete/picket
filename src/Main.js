@@ -214,6 +214,11 @@
 		);
 	};
 	
+	Picket.declareAssemblyResources = function(resources)
+	{
+		instantiator.getAutoLoader().declareAssemblyResources(resources);
+	};
+	
 	var _typeCheckMembers = function(members, definition)
 	{
 		if (definition instanceof Picket.Type.Class) {

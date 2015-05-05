@@ -518,4 +518,17 @@ describe('AutoLoader', function(){
 		expect(memberRegistry.callMethod.calls.count()).toBe(2);
 	});
 	
+	it('does not load a resource if a file declares that it contains the resource', function(){
+		autoloader.declareAssemblyResources([
+			'Example.Class',
+			'Other.Class'
+		]);
+		spyOn(includer, 'include');
+		spyOn(memberRegistry, 'callMethod');
+		autoloader.start('Example.Class');
+		autoloader.start('Other.Class');
+		expect(includer.include).not.toHaveBeenCalled();
+		expect(memberRegistry.callMethod.calls.count()).toBe(2);
+	});
+	
 });
