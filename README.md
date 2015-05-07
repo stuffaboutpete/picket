@@ -154,4 +154,4 @@ The following describes the likely features ahead for Picket.
 
 ## Contact
 
-You are encouraged to contact me at pete@peteonline.co.uk if you want to be involved in the project or if you want any assistance in using it for yourself.
+You are encouraged to contact me at pete@stuffaboutpete.com if you want to be involved in the project or if you want any assistance in using it for yourself.
