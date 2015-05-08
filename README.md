@@ -8,7 +8,7 @@ I am keen to hear from anyone who is interested in contributing, whether that be
 
 ## Documentation
 
-There is full documentation on each feature on the Picket website at (http://picketjs.com/documentation).
+There is full documentation on each feature on the Picket website at (http://picketjs.com/documentation.html).
 
 There is a tutorial series currently being and this will be available as soon as possible. This will be a considerably more friendly introduction to coding in Picket.
 
