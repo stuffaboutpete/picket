@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/stuffaboutpete/picket.svg?branch=master)](https://travis-ci.org/stuffaboutpete/picket)
+
 # Picket
 
 Picket allows you to create large-scale object-orientated architectures in JavaScript.
