@@ -1,9 +1,9 @@
 {
 	"name": "picket",
 	"version": "0.1.0",
-	"homepage": "https://github.com/peteonline/picket",
+	"homepage": "https://github.com/stuffaboutpete/picket",
 	"authors": [
-		"Pete Smith <pete@peteonline.co.uk>"
+		"Pete Smith <pete@stuffaboutpete.com>"
 	],
 	"description": "Picket allows you to create large-scale object-orientated architectures in JavaScript",
 	"main": [
