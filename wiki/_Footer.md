@@ -1,1 +1,0 @@
-**Picket.js** | [[Home]] | [[Contributing]] | [[Tutorials]]
