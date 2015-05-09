@@ -141,6 +141,10 @@ body {
   font-size: 14px;
   padding: 12px; }
 
+.button:hover {
+  border-color: rgba(44, 67, 80, 0.5);
+  cursor: pointer; }
+
 .code {
   font-family: 'Inconsolata', monospace;
   border-radius: 6px;
