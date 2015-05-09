@@ -1,0 +1,330 @@
+<!doctype html>
+<html>
+	
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+		<title>Picket</title>
+		
+		<link rel="stylesheet" href="/style.css">
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:700,400,300,400italic|Inconsolata">
+		
+		<script src="/html5shiv.min.js"></script>
+				
+		<!--[if gte IE 9]>
+			<style type="text/css">
+				.u-nofilter {
+					filter: none;
+				}
+			</style>
+		<![endif]-->
+		
+	</head>
+	
+	<body>
+		
+		<header class="siteHeader u-inlineList">
+			<img src="/images/picket.svg" onerror="this.src=/images/picket.png" alt="Picket Logo">
+			<h1>Picket.js</h1>
+			<nav>
+				<ul>
+					<a href="/documentation.html"><li>Documentation</li></a>
+					<a href="/contribute.html"><li>Contribute</li></a>
+					<!-- <a href=""><li>Road Map</li</li>> -->
+					<a href="https://github.com/stuffaboutpete/picket"><li>GitHub</li></a>
+				</ul>
+			</nav>
+		</header>
+		
+		<main class="home">
+			
+			<h2 class="hugeTextBanner">
+				Create large-scale, object-orientated
+				architectures using classes, interfaces, type hinting and more in JavaScript
+			</h2>
+			
+			<button class="button u-center u-nofilter">Download v0.1.0</button>
+			
+			<div class="beginLearn">
+				<div class="beginLearn-learn">
+					<h3 class="blockedHeader">Learn</h3>
+					<ul>
+						<li>Follow the <a href="">tutorials</a></li>
+						<li>Read the <a href="">documentation</a></li>
+						<li>See the code on <a href="">GitHub</a></li>
+					</ul>
+				</div>
+				<div class="beginLearn-begin">
+					<h3 class="blockedHeader">Begin</h3>
+					<ol class="code code--dark">
+						<li><pre>&lt;!DOCTYPE html&gt;</pre></li>
+						<li><pre>&lt;html lang=&quot;en&quot;&gt;</pre></li>
+						<li><pre>&lt;head&gt;</pre></li>
+						<li><pre>	&lt;meta charset=&quot;UTF-8&quot;&gt;</pre></li>
+						<li><pre>	&lt;title&gt;My Document&lt;/title&gt;</pre></li>
+						<li><pre>&lt;/head&gt;</pre></li>
+						<li><pre>&lt;body&gt;</pre></li>
+						<li><pre>	&lt;!-- Main body --&gt;</pre></li>
+						<li><pre>	&lt;script src=&quot;path/to/picket.js&quot;&gt;&lt;/script&gt;</pre></li>
+						<li><pre>	&lt;script&gt;</pre></li>
+						<li><pre>		start(</pre></li>
+						<li><pre>			'MyNamespace.Start',</pre></li>
+						<li><pre>			{</pre></li>
+						<li><pre>				MyNamespace: '/public/scripts/my',</pre></li>
+						<li><pre>				CoolLibrary: '/public/scripts/vendor/cool-library/dist'</pre></li>
+						<li><pre>			}</pre></li>
+						<li><pre>		);</pre></li>
+						<li><pre>	&lt;/script&gt;</pre></li>
+						<li><pre>&lt;/body&gt;</pre></li>
+						<li><pre>&lt;/html&gt;</pre></li>
+					</ol>
+				</div>
+			</div>
+			
+			<div class="textEditor">
+				<div class="textEditor-topBar">
+					<span class="textEditor-fileName">Start.js</span>
+					<img src="/images/textEditorClose.svg" onerror="this.src=/images/textEditorClose.png" alt="">
+				</div>
+				<div class="textEditor-main">
+					<div class="textEditor-line">
+						<span class="textEditor-gutter">1</span>
+						<pre>define(</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">2</span>
+						<pre></pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">3</span>
+						<pre>'require CoolLibrary.Application',</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">4</span>
+						<pre>'require CoolLibrary.Application.Bootstrap.Authenticator',</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">5</span>
+						<pre>'require MyNamespace.Application.FrontController',</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">6</span>
+						<pre>'require MyNamespace.Application.Bootstrap.Database',</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">7</span>
+						<pre></pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">8</span>
+						<pre>'class MyNamespace.Start',</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">9</span>
+						<pre>{</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">10</span>
+						<pre>    </pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">11</span>
+						<pre>    'public construct ()': function()</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">12</span>
+						<pre>    {</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">13</span>
+						<pre>        </pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">14</span>
+						<pre>        var application = new CoolLibrary.Application(new MyNamespace.Application.FrontController());</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">15</span>
+						<pre>        </pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">16</span>
+						<pre>        application.bootstrap([</pre>
+					</div>
+							<div class="textEditor-line">
+						<span class="textEditor-gutter">17</span>
+						<pre>            new CoolLibrary.Application.Bootstrap.Authenticator(),</pre>
+					</div>
+				</div>
+			</div>
+			
+			<nav class="siteSecondaryNav">
+				<ul>
+					<a href="/documentation.html"><li>Documentation</li></a>
+					<a href="/contribute.html"><li>Contribute</li></a>
+					<!-- <a href=""><li>Road Map</li</li>> -->
+					<a href="https://github.com/stuffaboutpete/picket"><li>GitHub</li></a>
+				</ul>
+				<button class="button u-nofilter">Download v0.1.0</button>
+			</nav>
+			
+			<div class="intro">
+				<h2>We build Picket in order to make writing complex JavaScript more manageable</h2>
+				<h3>Scalable</h3>
+				<p>
+					In Picket, each class is defined within one script file. That file is then
+					loaded if any other class specifies it as a dependency meaning you don't
+					have to manage script inclusions.
+				</p>
+				<p>
+					Language features too are built towards large-scale architectures with
+					a strong dedication to object-orientation. Build code which does not
+					encourage strong-coupling, is changeable and where each element is
+					concerned only with itself.
+				</p>
+				<h3>Testable</h3>
+				<p>
+					Picket was built with testing in mind. Object-orientation, coupled with
+					dependency injection and the ability to mock classes and interfaces allow
+					you to test each individual element of your code without side-effects from
+					other classes. This allows you to easily write code that is tested from top to bottom.
+				</p>
+				<h3>Predictable</h3>
+				<p>
+					Everything you do in Picket is type-safe meaning that properties and
+					constants will hold what you expect them to hold; methods and events
+					will recieve and provide what you expect. In truth, Picket will throw
+					an error if this is ever not the case.
+				</p>
+				<p>
+					This means you can code confidently knowing that whenever something
+					is wrong, you'll know about it immediately.
+				</p>
+			</div>
+			
+			<div class="features">
+				<h2>Simple namespaced classes with inheritance</h2>
+				<p>Classes and their location are defined in a simple elegant way, as is their relationship to their parents.</p>
+				<ol class="code code--light">
+					<li><pre>define(</pre></li>
+					<li><pre> </pre></li>
+					<li><pre>'class My.Child extends My.Parent',</pre></li>
+					<li><pre>{</pre></li>
+					<li><pre>	</pre></li>
+					<li><pre>	// ...</pre></li>
+					<li><pre>	</pre></li>
+					<li><pre>});</pre></li>
+				</ol>
+				<h2>Interfaces and abstract classes</h2>
+				<p>Interfaces can be defined and implemented, creating a contract between related classes and doing away with tight coupling.</p>
+				<ol class="code code--light">
+					<li><pre>define(</pre></li>
+					<li><pre> </pre></li>
+					<li><pre>'interface My.IInterface',</pre></li>
+					<li><pre>[</pre></li>
+					<li><pre>	</pre></li>
+					<li><pre>	'public doSomething ()',</pre></li>
+					<li><pre>	'public doSomethingElse (number) -&gt; string'</pre></li>
+					<li><pre>	</pre></li>
+					<li><pre>]);</pre></li>
+				</ol>
+				<h2>Private and protected members</h2>
+				<p>Class members are defined as public, private or protected to ensure that you can write code that keeps its internal workings hidden.</p>
+				<ol class="code code--light">
+					<li><pre>'private myValue (string)': null,</pre></li>
+					<li><pre> </pre></li>
+					<li><pre>'public setMyValue (string)': function(value)</pre></li>
+					<li><pre>{</pre></li>
+					<li><pre>	this.myValue('_' + value);</pre></li>
+					<li><pre>}</pre></li>
+				</ol>
+				<h2>Type Hinting</h2>
+				<p>Properties, methods, events and constants all define rules regarding what types of variable they are prepared to deal with. Picket ensures that any badly-typed value is caught immediately.</p>
+				<ol class="code code--light">
+					<li><pre>'public myMethod (Date) -&gt; string': function(date)</pre></li>
+				</ol>
+					<ol class="code code--light">
+					<li><pre>myObject.myMethod(new Date()); // Returns string</pre></li>
+					<li><pre>myObject.myMethod('November 30th'); // Errors - invalid argument</pre></li>
+				</ol>
+				<h2>Optional arguments and default values</h2>
+				<p>Method arguments can be defined as optional or be defined alongside a default value which is used if the user chooses to omit one.</p>
+				<ol class="code code--light">
+					<li><pre>'public myMethod (string = Example, number?)': function(string, optionalNumber)</pre></li>
+				</ol>
+					<ol class="code code--light">
+					<li><pre>myObject.myMethod(); // Valid</pre></li>
+					<li><pre>myObject.myMethod('Other example'); // Valid</pre></li>
+					<li><pre>myObject.myMethod('Other example', 10); // Valid</pre></li>
+				</ol>
+				<h2>Method overloading</h2>
+				<p>Multiple methods with the same name but different argument type signatures can be defined allowing for a complex variety of permutations whilst not complicating the implementation.</p>
+				<ol class="code code--light">
+					<li><pre>'public compareDate (Date) -&gt; boolean': function(date){},</pre></li>
+					<li><pre>'public compareDate (number, number, number) -&gt; boolean': function(year, month, day){}</pre></li>
+				</ol>
+				<h2>Class events</h2>
+				<p>Classes can define events in order to declare information to other classes. Other classes can choose to bind to these events, if they are interested.</p>
+				<ol class="code code--light">
+					<li><pre>eventObject.bind('change', 'handleChangeEvent');</pre></li>
+				</ol>
+				<h2>Constants</h2>
+				<p>Classes can define constants; properties that do not change value through the life of the program.</p>
+				<ol class="code code--light">
+					<li><pre>'public constant TAU (number)': 6.28</pre></li>
+				</ol>
+				<h2>Auto file loading</h2>
+				<p>Each class defines its dependencies and these are all loaded behind the scenes before any instance of the class is instantiated.</p>
+				<ol class="code code--light">
+					<li><pre>define(</pre></li>
+					<li><pre> </pre></li>
+					<li><pre>'require My.Application',</pre></li>
+					<li><pre>'require My.Application.Controller',</pre></li>
+					<li><pre> </pre></li>
+					<li><pre>'class My.Start',</pre></li>
+					<li><pre>{</pre></li>
+					<li><pre>	</pre></li>
+					<li><pre>	'public construct ()': function()</pre></li>
+					<li><pre>	{</pre></li>
+					<li><pre>		new My.Application(new My.Application.Controller()).run();</pre></li>
+					<li><pre>	}</pre></li>
+					<li><pre>	</pre></li>
+					<li><pre>});</pre></li>
+				</ol>
+				<h2>Reflection API</h2>
+				<p>Picket has a thorough set of reflection classes which allows your code to inspect details of classes and interfaces and their members. This allows you to, for example, check the class name of an object or check whether its third argument of a given method is optional.</p>
+				<ol class="code code--light">
+					<li><pre>var reflectionClass = new Reflection.Class(myObject);</pre></li>
+					<li><pre>reflectionClass.getName(); // Class name</pre></li>
+					<li><pre>reflectionClass.getMethods('myMethod')[0].getArguments()[2].isOptional(); // Boolean</pre></li>
+				</ol>
+			</div>
+			
+		</main>
+		
+		<footer class="siteFooter siteFooter--grey">
+			<div class="siteFooter-wrapper">
+				<ul>
+					<li>Picket.js</li>
+					<li>All rights reserved</li>
+				</ul>
+				<div class="siteFooter-links">
+					<ul>
+						<a href="/"><li>Home</li></a>
+						<!-- <a href="/"><li>Tutorials</li></a> -->
+						<a href="/documentation.html"><li>Documentation</li></a>
+					</ul>
+					<ul>
+						<a href="/contribute.html"><li>Contribute</li></a>
+						<!-- <a href="/"><li>Road Map</li></a> -->
+						<a href="https://github.com/stuffaboutpete/picket"><li>GitHub</li></a>
+					</ul>
+				</div>
+			</div>
+		</footer>
+		
+	</body>
+	
+</html>

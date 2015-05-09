@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
+    <title>textEditorClose</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Tablet-Portrait" sketch:type="MSArtboardGroup" transform="translate(-703.000000, -756.000000)" fill="#4E4E4E">
+            <path d="M710,761.200092 L707.750115,758.950207 L705.950207,760.750115 L708.200092,763 L705.950207,765.249885 L707.750115,767.049793 L710,764.799908 L712.249885,767.049793 L714.049793,765.249885 L711.799908,763 L714.049793,760.750115 L712.249885,758.950207 L710,761.200092 Z M710,770 C713.865993,770 717,766.865993 717,763 C717,759.134007 713.865993,756 710,756 C706.134007,756 703,759.134007 703,763 C703,766.865993 706.134007,770 710,770 Z" id="textEditorClose" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>
